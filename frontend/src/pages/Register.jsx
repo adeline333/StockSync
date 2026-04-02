@@ -6,7 +6,8 @@ import { useAuth } from '../context/AuthContext';
 const roles = [
   { id: 'admin', label: 'Admin', icon: <Crown className="w-6 h-6" /> },
   { id: 'manager', label: 'Manager', icon: <Package className="w-6 h-6" /> },
-  { id: 'staff', label: 'Retail Staff', icon: <Store className="w-6 h-6" /> }
+  { id: 'staff', label: 'Retail Staff', icon: <Store className="w-6 h-6" /> },
+  { id: 'auditor', label: 'Auditor', icon: <Hash className="w-6 h-6" /> }
 ];
 
 const Register = () => {

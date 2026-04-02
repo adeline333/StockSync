@@ -1,116 +1,153 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
 
 const AuthContext = createContext(null);
+
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes idle
+const WARN_BEFORE_MS = 2 * 60 * 1000;       // warn 2 minutes before
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
+  const [sessionWarning, setSessionWarning] = useState(false);
 
-  // Define API Base URL
+  const timeoutRef = useRef(null);
+  const warningRef = useRef(null);
+
   const API_URL = 'http://localhost:5000/api';
 
-  useEffect(() => {
-    // If token exists, verify it and fetch user details
-    const loadUser = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
+  const logout = useCallback(async () => {
+    try {
+      if (token) {
+        await fetch(`${API_URL}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
       }
+    } catch (_) {}
+    setToken(null);
+    setUser(null);
+    setSessionWarning(false);
+    localStorage.removeItem('token');
+    clearTimeout(timeoutRef.current);
+    clearTimeout(warningRef.current);
+  }, [token]);
 
+  // Reset idle timer on user activity
+  const resetTimer = useCallback(() => {
+    if (!token) return;
+    setSessionWarning(false);
+    clearTimeout(timeoutRef.current);
+    clearTimeout(warningRef.current);
+
+    warningRef.current = setTimeout(() => {
+      setSessionWarning(true);
+    }, SESSION_TIMEOUT_MS - WARN_BEFORE_MS);
+
+    timeoutRef.current = setTimeout(() => {
+      logout();
+    }, SESSION_TIMEOUT_MS);
+  }, [token, logout]);
+
+  // Attach activity listeners
+  useEffect(() => {
+    if (!token) return;
+    const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+    events.forEach(e => window.addEventListener(e, resetTimer));
+    resetTimer();
+    return () => {
+      events.forEach(e => window.removeEventListener(e, resetTimer));
+      clearTimeout(timeoutRef.current);
+      clearTimeout(warningRef.current);
+    };
+  }, [token, resetTimer]);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      if (!token) { setLoading(false); return; }
       try {
         const response = await fetch(`${API_URL}/auth/me`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
-
         if (response.ok) {
           const data = await response.json();
           setUser(data.user);
         } else {
-          // Token is invalid or expired
           setToken(null);
           setUser(null);
           localStorage.removeItem('token');
         }
-      } catch (error) {
-        console.error('Failed to authenticate:', error);
-      } finally {
-        setLoading(false);
-      }
+      } catch (_) {}
+      finally { setLoading(false); }
     };
-
     loadUser();
   }, [token]);
 
-  // Login Function
   const login = async (email, password) => {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Save to state & local storage
+      if (!response.ok) throw new Error(data.message || 'Login failed');
       setToken(data.token);
       setUser(data.user);
       localStorage.setItem('token', data.token);
-      
-      return { success: true };
+      return { success: true, role: data.user.role };
     } catch (error) {
       return { success: false, error: error.message };
     }
   };
 
-  // Register Function
   const register = async (name, email, password, role) => {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password, role }), // branch_id omitted for simple registration
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-
-      // Save to state & local storage
+      if (!response.ok) throw new Error(data.message || 'Registration failed');
       setToken(data.token);
       setUser(data.user);
       localStorage.setItem('token', data.token);
-
-      return { success: true };
+      return { success: true, role: data.user.role };
     } catch (error) {
       return { success: false, error: error.message };
     }
   };
 
-  // Logout Function
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('token');
+  const extendSession = () => {
+    setSessionWarning(false);
+    resetTimer();
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, sessionWarning, extendSession }}>
+      {/* Session Timeout Warning Banner */}
+      {sessionWarning && (
+        <div className="fixed top-0 left-0 right-0 z-[9999] bg-amber-500 text-white px-6 py-3 flex items-center justify-between shadow-lg">
+          <span className="font-semibold text-sm">
+            ⚠️ Your session is about to expire due to inactivity. You'll be logged out in 2 minutes.
+          </span>
+          <div className="flex gap-3">
+            <button
+              onClick={extendSession}
+              className="bg-white text-amber-600 font-bold text-sm px-4 py-1.5 rounded-lg hover:bg-amber-50 transition-colors"
+            >
+              Stay Logged In
+            </button>
+            <button
+              onClick={logout}
+              className="bg-amber-600 text-white font-bold text-sm px-4 py-1.5 rounded-lg hover:bg-amber-700 transition-colors"
+            >
+              Logout Now
+            </button>
+          </div>
+        </div>
+      )}
       {children}
     </AuthContext.Provider>
   );

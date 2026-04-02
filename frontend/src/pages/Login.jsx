@@ -21,8 +21,11 @@ const Login = () => {
     const res = await login(email, password);
     
     if (res.success) {
-      // Direct user to central warehouse initially
-      navigate('/warehouse-dashboard'); 
+      const role = res.role;
+      if (role === 'admin') navigate('/dashboard');
+      else if (role === 'manager') navigate('/warehouse-dashboard');
+      else if (role === 'auditor') navigate('/admin/audit');
+      else navigate('/retail-dashboard'); // staff
     } else {
       setErrorBanner(res.error || 'Invalid credentials');
       setIsSubmitting(false);
