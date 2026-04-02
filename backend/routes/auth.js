@@ -3,15 +3,13 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const authMiddleware = require('../middleware/auth');
 
-// Public route: Register
 router.post('/register', authController.register);
-
-// Public route: Login
 router.post('/login', authController.login);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
 
-// Protected route snippet: Get the currently logged-in user info
-router.get('/me', authMiddleware, (req, res) => {
-  res.json({ user: req.user });
-});
+// Protected
+router.get('/me', authMiddleware, authController.getMe);
+router.post('/logout', authMiddleware, authController.logout);
 
 module.exports = router;

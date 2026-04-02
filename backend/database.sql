@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS users (
   password VARCHAR(255) NOT NULL,
   role VARCHAR(50) DEFAULT 'staff',
   branch_id INTEGER,
+  reset_token VARCHAR(255),
+  reset_token_expires TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL
@@ -77,3 +79,28 @@ CREATE TABLE IF NOT EXISTS discrepancy_logs (
   FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE,
   FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL
 );
+
+-- 7. Login Attempts Table (for lockout)
+CREATE TABLE IF NOT EXISTS login_attempts (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  ip_address VARCHAR(100),
+  success BOOLEAN DEFAULT FALSE,
+  attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 8. Activity Logs Table (audit trail per session)
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER,
+  action VARCHAR(255) NOT NULL,
+  details TEXT,
+  ip_address VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Add login lockout columns to users
+ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_attempts INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP DEFAULT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP DEFAULT NULL;
