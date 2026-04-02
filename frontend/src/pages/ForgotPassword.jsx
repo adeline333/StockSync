@@ -5,10 +5,35 @@ import { Mail, ArrowLeft, KeyRound } from 'lucide-react';
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Something went wrong');
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,6 +67,11 @@ const ForgotPassword = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm border border-red-200 flex items-center">
+                  {error}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
                 <div className="relative">
@@ -61,9 +91,10 @@ const ForgotPassword = () => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-sky-500 to-teal-500 text-white font-semibold py-3.5 rounded-xl hover:from-sky-400 hover:to-teal-400 shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-[0_6px_20px_rgba(14,165,233,0.23)] hover:-translate-y-0.5 transition-all outline-none"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-sky-500 to-teal-500 text-white font-semibold py-3.5 rounded-xl hover:from-sky-400 hover:to-teal-400 shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] hover:shadow-[0_6px_20px_rgba(14,165,233,0.23)] hover:-translate-y-0.5 transition-all outline-none disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
-                Send Reset Link
+                {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
             </form>
           </>
