@@ -12,6 +12,10 @@ app.use(express.json());
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/transactions', require('./routes/transactions'));
+app.use('/api/profile', require('./routes/profile'));
+app.use('/api/audit', require('./routes/audit'));
+app.use('/api/sales', require('./routes/sales'));
+app.use('/api/inventory', require('./routes/inventory'));
 
 // Main GET route
 app.get('/', (req, res) => {
