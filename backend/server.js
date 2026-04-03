@@ -15,7 +15,13 @@ app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/audit', require('./routes/audit'));
 app.use('/api/sales', require('./routes/sales'));
+app.use('/api/reconciliation', require('./routes/reconciliation'));
 app.use('/api/inventory', require('./routes/inventory'));
+app.use('/api/locations', require('./routes/locations'));
+app.use('/api/transfers', require('./routes/transfers'));
+
+// Start scheduled jobs
+require('./scheduler');
 
 // Main GET route
 app.get('/', (req, res) => {
