@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LayoutDashboard, Map, MapPin, Building2, Store, AlertCircle, Plus, ArrowRightLeft, User, Loader2, X } from 'lucide-react';
+import { LayoutDashboard, Map, MapPin, Building2, Store, AlertCircle, Plus, ArrowRightLeft,
+  User, Loader2, X, History, Settings, ChevronDown, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,6 +17,16 @@ export default function Locations() {
   const [addForm, setAddForm] = useState({ name: '', location: '', branch_type: 'warehouse', manager_name: '', contact: '' });
   const [addSaving, setAddSaving] = useState(false);
   const [addError, setAddError] = useState('');
+  const [activeTab, setActiveTab] = useState('overview'); // overview | movements | thresholds
+  const [movements, setMovements] = useState([]);
+  const [movementsLoading, setMovementsLoading] = useState(false);
+  const [filterSource, setFilterSource] = useState('all');
+  const [filterDest, setFilterDest] = useState('all');
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [branchStock, setBranchStock] = useState([]);
+  const [branchStockLoading, setBranchStockLoading] = useState(false);
+  const [thresholdEdits, setThresholdEdits] = useState({});
+  const [thresholdSaving, setThresholdSaving] = useState(false);
 
   const fetchLocations = useCallback(async () => {
     setLoading(true);
@@ -28,6 +39,53 @@ export default function Locations() {
   }, [token]);
 
   useEffect(() => { fetchLocations(); }, [fetchLocations]);
+
+  const fetchMovements = useCallback(async () => {
+    setMovementsLoading(true);
+    const params = new URLSearchParams();
+    if (filterSource !== 'all') params.append('source_branch_id', filterSource);
+    if (filterDest !== 'all') params.append('dest_branch_id', filterDest);
+    try {
+      const res = await fetch(`${API_URL}/transfers/movements?${params}`, { headers });
+      const data = await res.json();
+      setMovements(data.movements || []);
+    } catch (e) { console.error(e); }
+    finally { setMovementsLoading(false); }
+  }, [filterSource, filterDest, token]);
+
+  useEffect(() => { if (activeTab === 'movements') fetchMovements(); }, [activeTab, fetchMovements]);
+
+  const fetchBranchStock = useCallback(async (branchId) => {
+    setBranchStockLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/transfers/stock/${branchId}`, { headers });
+      const data = await res.json();
+      setBranchStock(data.stock || []);
+      const edits = {};
+      data.stock.forEach(s => { edits[s.id] = s.min_stock_level; });
+      setThresholdEdits(edits);
+    } catch (e) { console.error(e); }
+    finally { setBranchStockLoading(false); }
+  }, [token]);
+
+  useEffect(() => {
+    if (activeTab === 'thresholds' && selectedBranch) fetchBranchStock(selectedBranch);
+  }, [activeTab, selectedBranch, fetchBranchStock]);
+
+  const saveThresholds = async () => {
+    if (!selectedBranch) return;
+    setThresholdSaving(true);
+    const thresholds = Object.entries(thresholdEdits).map(([product_id, min_stock_level]) => ({ product_id: parseInt(product_id), min_stock_level: parseInt(min_stock_level) }));
+    try {
+      await fetch(`${API_URL}/transfers/thresholds`, {
+        method: 'PUT',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ branch_id: selectedBranch, thresholds })
+      });
+      fetchLocations();
+    } catch (e) { console.error(e); }
+    finally { setThresholdSaving(false); }
+  };
 
   const handleAddLocation = async (e) => {
     e.preventDefault();
@@ -94,7 +152,23 @@ export default function Locations() {
           </div>
         </header>
 
-        <div className="px-8 pt-6 grid grid-cols-3 gap-4">
+        {/* Tab Navigation */}
+        <div className="px-8 pt-6 flex gap-1 border-b border-slate-200 bg-white sticky top-20 z-10">
+          {[
+            { id: 'overview', label: 'Overview', icon: <Map className="w-4 h-4 mr-1.5"/> },
+            { id: 'movements', label: 'Movement History', icon: <History className="w-4 h-4 mr-1.5"/> },
+            { id: 'thresholds', label: 'Stock Thresholds', icon: <Settings className="w-4 h-4 mr-1.5"/> },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center px-5 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === tab.id ? 'border-sky-500 text-sky-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>
+              {tab.icon}{tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'overview' && (
+        <div className="px-8 pt-6">
+        <div className="grid grid-cols-3 gap-4">
           <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Network Value</p>
             <p className="text-xl font-black mt-1 text-sky-600">RWF {(totalValue / 1000000).toFixed(1)}M</p>
@@ -226,6 +300,126 @@ export default function Locations() {
             })}
           </div>
         </div>
+        </div>
+        )} {/* end overview tab */}
+
+        {/* Movement History Tab */}
+        {activeTab === 'movements' && (
+          <div className="p-8 space-y-5">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-wrap gap-4 items-end">
+              <div className="flex-1 min-w-[160px]">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">From Location</label>
+                <div className="relative">
+                  <select value={filterSource} onChange={e => setFilterSource(e.target.value)}
+                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
+                    <option value="all">All Locations</option>
+                    {locations.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>
+                </div>
+              </div>
+              <div className="flex items-center mt-5"><ArrowRight className="w-5 h-5 text-slate-400"/></div>
+              <div className="flex-1 min-w-[160px]">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">To Location</label>
+                <div className="relative">
+                  <select value={filterDest} onChange={e => setFilterDest(e.target.value)}
+                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
+                    <option value="all">All Locations</option>
+                    {locations.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>
+                </div>
+              </div>
+              <button onClick={fetchMovements} className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">Filter</button>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+              <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+                <span>Date</span><span>Product</span><span>From</span><span>To</span><span className="text-right">Qty</span>
+              </div>
+              {movementsLoading ? (
+                <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-sky-500"/></div>
+              ) : movements.length === 0 ? (
+                <div className="text-center py-12 text-slate-400">
+                  <History className="w-10 h-10 mx-auto mb-3 opacity-30"/>
+                  <p className="font-semibold">No inter-location movements found</p>
+                </div>
+              ) : movements.map(m => (
+                <div key={m.id} className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] items-center px-6 py-4 border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                  <p className="text-sm font-semibold text-slate-700">{new Date(m.created_at).toLocaleString('en-RW', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                  <div>
+                    <p className="text-sm font-bold text-slate-800">{m.product_name}</p>
+                    <p className="text-[10px] font-mono text-slate-400">{m.sku}</p>
+                  </div>
+                  <p className="text-sm text-slate-600">{m.source_branch_name || '—'}</p>
+                  <p className="text-sm text-slate-600">{m.dest_branch_name || '—'}</p>
+                  <p className="text-sm font-black text-sky-600 text-right">{m.quantity}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Stock Thresholds Tab */}
+        {activeTab === 'thresholds' && (
+          <div className="p-8 space-y-5">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex items-center gap-4">
+              <div className="flex-1">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Select Location</label>
+                <div className="relative">
+                  <select value={selectedBranch || ''} onChange={e => setSelectedBranch(e.target.value)}
+                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
+                    <option value="">Choose a location...</option>
+                    {locations.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>
+                </div>
+              </div>
+              {selectedBranch && (
+                <button onClick={saveThresholds} disabled={thresholdSaving}
+                  className="mt-5 bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors disabled:opacity-60 flex items-center gap-2">
+                  {thresholdSaving ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Save Thresholds'}
+                </button>
+              )}
+            </div>
+
+            {selectedBranch && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="grid grid-cols-[2fr_1fr_1fr_1.5fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+                  <span>Product</span><span className="text-center">Current Stock</span><span className="text-center">Status</span><span className="text-center">Min Stock Level</span>
+                </div>
+                {branchStockLoading ? (
+                  <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-sky-500"/></div>
+                ) : branchStock.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">
+                    <p className="font-semibold">No stock data for this location</p>
+                  </div>
+                ) : branchStock.map(item => (
+                  <div key={item.id} className="grid grid-cols-[2fr_1fr_1fr_1.5fr] items-center px-6 py-4 border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">{item.name}</p>
+                      <p className="text-[10px] font-mono text-slate-400">{item.sku}</p>
+                    </div>
+                    <p className="text-sm font-bold text-slate-700 text-center">{item.quantity}</p>
+                    <div className="flex justify-center">
+                      <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${
+                        item.status === 'out_of_stock' ? 'bg-rose-50 text-rose-600 border-rose-100' :
+                        item.status === 'low_stock' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                        'bg-emerald-50 text-emerald-600 border-emerald-100'
+                      }`}>{item.status.replace('_', ' ')}</span>
+                    </div>
+                    <div className="flex justify-center">
+                      <input type="number" min="0" value={thresholdEdits[item.id] ?? item.min_stock_level}
+                        onChange={e => setThresholdEdits(prev => ({ ...prev, [item.id]: e.target.value }))}
+                        className="w-24 border-2 border-slate-200 focus:border-sky-500 rounded-lg px-3 py-1.5 text-sm font-bold text-center outline-none transition-colors"/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
       </main>
 
       {showAddModal && (
