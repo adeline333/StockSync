@@ -19,6 +19,7 @@ app.use('/api/reconciliation', require('./routes/reconciliation'));
 app.use('/api/inventory', require('./routes/inventory'));
 app.use('/api/locations', require('./routes/locations'));
 app.use('/api/transfers', require('./routes/transfers'));
+app.use('/api/analytics', require('./routes/analytics'));
 
 // Start scheduled jobs
 require('./scheduler');
