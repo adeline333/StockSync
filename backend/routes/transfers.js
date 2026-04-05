@@ -6,6 +6,9 @@ const authMiddleware = require('../middleware/auth');
 router.use(authMiddleware);
 
 router.get('/locations/summary', ctrl.getLocationsSummary);
+router.get('/movements', ctrl.getInterLocationMovements);
+router.get('/stock/:branch_id', ctrl.getBranchStock);
+router.put('/thresholds', ctrl.updateThresholds);
 router.get('/', ctrl.getTransfers);
 router.get('/:id', ctrl.getTransferById);
 router.post('/', ctrl.createTransfer);

@@ -210,3 +210,84 @@ exports.getLocationsSummary = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// GET /api/transfers/movements — inter-location movement history
+exports.getInterLocationMovements = async (req, res) => {
+  const { source_branch_id, dest_branch_id, page = 1, limit = 30 } = req.query;
+  const offset = (page - 1) * limit;
+  let conditions = [`t.type = 'transfer'`];
+  let params = [];
+  let idx = 1;
+
+  if (source_branch_id && source_branch_id !== 'all') {
+    conditions.push(`t.source_branch_id = $${idx++}`);
+    params.push(source_branch_id);
+  }
+  if (dest_branch_id && dest_branch_id !== 'all') {
+    conditions.push(`t.dest_branch_id = $${idx++}`);
+    params.push(dest_branch_id);
+  }
+
+  const where = `WHERE ${conditions.join(' AND ')}`;
+  params.push(parseInt(limit), parseInt(offset));
+
+  try {
+    const result = await db.query(
+      `SELECT t.*, p.name as product_name, p.sku,
+        sb.name as source_branch_name, db.name as dest_branch_name,
+        u.name as user_name
+       FROM transactions t
+       LEFT JOIN products p ON t.product_id = p.id
+       LEFT JOIN branches sb ON t.source_branch_id = sb.id
+       LEFT JOIN branches db ON t.dest_branch_id = db.id
+       LEFT JOIN users u ON t.user_id = u.id
+       ${where}
+       ORDER BY t.created_at DESC
+       LIMIT $${idx} OFFSET $${idx + 1}`,
+      params
+    );
+    res.json({ movements: result.rows });
+  } catch (e) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// GET /api/transfers/stock/:branch_id — real-time stock view per location
+exports.getBranchStock = async (req, res) => {
+  const { branch_id } = req.params;
+  try {
+    const result = await db.query(
+      `SELECT p.id, p.name, p.sku, p.category, p.price,
+        i.quantity, i.min_stock_level,
+        CASE WHEN i.quantity = 0 THEN 'out_of_stock'
+             WHEN i.quantity <= i.min_stock_level THEN 'low_stock'
+             ELSE 'in_stock' END as status
+       FROM inventory i
+       JOIN products p ON i.product_id = p.id
+       WHERE i.branch_id = $1
+       ORDER BY i.quantity ASC`,
+      [branch_id]
+    );
+    const branch = await db.query('SELECT * FROM branches WHERE id = $1', [branch_id]);
+    res.json({ branch: branch.rows[0], stock: result.rows });
+  } catch (e) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// PUT /api/transfers/thresholds — update location-level stock thresholds
+exports.updateThresholds = async (req, res) => {
+  const { branch_id, thresholds } = req.body;
+  // thresholds: [{ product_id, min_stock_level }]
+  try {
+    for (const t of thresholds) {
+      await db.query(
+        `UPDATE inventory SET min_stock_level = $1 WHERE product_id = $2 AND branch_id = $3`,
+        [t.min_stock_level, t.product_id, branch_id]
+      );
+    }
+    res.json({ message: 'Thresholds updated' });
+  } catch (e) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

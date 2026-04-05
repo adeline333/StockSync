@@ -15,13 +15,26 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, location, contact } = req.body;
+  const { name, location, contact, branch_type, manager_name, latitude, longitude } = req.body;
   try {
     const result = await db.query(
-      'INSERT INTO branches (name, location, contact) VALUES ($1,$2,$3) RETURNING *',
-      [name, location || null, contact || null]
+      'INSERT INTO branches (name, location, contact, branch_type, manager_name, latitude, longitude) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
+      [name, location || null, contact || null, branch_type || 'warehouse', manager_name || null, latitude || null, longitude || null]
     );
     res.status(201).json({ branch: result.rows[0] });
+  } catch (e) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  const { name, location, contact, branch_type, manager_name, latitude, longitude } = req.body;
+  try {
+    const result = await db.query(
+      'UPDATE branches SET name=$1, location=$2, contact=$3, branch_type=$4, manager_name=$5, latitude=$6, longitude=$7, updated_at=NOW() WHERE id=$8 RETURNING *',
+      [name, location || null, contact || null, branch_type || 'warehouse', manager_name || null, latitude || null, longitude || null, req.params.id]
+    );
+    res.json({ branch: result.rows[0] });
   } catch (e) {
     res.status(500).json({ message: 'Server error' });
   }
