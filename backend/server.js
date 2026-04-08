@@ -20,6 +20,11 @@ app.use('/api/inventory', require('./routes/inventory'));
 app.use('/api/locations', require('./routes/locations'));
 app.use('/api/transfers', require('./routes/transfers'));
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/customers', require('./routes/customers'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Start scheduled jobs
 require('./scheduler');
