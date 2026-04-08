@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Smartphone, Home, Banknote, CreditCard, SplitSquareHorizontal, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useOffline } from '../context/OfflineContext';
 
 const API_URL = 'http://localhost:5000/api';
 
 export default function PaymentMethod() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
+  const { isOnline, queueTransaction, showNotification } = useOffline();
 
   const [posData, setPosData] = useState(null);
   const [method, setMethod] = useState('cash');
@@ -35,6 +37,23 @@ export default function PaymentMethod() {
       return;
     }
     setLoading(true); setError('');
+
+    // If offline, queue the transaction
+    if (!isOnline) {
+      const orderData = {
+        branch_id: branch_id || user?.branch_id || 1,
+        items: cart.map(i => ({ product_id: i.id, quantity: i.qty })),
+        discount_amount: discount || 0,
+        payment_method: method,
+        amount_tendered: tenderedNum,
+        notes: notes || null,
+      };
+      queueTransaction({ type: 'order', data: orderData });
+      showNotification('Sale Queued Offline', `Order of ${total.toLocaleString()} RWF saved. Will sync when online.`);
+      sessionStorage.removeItem('pos_cart');
+      navigate('/sales-history');
+      return;
+    }
     try {
       const res = await fetch(`${API_URL}/sales/orders`, {
         method: 'POST',
