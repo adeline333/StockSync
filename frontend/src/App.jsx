@@ -1,10 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { OfflineProvider } from './context/OfflineContext';
 
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Welcome from './pages/Welcome';
 import Inventory from './pages/Inventory';
 import AddProduct from './pages/AddProduct';
@@ -35,6 +37,7 @@ import AuditLogs from './pages/AuditLogs';
 import ReportBuilder from './pages/ReportBuilder';
 import Settings from './pages/Settings';
 import SyncStatus from './pages/SyncStatus';
+import Profile from './pages/Profile';
 
 import { Package, LayoutDashboard, History, LogOut, Smartphone } from 'lucide-react';
 
@@ -63,7 +66,7 @@ function Navigation() {
 
   // Hide global navigation on all auth pages and modern sidebar pages
   const noNavRoutes = [
-    '/pos', '/login', '/register', '/forgot-password', '/welcome', 
+    '/pos', '/login', '/register', '/forgot-password', '/reset-password', '/welcome', '/profile', 
     '/dashboard', '/warehouse-dashboard', '/retail-dashboard', 
     '/inventory', '/inventory/new', '/movements', '/scanner',
     '/pos/payment', '/sales-history', '/reconciliation', '/analytics',
@@ -102,6 +105,7 @@ function Navigation() {
 function App() {
   return (
     <AuthProvider>
+      <OfflineProvider>
       <Router>
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
           <Navigation />
@@ -113,6 +117,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               
               {/* Protected Routes Container */}
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -142,6 +147,7 @@ function App() {
               <Route path="/admin/reports" element={<ProtectedRoute><ReportBuilder /></ProtectedRoute>} />
               <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/admin/sync" element={<ProtectedRoute><SyncStatus /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
               <Route path="/scanner" element={<ProtectedRoute><ScannerStation /></ProtectedRoute>} />
               <Route path="/pos" element={<ProtectedRoute><POS /></ProtectedRoute>} />
@@ -153,6 +159,7 @@ function App() {
           </div>
         </div>
       </Router>
+      </OfflineProvider>
     </AuthProvider>
   );
 }
