@@ -125,6 +125,17 @@ cron.schedule('0 * * * *', async () => {
       await logActivity('LOW_STOCK_ALERT',
         `${lowStock.rows.length} item(s) at or below minimum stock level: ${lowStock.rows.map(r => `${r.name} (${r.branch_name}: ${r.quantity})`).join(', ')}`
       );
+      // Create in-app notifications for each low stock item
+      for (const item of lowStock.rows) {
+        await db.query(
+          `INSERT INTO notifications (user_id, title, message, category, severity, action_url)
+           VALUES (NULL, $1, $2, 'inventory', 'critical', '/analytics/stock-risk')`,
+          [
+            `Low Stock: ${item.name}`,
+            `${item.name} (${item.branch_name}) has only ${item.quantity} units remaining, below minimum of ${item.min_stock_level}.`
+          ]
+        );
+      }
     }
   } catch (e) {
     console.error('[Scheduler] Low-stock check failed:', e.message);
