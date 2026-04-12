@@ -3,3 +3,4 @@ pgdata/
 .env
 stocksync.sqlite*
 .DS_Store
+uploads/
