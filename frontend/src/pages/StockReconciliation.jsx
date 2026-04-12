@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LayoutDashboard, History, ArrowLeftRight, RefreshCw, AlertTriangle,
+import { History, ArrowLeftRight, RefreshCw, AlertTriangle,
   CheckCircle2, AlertOctagon, Loader2, Calendar, ChevronDown, Download } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -85,48 +85,8 @@ export default function StockReconciliation() {
   const matched = items.filter(i => i.status === 'matched');
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans">
-      <aside className="w-64 bg-slate-900 flex flex-col fixed h-full z-20">
-        <div className="h-20 flex items-center px-6 border-b border-slate-800">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center mr-3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12C4 7.58172 7.58172 4 12 4V12H4Z" fill="white"/><path d="M16 12C16 14.2091 14.2091 16 12 16V12H16Z" fill="white" fillOpacity="0.6"/></svg>
-          </div>
-          <span className="text-xl font-bold text-white">StockSync</span>
-        </div>
-        <nav className="flex-1 px-4 py-6 space-y-1">
-          <Link to="/dashboard" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
-            <LayoutDashboard className="w-5 h-5 mr-3" /> Dashboard
-          </Link>
-          <Link to="/sales-history" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mt-1">
-            <History className="w-5 h-5 mr-3" /> Sales History
-          </Link>
-          <Link to="/reconciliation" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium bg-slate-800 text-white relative overflow-hidden mt-1">
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 rounded-l-xl" />
-            <ArrowLeftRight className="w-5 h-5 mr-3" /> Reconciliation
-            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sky-500" />
-          </Link>
-        </nav>
-        {/* History list */}
-        {history.length > 0 && (
-          <div className="px-4 pb-6 border-t border-slate-800 pt-4">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 mb-3">Recent Runs</p>
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              {history.slice(0, 8).map(h => (
-                <button key={h.id} onClick={async () => {
-                  const res = await fetch(`${API_URL}/reconciliation/${h.id}`, { headers });
-                  const data = await res.json();
-                  setRecon(data.reconciliation); setItems(data.items || []);
-                }} className="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
-                  <p className="font-semibold">{new Date(h.period_start).toLocaleDateString()} – {new Date(h.period_end).toLocaleDateString()}</p>
-                  <p className="text-slate-500">{h.score}% · {h.mismatched_items} issues</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </aside>
-
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1 flex flex-col min-h-screen">
         <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
             <h1 className="text-2xl font-black text-slate-800">Stock Reconciliation</h1>

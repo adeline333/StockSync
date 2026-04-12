@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, LayoutDashboard, History, Download, ChevronDown,
+import { Search, History, Download, ChevronDown,
   ArrowUpRight, ArrowDownRight, ArrowRight, PenTool, Calendar, MapPin, Filter, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -67,27 +67,8 @@ export default function StockMovements() {
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans">
-      <aside className="w-64 bg-slate-900 flex flex-col fixed h-full z-20">
-        <div className="h-20 flex items-center px-6 border-b border-slate-800">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center mr-3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12C4 7.58172 7.58172 4 12 4V12H4Z" fill="white"/><path d="M16 12C16 14.2091 14.2091 16 12 16V12H16Z" fill="white" fillOpacity="0.6"/></svg>
-          </div>
-          <span className="text-xl font-bold text-white">StockSync</span>
-        </div>
-        <nav className="flex-1 px-4 py-6 space-y-1">
-          <Link to="/warehouse-dashboard" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
-            <LayoutDashboard className="w-5 h-5 mr-3" /> Dashboard
-          </Link>
-          <Link to="/movements" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium bg-slate-800 text-white relative overflow-hidden mt-1">
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 rounded-l-xl" />
-            <History className="w-5 h-5 mr-3" /> Stock Movements
-            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sky-500" />
-          </Link>
-        </nav>
-      </aside>
-
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1 flex flex-col min-h-screen">
         <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Stock Movement History</h1>
