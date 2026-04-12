@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { LayoutDashboard, PackageSearch, Download, UploadCloud,
+import { Download, UploadCloud,
   CheckCircle2, XCircle, FileSpreadsheet, Loader2, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -19,10 +19,33 @@ export default function BulkImport() {
   const headers = { Authorization: `Bearer ${token}` };
 
   const downloadTemplate = () => {
-    const csv = 'name,sku,description,price,cost_price,category,barcode\nTusker Malt 330ml,BEV-TUSK-M330,Premium beer,2500,1800,Beer,6001234567890\nSkol Lager Crate,BEV-SKOL-CR,Crate of 24,12000,8000,Beer,';
+    const rows = [
+      'name,sku,description,price,cost_price,category,barcode',
+      'Sparkling Apple Juice 750ml,NAB-SAJ-750,Non-alcoholic sparkling apple juice in champagne bottle,3500,2200,Sparkling Juices,6001000000001',
+      'Sparkling Grape Juice 750ml,NAB-SGJ-750,Non-alcoholic sparkling grape juice,3500,2200,Sparkling Juices,6001000000002',
+      'Sparkling Mango Juice 750ml,NAB-SMJ-750,Non-alcoholic sparkling mango juice,3500,2200,Sparkling Juices,6001000000003',
+      'Sparkling Strawberry Juice 750ml,NAB-SSJ-750,Non-alcoholic sparkling strawberry juice,3500,2200,Sparkling Juices,6001000000004',
+      'Sparkling Pineapple Juice 750ml,NAB-SPJ-750,Non-alcoholic sparkling pineapple juice,3500,2200,Sparkling Juices,6001000000005',
+      'Inyange Mango Juice 500ml,NAB-IMJ-500,Fresh mango juice 500ml,1200,800,Fruit Juices,6001000000006',
+      'Inyange Orange Juice 500ml,NAB-IOJ-500,Fresh orange juice 500ml,1200,800,Fruit Juices,6001000000007',
+      'Inyange Pineapple Juice 500ml,NAB-IPJ-500,Fresh pineapple juice 500ml,1200,800,Fruit Juices,6001000000008',
+      'Inyange Water 500ml,NAB-IW-500,Still mineral water 500ml,500,300,Water,6001000000009',
+      'Inyange Water 1.5L,NAB-IW-1500,Still mineral water 1.5L,1000,600,Water,6001000000010',
+      'Coca-Cola 500ml,NAB-CC-500,Coca-Cola soft drink 500ml,1000,650,Soft Drinks,6001000000011',
+      'Fanta Orange 500ml,NAB-FO-500,Fanta orange soft drink 500ml,1000,650,Soft Drinks,6001000000012',
+      'Sprite 500ml,NAB-SP-500,Sprite lemon-lime soft drink 500ml,1000,650,Soft Drinks,6001000000013',
+      'Novida Pineapple 500ml,NAB-NP-500,Novida pineapple non-alcoholic malt,1500,900,Malt Drinks,6001000000014',
+      'Novida Apple 500ml,NAB-NA-500,Novida apple non-alcoholic malt,1500,900,Malt Drinks,6001000000015',
+      'Malta Guinness 330ml,NAB-MG-330,Malta Guinness non-alcoholic malt drink,1200,750,Malt Drinks,6001000000016',
+      'Ribena Blackcurrant 500ml,NAB-RB-500,Ribena blackcurrant juice drink,1500,950,Fruit Drinks,6001000000017',
+      'Minute Maid Orange 500ml,NAB-MM-500,Minute Maid orange juice drink,1500,950,Fruit Drinks,6001000000018',
+      'Tropicana Apple 1L,NAB-TA-1L,Tropicana apple juice 1 litre,3000,1900,Fruit Juices,6001000000019',
+      'Sparkling Water 750ml,NAB-SW-750,Sparkling mineral water 750ml,2000,1200,Water,6001000000020',
+    ].join('\n');
+    const csv = rows.join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'stocksync_template.csv'; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = 'stocksync_products_template.csv'; a.click();
   };
 
   const parseCSVPreview = (text) => {
@@ -77,26 +100,8 @@ export default function BulkImport() {
   const validCount = preview.filter(r => r._valid).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans">
-      <aside className="w-64 bg-slate-900 flex flex-col fixed h-full z-20">
-        <div className="h-20 flex items-center px-6 border-b border-slate-800">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center mr-3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12C4 7.58172 7.58172 4 12 4V12H4Z" fill="white"/><path d="M16 12C16 14.2091 14.2091 16 12 16V12H16Z" fill="white" fillOpacity="0.6"/></svg>
-          </div>
-          <span className="text-xl font-bold text-white">StockSync</span>
-        </div>
-        <nav className="flex-1 px-4 py-6 space-y-1">
-          <Link to="/warehouse-dashboard" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
-            <LayoutDashboard className="w-5 h-5 mr-3" /> Dashboard
-          </Link>
-          <Link to="/inventory" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium bg-slate-800 text-white relative overflow-hidden mt-1">
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 rounded-l-xl" />
-            <PackageSearch className="w-5 h-5 mr-3" /> Inventory
-          </Link>
-        </nav>
-      </aside>
-
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1 flex flex-col min-h-screen">
         <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center sticky top-0 z-10">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Bulk Import</h1>
