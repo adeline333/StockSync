@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { OfflineProvider } from './context/OfflineContext';
+import AppLayout from './components/AppLayout';
 
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -40,7 +41,6 @@ import SyncStatus from './pages/SyncStatus';
 import Profile from './pages/Profile';
 
 import { Package, LayoutDashboard, History, LogOut, Smartphone } from 'lucide-react';
-
 // --- Auth Security Wrapper ---
 function ProtectedRoute({ children }) {
   const { user, token, loading } = useAuth();
@@ -57,49 +57,17 @@ function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  return children;
-}
-
-function Navigation() {
-  const location = useLocation();
-  const { logout } = useAuth();
-
-  // Hide global navigation on all auth pages and modern sidebar pages
-  const noNavRoutes = [
-    '/pos', '/login', '/register', '/forgot-password', '/reset-password', '/welcome', '/profile', 
-    '/dashboard', '/warehouse-dashboard', '/retail-dashboard', 
-    '/inventory', '/inventory/new', '/movements', '/scanner',
-    '/pos/payment', '/sales-history', '/reconciliation', '/analytics',
-    '/locations', '/transfers', '/customers', '/notifications', '/admin'
-  ];
-  if (noNavRoutes.some(route => location.pathname.startsWith(route))) return null;
-
-  return (
-    <nav className="bg-white/80 backdrop-blur-xl shadow-sm border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center text-sky-600 font-black text-2xl tracking-tight">
-              <Package className="mr-2 w-8 h-8 text-sky-500" /> StockSync
-            </div>
-            <div className="ml-8 flex items-center space-x-2">
-              <Link to="/sales-history" className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center transition-all ${location.pathname === '/sales-history' ? 'bg-sky-50 text-sky-700' : 'text-slate-500 hover:bg-slate-50 hover:text-sky-600'}`}>
-                <History className="w-4 h-4 mr-2" /> Sales History
-              </Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-             <Link to="/pos" className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-full text-sm font-bold flex items-center transition-all shadow-md shadow-emerald-500/20 transform hover:-translate-y-0.5">
-                <Smartphone className="w-4 h-4 mr-2" /> Launch POS
-              </Link>
-             <button onClick={logout} className="text-slate-400 hover:text-rose-600 px-3 py-2 rounded-full text-sm font-bold flex items-center transition-colors">
-                <LogOut className="w-4 h-4" />
-             </button>
-          </div>
-        </div>
+  // Wait until user object is populated before rendering layout
+  // (avoids sidebar rendering with null user right after login)
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-10 h-10 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin"></div>
       </div>
-    </nav>
-  );
+    );
+  }
+
+  return <AppLayout>{children}</AppLayout>;
 }
 
 function App() {
@@ -108,7 +76,6 @@ function App() {
       <OfflineProvider>
       <Router>
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-          <Navigation />
           <div className="flex-1 w-full mx-auto">
             <Routes>
               {/* Public Auth Routes */}

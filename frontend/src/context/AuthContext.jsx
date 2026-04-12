@@ -65,6 +65,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const loadUser = async () => {
       if (!token) { setLoading(false); return; }
+      // If user already set (e.g. just logged in), skip re-fetch
+      if (user) { setLoading(false); return; }
+      setLoading(true);
       try {
         const response = await fetch(`${API_URL}/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
