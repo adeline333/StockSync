@@ -16,7 +16,7 @@ router.get('/summary', inventoryController.getDashboardSummary);
 router.get('/products', inventoryController.getProducts);
 router.get('/products/export', inventoryController.exportCSV);
 router.get('/products/:id', inventoryController.getProductById);
-router.post('/products', inventoryController.createProduct);
+router.post('/products', upload.single('image'), inventoryController.createProduct);
 router.put('/products/:id', inventoryController.updateProduct);
 router.delete('/products/:id', inventoryController.deleteProduct);
 

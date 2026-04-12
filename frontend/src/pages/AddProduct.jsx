@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowLeft, LayoutDashboard, PackageSearch, Image as ImageIcon, RefreshCcw, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { ArrowLeft, Image as ImageIcon, RefreshCcw, Loader2, AlertTriangle, CheckCircle2, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -18,6 +18,23 @@ export default function AddProduct() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [useVat, setUseVat] = useState(true);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { setError('Image must be under 2MB'); return; }
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const [form, setForm] = useState({
     name: '', description: '', category: 'Beer', brand: '',
@@ -33,10 +50,14 @@ export default function AddProduct() {
     if (!form.name || !form.sku || !form.price) { setError('Name, SKU and Price are required.'); return; }
     setSaving(true);
     try {
+      const body = new FormData();
+      Object.entries({ ...form, is_vat_inclusive: useVat }).forEach(([k, v]) => body.append(k, v));
+      if (imageFile) body.append('image', imageFile);
+
       const res = await fetch(`${API_URL}/inventory/products`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...form, is_vat_inclusive: useVat })
+        headers: { Authorization: `Bearer ${token}` },
+        body,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
@@ -48,26 +69,8 @@ export default function AddProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans">
-      <aside className="w-64 bg-slate-900 flex flex-col fixed h-full z-20">
-        <div className="h-20 flex items-center px-6 border-b border-slate-800">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center mr-3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12C4 7.58172 7.58172 4 12 4V12H4Z" fill="white"/><path d="M16 12C16 14.2091 14.2091 16 12 16V12H16Z" fill="white" fillOpacity="0.6"/></svg>
-          </div>
-          <span className="text-xl font-bold text-white">StockSync</span>
-        </div>
-        <nav className="flex-1 px-4 py-6">
-          <Link to="/dashboard" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
-            <LayoutDashboard className="w-5 h-5 mr-3" /> Dashboard
-          </Link>
-          <Link to="/inventory" className="flex items-center px-4 py-3 rounded-xl text-sm font-medium bg-slate-800 text-white relative overflow-hidden mt-1">
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 rounded-l-xl" />
-            <PackageSearch className="w-5 h-5 mr-3" /> Product Catalog
-          </Link>
-        </nav>
-      </aside>
-
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1 flex flex-col min-h-screen">
         <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center text-sm font-medium text-slate-500">
             <Link to="/inventory" className="flex items-center hover:text-slate-700 mr-2"><ArrowLeft className="w-4 h-4 mr-1" /> Back to List</Link>
@@ -169,11 +172,34 @@ export default function AddProduct() {
               <div className="space-y-8">
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
                   <h3 className="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Product Image</h3>
-                  <div className="w-full aspect-video rounded-xl border-2 border-dashed border-sky-300 bg-sky-50 flex flex-col items-center justify-center cursor-pointer hover:bg-sky-100 transition-colors">
-                    <ImageIcon className="w-8 h-8 text-sky-400 mb-2" />
-                    <p className="font-semibold text-sky-600 text-sm">Click to Upload</p>
-                    <p className="text-xs text-slate-400 mt-1">PNG, JPG (max 2MB)</p>
-                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                  {imagePreview ? (
+                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-200">
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={clearImage}
+                        className="absolute top-2 right-2 w-7 h-7 bg-rose-500 text-white rounded-full flex items-center justify-center hover:bg-rose-600 transition-colors shadow"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full aspect-video rounded-xl border-2 border-dashed border-sky-300 bg-sky-50 flex flex-col items-center justify-center cursor-pointer hover:bg-sky-100 transition-colors"
+                    >
+                      <ImageIcon className="w-8 h-8 text-sky-400 mb-2" />
+                      <p className="font-semibold text-sky-600 text-sm">Click to Upload</p>
+                      <p className="text-xs text-slate-400 mt-1">PNG, JPG, WEBP (max 2MB)</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">

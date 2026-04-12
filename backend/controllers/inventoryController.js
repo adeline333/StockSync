@@ -108,16 +108,27 @@ exports.createProduct = async (req, res) => {
     supplier_name, supplier_lead_days, is_vat_inclusive, min_stock_level } = req.body;
   const ip = getIP(req);
 
+  // Handle uploaded image — move to permanent location
+  let image_url = null;
+  if (req.file) {
+    const ext = path.extname(req.file.originalname) || '.jpg';
+    const dest = path.join(__dirname, '../uploads', `product_${Date.now()}${ext}`);
+    fs.renameSync(req.file.path, dest);
+    image_url = `/uploads/product_${Date.now()}${ext}`;
+    // Use the actual filename we just moved to
+    image_url = `/uploads/${path.basename(dest)}`;
+  }
+
   try {
     const existing = await db.query('SELECT id FROM products WHERE sku = $1', [sku]);
     if (existing.rows.length > 0) return res.status(400).json({ message: 'SKU already exists' });
 
     const result = await db.query(
       `INSERT INTO products (name, sku, description, price, cost_price, category, brand, barcode,
-        supplier_name, supplier_lead_days, is_vat_inclusive, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'active') RETURNING *`,
+        supplier_name, supplier_lead_days, is_vat_inclusive, image_url, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'active') RETURNING *`,
       [name, sku, description || null, price, cost_price || 0, category || null, brand || null,
-       barcode || null, supplier_name || null, supplier_lead_days || 0, is_vat_inclusive !== false]
+       barcode || null, supplier_name || null, supplier_lead_days || 0, is_vat_inclusive !== false, image_url]
     );
 
     const product = result.rows[0];
