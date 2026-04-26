@@ -110,15 +110,15 @@ export default function Locations() {
   const alertLocations = locations.filter(l => parseInt(l.low_stock_count) > 0);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-black text-slate-800">Network Overview</h1>
-            <p className="text-sm text-slate-500">Warehouses & Retail Outlets · {locations.length} locations</p>
+            <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">Network Overview</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Warehouses & Retail Outlets · {locations.length} locations</p>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/transfers/new')} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
+            <button onClick={() => navigate('/transfers/new')} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
               <ArrowRightLeft className="w-4 h-4" /> Stock Transfer
             </button>
             <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-bold transition-colors shadow-md">
@@ -128,14 +128,14 @@ export default function Locations() {
         </header>
 
         {/* Tab Navigation */}
-        <div className="px-8 pt-6 flex gap-1 border-b border-slate-200 bg-white sticky top-20 z-10">
+        <div className="px-8 pt-6 flex gap-1 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 sticky top-20 z-10">
           {[
             { id: 'overview', label: 'Overview', icon: <Map className="w-4 h-4 mr-1.5"/> },
             { id: 'movements', label: 'Movement History', icon: <History className="w-4 h-4 mr-1.5"/> },
             { id: 'thresholds', label: 'Stock Thresholds', icon: <Settings className="w-4 h-4 mr-1.5"/> },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center px-5 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === tab.id ? 'border-sky-500 text-sky-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>
+              className={`flex items-center px-5 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === tab.id ? 'border-sky-500 text-sky-600' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>
               {tab.icon}{tab.label}
             </button>
           ))}
@@ -144,16 +144,16 @@ export default function Locations() {
         {activeTab === 'overview' && (
         <div className="px-8 pt-6">
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Network Value</p>
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm p-4">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Total Network Value</p>
             <p className="text-xl font-black mt-1 text-sky-600">RWF {(totalValue / 1000000).toFixed(1)}M</p>
           </div>
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Items</p>
-            <p className="text-xl font-black mt-1 text-slate-800">{totalItems.toLocaleString()}</p>
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm p-4">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Total Items</p>
+            <p className="text-xl font-black mt-1 text-slate-800 dark:text-slate-100">{totalItems.toLocaleString()}</p>
           </div>
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Locations with Alerts</p>
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm p-4">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Locations with Alerts</p>
             <p className={`text-xl font-black mt-1 ${alertLocations.length > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
               {alertLocations.length} location(s)
             </p>
@@ -162,11 +162,11 @@ export default function Locations() {
 
         <div className="p-8 flex-1 flex gap-8">
           {/* Map panel */}
-          <div className="flex-[2] bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col relative overflow-hidden min-h-[600px]">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center mb-6">
+          <div className="flex-[2] bg-white rounded-3xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col relative overflow-hidden min-h-[600px]">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center mb-6">
               <MapPin className="w-5 h-5 mr-2 text-sky-500" /> Location Map (Kigali)
             </h2>
-            <div className="flex-1 relative bg-slate-50 rounded-2xl overflow-hidden border border-slate-100">
+            <div className="flex-1 relative bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800">
               {/* Static map background */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <svg width="100%" height="100%" viewBox="0 0 600 500" preserveAspectRatio="xMidYMid meet">
@@ -194,7 +194,7 @@ export default function Locations() {
               {[['bg-slate-900', 'Warehouse'], ['bg-sky-500', 'Retail Outlet'], ['bg-rose-500', 'Low Stock']].map(([bg, label]) => (
                 <div key={label} className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${bg}`} />
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</span>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</span>
                 </div>
               ))}
             </div>
@@ -207,7 +207,7 @@ export default function Locations() {
                 <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
               </div>
             ) : locations.length === 0 ? (
-              <div className="bg-white rounded-2xl p-10 text-center text-slate-400 border border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-10 text-center text-slate-400 border border-slate-100 dark:border-slate-800">
                 <MapPin className="w-10 h-10 mx-auto mb-3 opacity-30" />
                 <p className="font-semibold">No locations yet</p>
                 <button onClick={() => setShowAddModal(true)} className="mt-3 text-sky-500 text-sm font-semibold hover:underline">
@@ -222,9 +222,9 @@ export default function Locations() {
                 <div key={loc.id} className={`bg-white rounded-2xl p-6 shadow-sm border flex flex-col relative overflow-hidden cursor-pointer hover:shadow-md transition-all ${borderColor}`}>
                   <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl ${accentColor}`} />
                   <div className="pl-3">
-                    <h3 className="text-base font-black text-slate-800 flex items-center gap-2 mb-1">
+                    <h3 className="text-base font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-1">
                       {loc.branch_type === 'warehouse'
-                        ? <Building2 className="w-4 h-4 text-slate-500" />
+                        ? <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                         : <Store className="w-4 h-4 text-sky-500" />}
                       {loc.name}
                     </h3>
@@ -241,23 +241,23 @@ export default function Locations() {
                         </span>
                       </div>
                     )}
-                    <div className="border-t border-slate-100 pt-3 flex justify-between mb-3">
+                    <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex justify-between mb-3">
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Stock Value</p>
-                        <p className="text-lg font-black text-slate-700">
+                        <p className="text-lg font-black text-slate-700 dark:text-slate-300">
                           {(parseFloat(loc.stock_value) / 1000000).toFixed(1)}M <span className="text-xs">RWF</span>
                         </p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Items</p>
-                        <p className="text-lg font-black text-slate-700">{parseInt(loc.total_items).toLocaleString()}</p>
+                        <p className="text-lg font-black text-slate-700 dark:text-slate-300">{parseInt(loc.total_items).toLocaleString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
                       {loc.manager_name && (
-                        <div className="flex items-center bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+                        <div className="flex items-center bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
                           <User className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
-                          <span className="text-xs font-bold text-slate-600">{loc.manager_name}</span>
+                          <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{loc.manager_name}</span>
                         </div>
                       )}
                       {hasAlert ? (
@@ -281,12 +281,12 @@ export default function Locations() {
         {/* Movement History Tab */}
         {activeTab === 'movements' && (
           <div className="p-8 space-y-5">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-wrap gap-4 items-end">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-5 flex flex-wrap gap-4 items-end">
               <div className="flex-1 min-w-[160px]">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">From Location</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 block">From Location</label>
                 <div className="relative">
                   <select value={filterSource} onChange={e => setFilterSource(e.target.value)}
-                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
+                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
                     <option value="all">All Locations</option>
                     {locations.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
@@ -295,10 +295,10 @@ export default function Locations() {
               </div>
               <div className="flex items-center mt-5"><ArrowRight className="w-5 h-5 text-slate-400"/></div>
               <div className="flex-1 min-w-[160px]">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">To Location</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 block">To Location</label>
                 <div className="relative">
                   <select value={filterDest} onChange={e => setFilterDest(e.target.value)}
-                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
+                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
                     <option value="all">All Locations</option>
                     {locations.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
@@ -308,8 +308,8 @@ export default function Locations() {
               <button onClick={fetchMovements} className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">Filter</button>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+              <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                 <span>Date</span><span>Product</span><span>From</span><span>To</span><span className="text-right">Qty</span>
               </div>
               {movementsLoading ? (
@@ -320,14 +320,14 @@ export default function Locations() {
                   <p className="font-semibold">No inter-location movements found</p>
                 </div>
               ) : movements.map(m => (
-                <div key={m.id} className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] items-center px-6 py-4 border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                  <p className="text-sm font-semibold text-slate-700">{new Date(m.created_at).toLocaleString('en-RW', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                <div key={m.id} className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] items-center px-6 py-4 border-b border-slate-50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{new Date(m.created_at).toLocaleString('en-RW', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                   <div>
-                    <p className="text-sm font-bold text-slate-800">{m.product_name}</p>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{m.product_name}</p>
                     <p className="text-[10px] font-mono text-slate-400">{m.sku}</p>
                   </div>
-                  <p className="text-sm text-slate-600">{m.source_branch_name || '—'}</p>
-                  <p className="text-sm text-slate-600">{m.dest_branch_name || '—'}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{m.source_branch_name || '—'}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{m.dest_branch_name || '—'}</p>
                   <p className="text-sm font-black text-sky-600 text-right">{m.quantity}</p>
                 </div>
               ))}
@@ -338,12 +338,12 @@ export default function Locations() {
         {/* Stock Thresholds Tab */}
         {activeTab === 'thresholds' && (
           <div className="p-8 space-y-5">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex items-center gap-4">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-5 flex items-center gap-4">
               <div className="flex-1">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Select Location</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 block">Select Location</label>
                 <div className="relative">
                   <select value={selectedBranch || ''} onChange={e => setSelectedBranch(e.target.value)}
-                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
+                    className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-sky-500 appearance-none cursor-pointer">
                     <option value="">Choose a location...</option>
                     {locations.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
@@ -359,8 +359,8 @@ export default function Locations() {
             </div>
 
             {selectedBranch && (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="grid grid-cols-[2fr_1fr_1fr_1.5fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="grid grid-cols-[2fr_1fr_1fr_1.5fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                   <span>Product</span><span className="text-center">Current Stock</span><span className="text-center">Status</span><span className="text-center">Min Stock Level</span>
                 </div>
                 {branchStockLoading ? (
@@ -370,12 +370,12 @@ export default function Locations() {
                     <p className="font-semibold">No stock data for this location</p>
                   </div>
                 ) : branchStock.map(item => (
-                  <div key={item.id} className="grid grid-cols-[2fr_1fr_1fr_1.5fr] items-center px-6 py-4 border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                  <div key={item.id} className="grid grid-cols-[2fr_1fr_1fr_1.5fr] items-center px-6 py-4 border-b border-slate-50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <div>
-                      <p className="text-sm font-bold text-slate-800">{item.name}</p>
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{item.name}</p>
                       <p className="text-[10px] font-mono text-slate-400">{item.sku}</p>
                     </div>
-                    <p className="text-sm font-bold text-slate-700 text-center">{item.quantity}</p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300 text-center">{item.quantity}</p>
                     <div className="flex justify-center">
                       <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${
                         item.status === 'out_of_stock' ? 'bg-rose-50 text-rose-600 border-rose-100' :
@@ -399,36 +399,36 @@ export default function Locations() {
 
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Add New Location</h2>
-              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Add New Location</h2>
+              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600 dark:text-slate-400">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleAddLocation} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Location Name *</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Location Name *</label>
                 <input value={addForm.name} onChange={e => setAddForm(p => ({ ...p, name: e.target.value }))}
                   placeholder="e.g., Kicukiro Outlet" required
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Address</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Address</label>
                 <input value={addForm.location} onChange={e => setAddForm(p => ({ ...p, location: e.target.value }))}
                   placeholder="e.g., KG 5 Ave, Kicukiro"
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Manager Name</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Manager Name</label>
                 <input value={addForm.manager_name} onChange={e => setAddForm(p => ({ ...p, manager_name: e.target.value }))}
                   placeholder="e.g., Alice M."
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Type</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Type</label>
                 <select value={addForm.branch_type} onChange={e => setAddForm(p => ({ ...p, branch_type: e.target.value }))}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
                   <option value="warehouse">Warehouse</option>
                   <option value="retail">Retail Outlet</option>
                 </select>
@@ -438,7 +438,7 @@ export default function Locations() {
               )}
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setShowAddModal(false)}
-                  className="flex-1 py-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                  className="flex-1 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50">
                   Cancel
                 </button>
                 <button type="submit" disabled={addSaving}
