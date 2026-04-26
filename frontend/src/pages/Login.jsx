@@ -33,7 +33,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none opacity-40">
         <svg fill="none" viewBox="0 0 1280 832" className="w-full h-full">
@@ -43,7 +43,7 @@ const Login = () => {
         </svg>
       </div>
 
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-10 relative z-10 border border-slate-100 mt-[-40px]">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-10 relative z-10 border border-slate-100 dark:border-slate-800 mt-[-40px]">
         {/* Header content */}
         <div className="flex flex-col items-center mb-8">
           <div className="mb-6">
@@ -61,8 +61,8 @@ const Login = () => {
               </defs>
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-slate-800">Welcome Back</h2>
-          <p className="text-slate-500 text-sm mt-2">Sign in to StockSync Dashboard</p>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Welcome Back</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">Sign in to StockSync Dashboard</p>
         </div>
 
         {/* Error Banner */}
@@ -75,7 +75,7 @@ const Login = () => {
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Mail className="h-5 w-5 text-slate-400" />
@@ -84,7 +84,7 @@ const Login = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all text-slate-700 placeholder:text-slate-400 font-bold"
+                className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all text-slate-700 placeholder:text-slate-400 font-bold"
                 placeholder="user@bspecial.com"
                 required
               />
@@ -92,7 +92,7 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Password</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Lock className="h-5 w-5 text-slate-400" />
@@ -101,7 +101,7 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all text-slate-800 font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
+                className="w-full pl-10 pr-12 py-3 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all text-slate-800 font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
                 placeholder="••••••••"
                 required
               />
@@ -145,7 +145,7 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-slate-500">
+        <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
           Don't have an account?{' '}
           <Link to="/register" className="font-semibold text-sky-500 hover:text-sky-600 transition-colors">
             Register New User
