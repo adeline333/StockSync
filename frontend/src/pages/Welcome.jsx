@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Welcome = () => {
   return (
-    <div className="min-h-screen bg-slate-50 relative overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 relative overflow-hidden flex items-center justify-center">
       {/* Abstract Background SVG Elements from Mockup */}
       <div className="absolute inset-0 pointer-events-none opacity-60">
         <svg fill="none" viewBox="0 0 1280 832" preserveAspectRatio="xMidYMid slice" className="w-full h-full">
@@ -43,18 +43,18 @@ const Welcome = () => {
         </div>
 
         {/* Text Content */}
-        <h1 className="text-7xl font-extrabold text-slate-800 tracking-tight mb-4">
+        <h1 className="text-7xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight mb-4">
           StockSync.
         </h1>
-        <p className="text-3xl text-slate-500 font-normal mb-10 max-w-2xl">
+        <p className="text-3xl text-slate-500 dark:text-slate-400 font-normal mb-10 max-w-2xl">
           Intelligent Multi-Location Inventory Reconciliation.
         </p>
 
         {/* Prepared For Badge */}
         <div className="flex items-center mb-10">
-          <div className="bg-white border border-slate-200 rounded-lg px-6 py-3 flex items-center shadow-sm">
+          <div className="bg-white border border-slate-200 dark:border-slate-700 rounded-lg px-6 py-3 flex items-center shadow-sm">
             <span className="text-slate-400 font-medium text-sm mr-2">Prepared for:</span>
-            <span className="text-slate-700 font-semibold text-sm">B Special Business Ltd</span>
+            <span className="text-slate-700 dark:text-slate-300 font-semibold text-sm">B Special Business Ltd</span>
           </div>
         </div>
 
@@ -74,7 +74,7 @@ const Welcome = () => {
 
       {/* Footer */}
       <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-        <div className="text-slate-400 text-sm border-t border-slate-200 pt-6 px-12 max-w-7xl w-full text-center">
+        <div className="text-slate-400 text-sm border-t border-slate-200 dark:border-slate-700 pt-6 px-12 max-w-7xl w-full text-center">
           © 2026 StockSync. All rights reserved.
         </div>
       </div>
