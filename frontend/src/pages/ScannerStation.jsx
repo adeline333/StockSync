@@ -71,12 +71,12 @@ export default function ScannerStation() {
   const totalItems = scanned.reduce((sum, s) => sum + s.count, 0);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Scanner Station</h1>
-            <p className="text-sm text-slate-500">Mode: <span className="text-sky-600 font-bold ml-1">Inventory Check</span></p>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Scanner Station</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Mode: <span className="text-sky-600 font-bold ml-1">Inventory Check</span></p>
           </div>
         </header>
 
@@ -118,7 +118,7 @@ export default function ScannerStation() {
             )}
 
             {/* Manual Entry */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Manual Entry / Barcode Scanner</p>
               <div className="flex gap-3">
                 <input
@@ -128,7 +128,7 @@ export default function ScannerStation() {
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={handleKey}
                   placeholder="Enter SKU or scan barcode..."
-                  className="flex-1 border border-slate-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all shadow-inner bg-slate-50"
+                  className="flex-1 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3.5 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all shadow-inner bg-slate-50"
                 />
                 <button
                   onClick={() => lookup()}
@@ -142,10 +142,10 @@ export default function ScannerStation() {
           </div>
 
           {/* Right: Scanned Items */}
-          <div className="w-[420px] bg-white rounded-3xl shadow-lg border border-slate-100 flex flex-col shrink-0 overflow-hidden">
+          <div className="w-[420px] bg-white rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col shrink-0 overflow-hidden">
             {/* Header */}
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h3 className="text-xl font-bold text-slate-800">Scanned Items</h3>
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Scanned Items</h3>
               <span className="bg-sky-100 text-sky-700 text-xs font-black uppercase px-3 py-1.5 rounded-full tracking-wider border border-sky-200">
                 Total: {totalItems}
               </span>
@@ -156,7 +156,7 @@ export default function ScannerStation() {
               {completed && (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <CheckCircle2 className="w-12 h-12 text-emerald-400 mb-3" />
-                  <p className="text-lg font-bold text-slate-700">Check Complete!</p>
+                  <p className="text-lg font-bold text-slate-700 dark:text-slate-300">Check Complete!</p>
                   <p className="text-sm text-slate-400 mt-1">All items have been recorded.</p>
                 </div>
               )}
@@ -173,20 +173,20 @@ export default function ScannerStation() {
                 <div key={item.id} className="bg-white border-2 border-slate-100 rounded-xl p-4 flex justify-between items-center relative overflow-hidden hover:border-sky-200 transition-colors">
                   <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-sky-500 rounded-l-xl" />
                   <div className="pl-3 min-w-0">
-                    <p className="text-sm font-bold text-slate-800 truncate">{item.name}</p>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{item.name}</p>
                     <p className="text-xs font-medium text-slate-400 mt-0.5">SKU: {item.sku}</p>
                     <p className="text-xs text-slate-400">Stock: {parseInt(item.total_stock).toLocaleString()}</p>
                   </div>
-                  <span className="text-xl font-black text-slate-800 shrink-0 ml-2">x{item.count}</span>
+                  <span className="text-xl font-black text-slate-800 dark:text-slate-100 shrink-0 ml-2">x{item.count}</span>
                 </div>
               ))}
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-slate-100 bg-white space-y-3">
+            <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white space-y-3">
               <div className="flex justify-between items-center">
-                <p className="text-sm font-semibold text-slate-500">Total Valid Scans</p>
-                <p className="text-2xl font-black text-slate-800">{totalItems}</p>
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Total Valid Scans</p>
+                <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{totalItems}</p>
               </div>
               <button
                 onClick={handleComplete}
@@ -198,7 +198,7 @@ export default function ScannerStation() {
               <button
                 onClick={handleClear}
                 disabled={scanned.length === 0 && !completed}
-                className="w-full flex items-center justify-center gap-2 py-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Trash2 className="w-4 h-4" /> Clear All
               </button>
