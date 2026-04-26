@@ -106,15 +106,15 @@ export default function Notifications() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-black text-slate-800">Notification Center</h1>
-            <p className="text-sm text-slate-500">Alerts, Tasks & System Updates · {unreadCount} unread</p>
+            <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">Notification Center</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Alerts, Tasks & System Updates · {unreadCount} unread</p>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={fetchNotifications} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+            <button onClick={fetchNotifications} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
               <RefreshCw className="w-4 h-4"/> Refresh
             </button>
             <button onClick={markAllRead} disabled={unreadCount === 0}
@@ -126,12 +126,12 @@ export default function Notifications() {
 
         <div className="p-8 flex-1 flex gap-6">
           {/* Notifications List */}
-          <div className="flex-[2.5] bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden">
+          <div className="flex-[2.5] bg-white rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden">
             {/* Tabs */}
-            <div className="flex items-center border-b border-slate-100 px-6 pt-4 gap-6">
+            <div className="flex items-center border-b border-slate-100 dark:border-slate-800 px-6 pt-4 gap-6">
               {['all', 'inventory', 'transfers', 'reconciliation', 'system'].map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)}
-                  className={`text-sm font-bold pb-4 transition-colors capitalize relative ${activeTab === tab ? 'text-slate-800 border-b-2 border-slate-800' : 'text-slate-400 hover:text-slate-600'}`}>
+                  className={`text-sm font-bold pb-4 transition-colors capitalize relative ${activeTab === tab ? 'text-slate-800 dark:text-slate-100 border-b-2 border-slate-800' : 'text-slate-400 hover:text-slate-600'}`}>
                   {tab}
                 </button>
               ))}
@@ -156,7 +156,7 @@ export default function Notifications() {
                         {categoryIcon[n.category] || cfg.icon}
                       </div>
                     </div>
-                    <div className="flex-1 py-4 pr-5 flex justify-between items-center border-b border-slate-100 last:border-0">
+                    <div className="flex-1 py-4 pr-5 flex justify-between items-center border-b border-slate-100 dark:border-slate-800 last:border-0">
                       <div className="flex-1 min-w-0">
                         <h3 className={`text-sm font-black flex items-center gap-2 ${n.is_read ? 'text-slate-600' : 'text-slate-800'}`}>
                           {n.title}
@@ -174,15 +174,15 @@ export default function Notifications() {
           </div>
 
           {/* Preferences Panel */}
-          <div className="flex-1 bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex flex-col h-fit">
-            <h2 className="text-base font-black text-slate-800 mb-1 flex items-center gap-2">
+          <div className="flex-1 bg-white rounded-2xl p-6 shadow-md border border-slate-100 dark:border-slate-800 flex flex-col h-fit">
+            <h2 className="text-base font-black text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2">
               <Sliders className="w-4 h-4 text-slate-400"/> Preferences
             </h2>
-            <p className="text-xs text-slate-500 mb-5">Manage how you receive alerts.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">Manage how you receive alerts.</p>
 
             {prefs && (
               <>
-                <div className="space-y-4 border-b border-slate-100 pb-5 mb-5">
+                <div className="space-y-4 border-b border-slate-100 dark:border-slate-800 pb-5 mb-5">
                   {[
                     { key: 'stock_alerts', label: 'Stock Alerts', sub: 'Low stock & expiry dates' },
                     { key: 'transfer_requests', label: 'Transfer Requests', sub: 'Managerial approvals' },
@@ -191,7 +191,7 @@ export default function Notifications() {
                   ].map(p => (
                     <div key={p.key} className="flex justify-between items-center">
                       <div>
-                        <p className="text-sm font-bold text-slate-700">{p.label}</p>
+                        <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{p.label}</p>
                         <p className="text-xs text-slate-400">{p.sub}</p>
                       </div>
                       <div onClick={() => togglePref(p.key)}
@@ -205,16 +205,16 @@ export default function Notifications() {
                 <div className="space-y-3 mb-5">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Send Alerts To:</p>
                   <div>
-                    <label className="text-xs font-bold text-slate-500 mb-1 flex items-center gap-1.5"><Mail className="w-3 h-3"/> Email</label>
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5"><Mail className="w-3 h-3"/> Email</label>
                     <input value={prefs.alert_email || ''} onChange={e => setPrefs(p => ({...p, alert_email: e.target.value}))}
                       placeholder="admin@bspecial.rw"
-                      className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-500 mb-1 flex items-center gap-1.5"><Smartphone className="w-3 h-3"/> Phone</label>
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5"><Smartphone className="w-3 h-3"/> Phone</label>
                     <input value={prefs.alert_phone || ''} onChange={e => setPrefs(p => ({...p, alert_phone: e.target.value}))}
                       placeholder="+250 7XX XXX XXX"
-                      className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
                   </div>
                 </div>
 
