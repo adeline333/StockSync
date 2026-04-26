@@ -48,18 +48,18 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Overview</h1>
-            <p className="text-sm text-slate-500">Last updated: {new Date().toLocaleTimeString('en-RW', { hour: '2-digit', minute: '2-digit' })}</p>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Overview</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Last updated: {new Date().toLocaleTimeString('en-RW', { hour: '2-digit', minute: '2-digit' })}</p>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={fetchDashboard} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+            <button onClick={fetchDashboard} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
               <RefreshCw className="w-5 h-5"/>
             </button>
-            <Link to="/notifications" className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
+            <Link to="/notifications" className="relative p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
               <Bell className="w-5 h-5"/>
-              {unread > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border border-white"/>}
+              {unread > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border border-white dark:border-slate-900"/>}
             </Link>
           </div>
         </header>
@@ -92,10 +92,10 @@ export default function Dashboard() {
                   { icon: <AlertCircle className="w-6 h-6"/>, bg: 'bg-rose-50 text-rose-500', label: 'Pending Issues', value: `${data?.pending_issues} Items`, sub: 'Needs Review', valueColor: 'text-rose-500' },
                   { icon: <AlertTriangle className="w-6 h-6"/>, bg: 'bg-orange-50 text-orange-500', label: 'Low Stock Alerts', value: `${data?.low_stock_count} SKUs`, sub: null, valueColor: 'text-orange-500' },
                 ].map((card, i) => (
-                  <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+                  <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col">
                     <div className={`w-12 h-12 ${card.bg} rounded-full flex items-center justify-center mb-4`}>{card.icon}</div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">{card.label}</p>
-                    <h3 className={`text-2xl font-bold ${card.valueColor || 'text-slate-800'}`}>{card.value}</h3>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{card.label}</p>
+                    <h3 className={`text-2xl font-bold ${card.valueColor || 'text-slate-800 dark:text-slate-100'}`}>{card.value}</h3>
                     {card.sub && <p className="text-xs text-slate-400 mt-1">{card.sub}</p>}
                   </div>
                 ))}
@@ -103,8 +103,8 @@ export default function Dashboard() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Sales Trend Chart */}
-                <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <h3 className="text-lg font-bold text-slate-800 mb-4">Sales Trend (Last 7 Days)</h3>
+                <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Sales Trend (Last 7 Days)</h3>
                   {data?.sales_trend?.length > 0 ? (
                     <div className="relative h-48">
                       <div className="absolute inset-0 flex items-end gap-2 pb-6">
@@ -126,9 +126,9 @@ export default function Dashboard() {
                 </div>
 
                 {/* Recent Activity */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
                   <div className="flex justify-between items-center mb-5">
-                    <h3 className="text-lg font-bold text-slate-800">Recent Activity</h3>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Recent Activity</h3>
                     <Link to="/admin/audit" className="text-xs font-semibold text-sky-500 hover:underline">View All</Link>
                   </div>
                   <div className="space-y-4">
@@ -138,9 +138,9 @@ export default function Dashboard() {
                       const colors = ['bg-sky-500', 'bg-rose-500', 'bg-emerald-500', 'bg-amber-500', 'bg-violet-500'];
                       return (
                         <div key={i} className="relative pl-5">
-                          <div className={`absolute left-0 top-1.5 w-2 h-2 rounded-full ${colors[i % colors.length]} ring-4 ring-slate-50`}/>
+                          <div className={`absolute left-0 top-1.5 w-2 h-2 rounded-full ${colors[i % colors.length]} ring-4 ring-slate-50 dark:ring-slate-900`}/>
                           <div className="flex justify-between items-start mb-0.5">
-                            <p className="text-sm font-semibold text-slate-800 capitalize">{a.action.replace(/_/g, ' ').toLowerCase()}</p>
+                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 capitalize">{a.action.replace(/_/g, ' ').toLowerCase()}</p>
                             <span className="text-xs text-slate-400">{timeAgo(a.created_at)}</span>
                           </div>
                           <p className="text-xs text-slate-500 truncate">{a.details}</p>
@@ -148,7 +148,7 @@ export default function Dashboard() {
                       );
                     })}
                   </div>
-                  <Link to="/admin/audit" className="block w-full mt-5 py-2.5 bg-slate-50 hover:bg-slate-100 text-sky-600 text-sm font-semibold rounded-xl transition-colors text-center">
+                  <Link to="/admin/audit" className="block w-full mt-5 py-2.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sky-600 text-sm font-semibold rounded-xl transition-colors text-center">
                     View All Activity
                   </Link>
                 </div>
@@ -158,7 +158,7 @@ export default function Dashboard() {
               {data?.warehouse_status?.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-slate-800 mb-4">Location Performance Comparison</h3>
-                  <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
                     <div className="space-y-4">
                       {data.warehouse_status.map((w, i) => {
                         const maxVal = Math.max(...data.warehouse_status.map(x => parseFloat(x.stock_value)), 1);
@@ -167,14 +167,14 @@ export default function Dashboard() {
                         return (
                           <div key={w.id} className="flex items-center gap-4">
                             <div className="w-36 shrink-0">
-                              <p className="text-sm font-bold text-slate-700 truncate">{w.name}</p>
+                              <p className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate">{w.name}</p>
                               <p className="text-xs text-slate-400">{parseInt(w.total_items).toLocaleString()} items</p>
                             </div>
-                            <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="flex-1 h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                               <div className={`h-full ${colors[i % colors.length]} rounded-full transition-all`} style={{ width: `${pct}%` }}/>
                             </div>
                             <div className="w-28 text-right shrink-0">
-                              <p className="text-sm font-black text-slate-700">RWF {(parseFloat(w.stock_value)/1000000).toFixed(1)}M</p>
+                              <p className="text-sm font-black text-slate-700 dark:text-slate-300">RWF {(parseFloat(w.stock_value)/1000000).toFixed(1)}M</p>
                               {parseInt(w.low_stock_count) > 0 && (
                                 <p className="text-[10px] font-bold text-rose-500">{w.low_stock_count} alerts</p>
                               )}
@@ -198,14 +198,14 @@ export default function Dashboard() {
                       { icon: <Clock className="w-5 h-5"/>, label: 'Uptime', value: `${data.system_health.uptime_hours}h`, ok: true, bg: 'bg-violet-50', iconColor: 'text-violet-500' },
                       { icon: <Users className="w-5 h-5"/>, label: 'Total Users', value: data.system_health.total_users, ok: true, bg: 'bg-amber-50', iconColor: 'text-amber-500' },
                     ].map((s, i) => (
-                      <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center gap-4">
+                      <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
                         <div className={`w-10 h-10 ${s.bg} ${s.iconColor} rounded-full flex items-center justify-center shrink-0`}>
                           {s.icon}
                         </div>
                         <div>
                           <p className="text-xs font-semibold text-slate-500">{s.label}</p>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <p className="text-sm font-black text-slate-800 capitalize">{s.value}</p>
+                            <p className="text-sm font-black text-slate-800 dark:text-slate-100 capitalize">{s.value}</p>
                             <div className={`w-2 h-2 rounded-full ${s.ok ? 'bg-emerald-500' : 'bg-rose-500'}`}/>
                           </div>
                         </div>
@@ -218,9 +218,9 @@ export default function Dashboard() {
                       { label: 'Total Orders', value: data.system_health.total_orders },
                       { label: 'Last Backup', value: 'Today 04:00 AM' },
                     ].map((s, i) => (
-                      <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
+                      <div key={i} className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
                         <p className="text-xs font-semibold text-slate-500">{s.label}</p>
-                        <p className="text-lg font-black text-slate-800 mt-0.5">{typeof s.value === 'number' ? s.value.toLocaleString() : s.value}</p>
+                        <p className="text-lg font-black text-slate-800 dark:text-slate-100 mt-0.5">{typeof s.value === 'number' ? s.value.toLocaleString() : s.value}</p>
                       </div>
                     ))}
                   </div>
