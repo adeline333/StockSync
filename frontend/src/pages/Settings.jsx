@@ -160,13 +160,13 @@ export default function Settings() {
     fetchApiKeys();
   };
 
-  if (loading) return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-sky-500"/></div>;
+  if (loading) return <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-sky-500"/></div>;
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
-          <h1 className="text-2xl font-black text-slate-800">System Configuration</h1>
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+          <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">System Configuration</h1>
           <div className="flex items-center gap-3">
             {msg && (
               <div className={`flex items-center gap-2 text-sm font-semibold ${msg.ok ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -184,11 +184,11 @@ export default function Settings() {
 
         <div className="p-8 flex-1 flex gap-6">
           {/* Left nav */}
-          <div className="w-56 shrink-0 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 h-fit">
+          <div className="w-56 shrink-0 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 h-fit">
             <div className="space-y-1">
               {MENUS.map(menu => (
                 <button key={menu} onClick={() => setActiveMenu(menu)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeMenu === menu ? 'bg-sky-50 text-sky-600 border border-sky-100' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'}`}>
+                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeMenu === menu ? 'bg-sky-50 text-sky-600 border border-sky-100' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 hover:text-slate-800'}`}>
                   {menu}
                 </button>
               ))}
@@ -200,9 +200,9 @@ export default function Settings() {
 
             {/* General Profile */}
             {activeMenu === 'General Profile' && settings && (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="border-b border-slate-100 px-6 py-4 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-slate-400"/><h2 className="text-base font-black text-slate-800">Business Identity</h2>
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-4 flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-slate-400"/><h2 className="text-base font-black text-slate-800 dark:text-slate-100">Business Identity</h2>
                 </div>
                 <div className="p-6 grid grid-cols-2 gap-5">
                   {[
@@ -211,16 +211,16 @@ export default function Settings() {
                     { label: 'Business Address', key: 'address', placeholder: 'Prime Economic Zone, Kigali', col: 2 },
                   ].map(f => (
                     <div key={f.key} className={f.col === 2 ? 'col-span-2' : ''}>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">{f.label}</label>
+                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">{f.label}</label>
                       <input value={settings[f.key] || ''} onChange={e => setSettings(p => ({...p, [f.key]: e.target.value}))}
                         placeholder={f.placeholder}
-                        className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-sky-500 focus:bg-white transition-colors"/>
+                        className="w-full bg-slate-50 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500 focus:bg-white transition-colors"/>
                     </div>
                   ))}
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2 flex items-center gap-1"><Globe className="w-3 h-3"/> Timezone</label>
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2 flex items-center gap-1"><Globe className="w-3 h-3"/> Timezone</label>
                     <select value={settings.timezone || 'Africa/Kigali'} onChange={e => setSettings(p => ({...p, timezone: e.target.value}))}
-                      className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-sky-500 appearance-none cursor-pointer">
+                      className="w-full bg-slate-50 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500 appearance-none cursor-pointer">
                       <option value="Africa/Kigali">(GMT+02:00) Central Africa Time</option>
                       <option value="UTC">UTC</option>
                       <option value="Africa/Nairobi">(GMT+03:00) East Africa Time</option>
@@ -232,26 +232,26 @@ export default function Settings() {
 
             {/* Tax & Currency */}
             {activeMenu === 'Tax & Currency' && settings && (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="border-b border-slate-100 px-6 py-4"><h2 className="text-base font-black text-slate-800">Tax & Currency</h2></div>
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-4"><h2 className="text-base font-black text-slate-800 dark:text-slate-100">Tax & Currency</h2></div>
                 <div className="p-6 grid grid-cols-2 gap-5">
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Default Currency</label>
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">Default Currency</label>
                     <div className="bg-sky-50 border border-sky-200 px-4 py-3 rounded-xl text-sm font-black text-sky-700 flex justify-between">
                       RWF (Rwanda Franc) <span className="text-sky-400 text-xs">Locked</span>
                     </div>
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">VAT Rate (%)</label>
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">VAT Rate (%)</label>
                     <input type="number" value={settings.vat_rate || 18} onChange={e => setSettings(p => ({...p, vat_rate: e.target.value}))}
-                      className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-sky-500 focus:bg-white transition-colors"/>
+                      className="w-full bg-slate-50 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500 focus:bg-white transition-colors"/>
                   </div>
                   <div className="col-span-2">
                     <label className="flex items-center gap-3 cursor-pointer" onClick={() => setSettings(p => ({...p, prices_tax_inclusive: !p.prices_tax_inclusive}))}>
                       <div className={`w-11 h-6 rounded-full flex items-center px-1 transition-colors ${settings.prices_tax_inclusive ? 'bg-emerald-500 justify-end' : 'bg-slate-200 justify-start'}`}>
                         <div className="w-4 h-4 rounded-full bg-white shadow-sm"/>
                       </div>
-                      <span className="text-sm font-bold text-slate-700">Prices are Tax Inclusive</span>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Prices are Tax Inclusive</span>
                     </label>
                   </div>
                 </div>
@@ -260,37 +260,37 @@ export default function Settings() {
 
             {/* User Management */}
             {activeMenu === 'User Management' && (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="border-b border-slate-100 px-6 py-4 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-slate-400"/><h2 className="text-base font-black text-slate-800">User Role & Permission Matrix</h2>
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-4 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-slate-400"/><h2 className="text-base font-black text-slate-800 dark:text-slate-100">User Role & Permission Matrix</h2>
                 </div>
                 {editingUser && (
                   <div className="mx-6 mt-4 p-4 bg-sky-50 border border-sky-200 rounded-xl">
-                    <p className="text-sm font-bold text-slate-700 mb-3">Editing: {editingUser.name}</p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Editing: {editingUser.name}</p>
                     <div className="flex gap-3 flex-wrap">
                       <select value={editRole} onChange={e => setEditRole(e.target.value)}
-                        className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
                         {['admin','manager','staff','auditor'].map(r => <option key={r} value={r}>{r}</option>)}
                       </select>
                       <select value={editBranch} onChange={e => setEditBranch(e.target.value)}
-                        className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
                         <option value="">No Branch</option>
                         {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                       </select>
                       <button onClick={updateUserRole} className="bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-sky-600 transition-colors">Save</button>
-                      <button onClick={() => setEditingUser(null)} className="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors">Cancel</button>
+                      <button onClick={() => setEditingUser(null)} className="bg-white border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
                     </div>
                   </div>
                 )}
-                <div className="divide-y divide-slate-50">
+                <div className="divide-y divide-slate-50 dark:divide-slate-800">
                   {users.map(u => (
-                    <div key={u.id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors">
+                    <div key={u.id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black text-slate-500">
+                        <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black text-slate-500 dark:text-slate-400">
                           {u.name.slice(0,2).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-slate-800">{u.name}</p>
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{u.name}</p>
                           <p className="text-xs text-slate-400">{u.email}</p>
                         </div>
                       </div>
@@ -319,28 +319,28 @@ export default function Settings() {
 
             {/* Categories */}
             {activeMenu === 'Categories' && (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="border-b border-slate-100 px-6 py-4 flex items-center gap-2">
-                  <Tag className="w-5 h-5 text-slate-400"/><h2 className="text-base font-black text-slate-800">Product Categories</h2>
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-4 flex items-center gap-2">
+                  <Tag className="w-5 h-5 text-slate-400"/><h2 className="text-base font-black text-slate-800 dark:text-slate-100">Product Categories</h2>
                 </div>
                 <div className="p-6 space-y-4">
                   <div className="flex gap-3">
                     <input value={renameCategory.old} onChange={e => setRenameCategory(p => ({...p, old: e.target.value}))}
                       placeholder="Current category name"
-                      className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
+                      className="flex-1 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
                     <span className="self-center text-slate-400">→</span>
                     <input value={renameCategory.new} onChange={e => setRenameCategory(p => ({...p, new: e.target.value}))}
                       placeholder="New name"
-                      className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
+                      className="flex-1 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
                     <button onClick={handleRenameCategory} className="bg-sky-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-sky-600 transition-colors flex items-center gap-1.5">
                       <Edit className="w-4 h-4"/> Rename
                     </button>
                   </div>
-                  <div className="divide-y divide-slate-50">
+                  <div className="divide-y divide-slate-50 dark:divide-slate-800">
                     {categories.map(c => (
                       <div key={c.category} className="flex items-center justify-between py-3">
                         <div>
-                          <p className="text-sm font-bold text-slate-800">{c.category}</p>
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{c.category}</p>
                           <p className="text-xs text-slate-400">{c.product_count} products</p>
                         </div>
                         <button onClick={() => deleteCategory(c.category)} className="text-slate-300 hover:text-rose-500 transition-colors">
@@ -356,19 +356,19 @@ export default function Settings() {
             {/* Backup & Export */}
             {activeMenu === 'Backup & Export' && (
               <div className="space-y-5">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                  <h2 className="text-base font-black text-slate-800 mb-4 flex items-center gap-2"><Database className="w-5 h-5 text-slate-400"/> Backup</h2>
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4">
-                    <p className="text-sm font-bold text-slate-700">Last Backup</p>
-                    <p className="text-xs text-slate-500 mt-1">{settings?.last_backup ? new Date(settings.last_backup).toLocaleString() : 'No backup recorded'}</p>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+                  <h2 className="text-base font-black text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2"><Database className="w-5 h-5 text-slate-400"/> Backup</h2>
+                  <div className="bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-4">
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Last Backup</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{settings?.last_backup ? new Date(settings.last_backup).toLocaleString() : 'No backup recorded'}</p>
                   </div>
                   <button onClick={triggerBackup} className="flex items-center gap-2 bg-slate-900 hover:bg-black text-white px-5 py-3 rounded-xl text-sm font-bold transition-colors shadow-md">
                     <Database className="w-4 h-4"/> Backup Now
                   </button>
                 </div>
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                  <h2 className="text-base font-black text-slate-800 mb-4 flex items-center gap-2"><Download className="w-5 h-5 text-slate-400"/> Data Export</h2>
-                  <p className="text-sm text-slate-500 mb-4">Export all products, customers, orders, and branches as a JSON file for migration or backup.</p>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+                  <h2 className="text-base font-black text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2"><Download className="w-5 h-5 text-slate-400"/> Data Export</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Export all products, customers, orders, and branches as a JSON file for migration or backup.</p>
                   <button onClick={exportData} className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-5 py-3 rounded-xl text-sm font-bold transition-colors shadow-md">
                     <Download className="w-4 h-4"/> Export All Data (JSON)
                   </button>
@@ -378,15 +378,15 @@ export default function Settings() {
 
             {/* API Keys */}
             {activeMenu === 'API Keys' && (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="border-b border-slate-100 px-6 py-4 flex items-center gap-2">
-                  <Key className="w-5 h-5 text-slate-400"/><h2 className="text-base font-black text-slate-800">API Keys & Integrations</h2>
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-4 flex items-center gap-2">
+                  <Key className="w-5 h-5 text-slate-400"/><h2 className="text-base font-black text-slate-800 dark:text-slate-100">API Keys & Integrations</h2>
                 </div>
                 <div className="p-6 space-y-4">
                   <div className="flex gap-3">
                     <input value={newKeyName} onChange={e => setNewKeyName(e.target.value)}
                       placeholder="Key name (e.g., Mobile App)"
-                      className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
+                      className="flex-1 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
                     <button onClick={generateKey} className="bg-sky-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-sky-600 transition-colors flex items-center gap-2">
                       <Plus className="w-4 h-4"/> Generate Key
                     </button>
@@ -397,9 +397,9 @@ export default function Settings() {
                       <p className="font-semibold text-sm">No API keys yet</p>
                     </div>
                   ) : apiKeys.map(k => (
-                    <div key={k.id} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div key={k.id} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl">
                       <div>
-                        <p className="text-sm font-bold text-slate-800">{k.name}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{k.name}</p>
                         <p className="text-xs font-mono text-slate-400 mt-0.5">{k.key_value.slice(0, 20)}...</p>
                         <p className="text-[10px] text-slate-400 mt-0.5">Created {new Date(k.created_at).toLocaleDateString()}</p>
                       </div>
