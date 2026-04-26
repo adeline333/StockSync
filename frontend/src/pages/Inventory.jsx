@@ -59,10 +59,10 @@ export default function Inventory() {
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Inventory Management</h1>
-            {summary && <p className="text-sm text-slate-500">{total} products · RWF {Number(summary.total_value).toLocaleString()} total value</p>}
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Inventory Management</h1>
+            {summary && <p className="text-sm text-slate-500 dark:text-slate-400">{total} products · RWF {Number(summary.total_value).toLocaleString()} total value</p>}
           </div>
           <Link to="/inventory/new" className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm">
             <Plus className="w-4 h-4 mr-2" /> Add New Product
@@ -79,7 +79,7 @@ export default function Inventory() {
                 { label: 'Low Stock', value: summary.low_stock_count + ' SKUs', color: 'text-amber-600' },
                 { label: 'Out of Stock', value: summary.out_of_stock_count + ' SKUs', color: 'text-rose-600' },
               ].map((card, i) => (
-                <div key={i} className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
+                <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm p-5">
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{card.label}</p>
                   <p className={`text-xl font-black mt-1 ${card.color}`}>{card.value}</p>
                 </div>
@@ -88,20 +88,20 @@ export default function Inventory() {
           )}
 
           {/* Controls */}
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-wrap items-center gap-3">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-3">
             <form onSubmit={handleSearch} className="flex-1 min-w-[260px] relative flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input value={searchInput} onChange={e => setSearchInput(e.target.value)}
                   type="text" placeholder="Search by Name, SKU, or Barcode..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:border-sky-500 outline-none transition-all" />
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 border border-slate-200 rounded-lg text-sm focus:bg-white dark:focus:bg-slate-700 focus:border-sky-500 outline-none transition-all" />
               </div>
               <button type="submit" className="bg-sky-500 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-sky-600 transition">Search</button>
             </form>
 
             <div className="relative">
               <select value={category} onChange={e => { setCategory(e.target.value); setPage(1); }}
-                className="appearance-none bg-white border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:border-sky-500 cursor-pointer min-w-[150px]">
+                className="appearance-none bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:border-sky-500 cursor-pointer min-w-[150px]">
                 <option value="all">Category: All</option>
                 {categories.map(c => <option key={c.category} value={c.category}>{c.category} ({c.count})</option>)}
               </select>
@@ -110,7 +110,7 @@ export default function Inventory() {
 
             <div className="relative">
               <select value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}
-                className="appearance-none bg-white border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:border-sky-500 cursor-pointer min-w-[150px]">
+                className="appearance-none bg-white dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:border-sky-500 cursor-pointer min-w-[150px]">
                 <option value="all">Status: Any</option>
                 <option value="in_stock">In Stock</option>
                 <option value="low_stock">Low Stock</option>
@@ -119,16 +119,16 @@ export default function Inventory() {
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
-            <button onClick={exportCSV} className="flex items-center px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+            <button onClick={exportCSV} className="flex items-center px-4 py-2.5 bg-white dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
               Export CSV <Download className="w-4 h-4 ml-2" />
             </button>
           </div>
 
           {/* Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+                <tr className="bg-slate-50 dark:bg-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-700">
                   <th className="px-6 py-4">Product Name</th>
                   <th className="px-6 py-4">SKU / Code</th>
                   <th className="px-6 py-4">Category</th>
@@ -137,7 +137,7 @@ export default function Inventory() {
                   <th className="px-6 py-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="text-sm divide-y divide-slate-50">
+              <tbody className="text-sm divide-y divide-slate-50 dark:divide-slate-800">
                 {loading ? (
                   <tr><td colSpan={6} className="text-center py-16">
                     <Loader2 className="w-8 h-8 animate-spin text-sky-500 mx-auto" />
@@ -149,27 +149,27 @@ export default function Inventory() {
                     <Link to="/inventory/new" className="text-sky-500 text-sm font-semibold mt-2 inline-block">Add your first product</Link>
                   </td></tr>
                 ) : products.map(p => (
-                  <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center mr-4 border border-slate-200 overflow-hidden shrink-0">
+                        <div className="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-4 border border-slate-200 dark:border-slate-700 overflow-hidden shrink-0">
                           {p.image_url
                             ? <img src={`http://localhost:5000${p.image_url}`} alt={p.name} className="w-full h-full object-cover" />
                             : <Package className="w-5 h-5 text-slate-400" />
                           }
                         </div>
                         <div>
-                          <Link to={`/inventory/${p.id}`} className="font-semibold text-slate-800 hover:text-sky-600 transition-colors">{p.name}</Link>
+                          <Link to={`/inventory/${p.id}`} className="font-semibold text-slate-800 dark:text-slate-200 hover:text-sky-600 transition-colors">{p.name}</Link>
                           {p.brand && <p className="text-[11px] text-slate-400 mt-0.5">{p.brand}</p>}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-600 font-mono font-medium">{p.sku}</td>
-                    <td className="px-6 py-4 text-slate-600">{p.category || '—'}</td>
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400 font-mono font-medium">{p.sku}</td>
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{p.category || '—'}</td>
                     <td className="px-6 py-4">
                       <StockBadge qty={parseInt(p.total_stock)} min={parseInt(p.min_stock_level)} />
                     </td>
-                    <td className="px-6 py-4 font-bold text-slate-800">{Number(p.price).toLocaleString()}</td>
+                    <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">{Number(p.price).toLocaleString()}</td>
                     <td className="px-6 py-4 text-right">
                       <Link to={`/inventory/${p.id}`} className="text-slate-400 hover:text-sky-500 transition-colors inline-block">
                         <MoreHorizontal className="w-5 h-5" />
@@ -180,17 +180,17 @@ export default function Inventory() {
               </tbody>
             </table>
 
-            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-sm">
+            <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-sm">
               <span className="text-slate-500">Showing {Math.min((page - 1) * LIMIT + 1, total)}–{Math.min(page * LIMIT, total)} of {total} items</span>
               <div className="flex space-x-1">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                  className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40">&lt;</button>
+                  className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40">&lt;</button>
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map(n => (
                   <button key={n} onClick={() => setPage(n)}
-                    className={`w-8 h-8 flex items-center justify-center rounded font-medium ${page === n ? 'bg-slate-900 text-white' : 'border border-slate-200 text-slate-500 hover:bg-slate-50'}`}>{n}</button>
+                    className={`w-8 h-8 flex items-center justify-center rounded font-medium ${page === n ? 'bg-slate-900 dark:bg-sky-600 text-white' : 'border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>{n}</button>
                 ))}
                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                  className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40">&gt;</button>
+                  className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40">&gt;</button>
               </div>
             </div>
           </div>
