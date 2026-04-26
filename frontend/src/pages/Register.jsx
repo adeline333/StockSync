@@ -54,7 +54,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center relative overflow-hidden py-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden py-10">
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none opacity-40">
         <svg fill="none" viewBox="0 0 1280 832" className="w-full h-full">
@@ -64,10 +64,10 @@ const Register = () => {
         </svg>
       </div>
 
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-8 md:p-12 relative z-10 border border-slate-100">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-8 md:p-12 relative z-10 border border-slate-100 dark:border-slate-800">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Create Account</h2>
-          <p className="text-slate-500 mt-2 font-medium">Set up a new system profile for StockSync</p>
+          <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Create Account</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">Set up a new system profile for StockSync</p>
         </div>
 
         {/* Error Banner Injection */}
@@ -92,7 +92,7 @@ const Register = () => {
                   className={`relative flex flex-col items-center justify-center p-4 h-24 rounded-2xl border-2 transition-all ${
                     selectedRole === role.id
                       ? 'bg-sky-50 border-sky-500 text-sky-600 shadow-sm'
-                      : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                      : 'bg-white border-slate-200 text-slate-500 dark:text-slate-400 hover:border-slate-300'
                   }`}
                 >
                   <div className={`p-2 rounded-full mb-2 ${selectedRole === role.id ? 'bg-sky-100 text-sky-600' : 'bg-slate-100 text-slate-400'}`}>
@@ -111,7 +111,7 @@ const Register = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Full Legal Name</label>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Full Legal Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-slate-400" />
@@ -120,7 +120,7 @@ const Register = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all placeholder:text-slate-400 font-bold"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all placeholder:text-slate-400 font-bold"
                   placeholder="Jean Pierre"
                   required
                 />
@@ -128,7 +128,7 @@ const Register = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-slate-400" />
@@ -137,7 +137,7 @@ const Register = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all placeholder:text-slate-400 font-bold"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all placeholder:text-slate-400 font-bold"
                   placeholder="jp@bspecial.com"
                   required
                 />
@@ -145,21 +145,21 @@ const Register = () => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-slate-700 mb-2">Employee ID Number (Optional)</label>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Employee ID Number (Optional)</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Hash className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
                   type="text"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all placeholder:text-slate-400 font-bold"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all placeholder:text-slate-400 font-bold"
                   placeholder="EMP-1234"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Create Password</label>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Create Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-slate-400" />
@@ -168,7 +168,7 @@ const Register = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all text-slate-800 font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all text-slate-800 dark:text-slate-100 font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
                   placeholder="••••••••"
                   required
                 />
@@ -176,7 +176,7 @@ const Register = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Confirm Password</label>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Confirm Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-slate-400" />
@@ -185,7 +185,7 @@ const Register = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all text-slate-800 font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all text-slate-800 dark:text-slate-100 font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
                   placeholder="••••••••"
                   required
                 />
@@ -206,7 +206,7 @@ const Register = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-slate-500">
+        <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
           Already have an account?{' '}
           <Link to="/login" className="font-semibold text-sky-500 hover:text-sky-600 transition-colors">
             Sign In
