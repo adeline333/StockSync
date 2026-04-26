@@ -39,18 +39,18 @@ export default function SyncStatus() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-black text-slate-800">Connectivity & Data Sync</h1>
-            <p className="text-sm text-slate-500">Manage offline fallback and server connections</p>
+            <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">Connectivity & Data Sync</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Manage offline fallback and server connections</p>
           </div>
         </header>
 
         <div className="p-8 flex-1 space-y-6">
           {/* Connection Status */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 flex items-center justify-between relative overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between relative overflow-hidden">
             <div className={`absolute top-0 right-0 w-48 h-48 ${isOnline ? 'bg-emerald-50' : 'bg-rose-50'} rounded-bl-full pointer-events-none blur-3xl`}/>
 
             <div className="flex items-center gap-8 relative z-10">
@@ -69,10 +69,10 @@ export default function SyncStatus() {
                   <Activity className={`w-6 h-6 opacity-70 ${isOnline ? 'text-emerald-400' : 'text-rose-400'}`}/>
                 </h2>
                 {isOnline && ping && (
-                  <p className="text-sm font-bold text-slate-600 mt-1 flex items-center gap-2">
+                  <p className="text-sm font-bold text-slate-600 dark:text-slate-400 mt-1 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500"/>
                     Connected to Kigali Central Server
-                    <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Ping: {ping}ms</span>
+                    <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">Ping: {ping}ms</span>
                   </p>
                 )}
                 {!isOnline && (
@@ -84,7 +84,7 @@ export default function SyncStatus() {
             <div className="flex flex-col items-end gap-3 relative z-10">
               <div className="text-right">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Last Sync</p>
-                <p className="text-lg font-black text-slate-800">{lastSync ? lastSync.toLocaleTimeString() : 'Never'}</p>
+                <p className="text-lg font-black text-slate-800 dark:text-slate-100">{lastSync ? lastSync.toLocaleTimeString() : 'Never'}</p>
               </div>
               <button onClick={handleSync} disabled={!isOnline || isSyncing}
                 className="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-xl text-sm font-bold shadow-xl transition-all flex items-center gap-2 disabled:opacity-50">
@@ -96,9 +96,9 @@ export default function SyncStatus() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Offline Queue */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-4">
-                <h2 className="text-base font-black text-slate-800">Pending Uploads (Outbox)</h2>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-5 border-b border-slate-100 dark:border-slate-800 pb-4">
+                <h2 className="text-base font-black text-slate-800 dark:text-slate-100">Pending Uploads (Outbox)</h2>
                 {offlineQueue.length > 0 && (
                   <button onClick={() => handleSync()} disabled={!isOnline || isSyncing}
                     className="flex items-center gap-1.5 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors disabled:opacity-50">
@@ -110,16 +110,16 @@ export default function SyncStatus() {
               {offlineQueue.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10">
                   <CheckCircle2 className="w-14 h-14 text-emerald-400 mb-3"/>
-                  <h3 className="text-lg font-black text-slate-700">All Clear!</h3>
-                  <p className="text-sm text-slate-500 mt-1 text-center">No offline transactions waiting to sync.</p>
+                  <h3 className="text-lg font-black text-slate-700 dark:text-slate-300">All Clear!</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 text-center">No offline transactions waiting to sync.</p>
                 </div>
               ) : (
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {offlineQueue.map(item => (
                     <div key={item.id} className="flex items-center justify-between p-3 bg-amber-50 border border-amber-100 rounded-xl">
                       <div>
-                        <p className="text-sm font-bold text-slate-800">Offline Sale</p>
-                        <p className="text-xs text-slate-500">{new Date(item.queued_at).toLocaleString()}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">Offline Sale</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{new Date(item.queued_at).toLocaleString()}</p>
                       </div>
                       <button onClick={() => removeFromQueue(item.id)} className="text-rose-400 hover:text-rose-600 transition-colors">
                         <Trash2 className="w-4 h-4"/>
@@ -131,15 +131,15 @@ export default function SyncStatus() {
             </div>
 
             {/* Device Storage & Settings */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-5">
-              <h2 className="text-base font-black text-slate-800 border-b border-slate-100 pb-4">Device Storage & Settings</h2>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 space-y-5">
+              <h2 className="text-base font-black text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-800 pb-4">Device Storage & Settings</h2>
 
               <div>
                 <div className="flex justify-between items-end mb-2">
-                  <p className="text-sm font-bold text-slate-700">Local Cache Size</p>
-                  <p className="text-sm font-black text-slate-800">{dbSize}</p>
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Local Cache Size</p>
+                  <p className="text-sm font-black text-slate-800 dark:text-slate-100">{dbSize}</p>
                 </div>
-                <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
                   <div className="h-full bg-emerald-500 rounded-full" style={{ width: '15%' }}/>
                 </div>
                 <p className="text-xs text-slate-400 mt-2 flex items-center gap-1.5">
@@ -147,12 +147,12 @@ export default function SyncStatus() {
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between">
+              <div className="bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-black text-slate-800 flex items-center gap-2">
+                  <p className="text-sm font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <PowerOff className="w-4 h-4 text-slate-400"/> Force Offline Mode
                   </p>
-                  <p className="text-xs text-slate-500 mt-0.5">Disconnect to save data usage.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Disconnect to save data usage.</p>
                 </div>
                 <div onClick={() => setForceOffline(!forceOffline)}
                   className={`w-12 h-6 rounded-full flex items-center px-1 cursor-pointer transition-colors ${forceOffline ? 'bg-amber-500 justify-end' : 'bg-slate-300 justify-start'}`}>
@@ -160,12 +160,12 @@ export default function SyncStatus() {
                 </div>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between">
+              <div className="bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-black text-slate-800 flex items-center gap-2">
+                  <p className="text-sm font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <Bell className="w-4 h-4 text-slate-400"/> Push Notifications
                   </p>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     {pushGranted ? 'Notifications enabled' : 'Enable browser notifications'}
                   </p>
                 </div>
@@ -179,9 +179,9 @@ export default function SyncStatus() {
                 )}
               </div>
 
-              <div className="pt-3 border-t border-slate-100">
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Device Info</p>
-                <div className="flex justify-between text-sm font-bold text-slate-700">
+                <div className="flex justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
                   <span className="flex items-center gap-2"><Smartphone className="w-4 h-4 text-sky-500"/> Device: TAB-RW-04</span>
                   <span className="bg-sky-50 text-sky-600 px-3 py-1 rounded-lg border border-sky-100 text-xs">v2.4.0</span>
                 </div>
