@@ -81,16 +81,16 @@ export default function ReconciliationTicket() {
   const unexplainedVariance = selectedItem ? selectedItem.variance : 0;
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
     </div>
   );
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
-          <button onClick={() => navigate('/reconciliation')} className="flex items-center text-slate-500 hover:text-sky-600 font-bold group">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+          <button onClick={() => navigate('/reconciliation')} className="flex items-center text-slate-500 dark:text-slate-400 hover:text-sky-600 font-bold group">
             <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" /> Back
           </button>
           <div className="bg-rose-100 text-rose-700 px-4 py-2 rounded-full font-black text-xs uppercase tracking-widest border border-rose-200 flex items-center gap-2">
@@ -118,7 +118,7 @@ export default function ReconciliationTicket() {
           )}
 
           {!selectedItem && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-12 text-center text-slate-400">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-12 text-center text-slate-400">
               <AlertOctagon className="w-12 h-12 mx-auto mb-4 opacity-30" />
               <p className="font-semibold">No mismatched items in this reconciliation run</p>
               <p className="text-sm mt-2">All transactions matched successfully</p>
@@ -128,21 +128,21 @@ export default function ReconciliationTicket() {
           {selectedItem && (
             <div className="flex gap-6">
               {/* Audit Trail */}
-              <div className="flex-[3] bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                <h3 className="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Investigation Audit Trail</h3>
+              <div className="flex-[3] bg-white p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">Investigation Audit Trail</h3>
                 <div className="relative pl-8">
                   <div className="absolute left-10 top-2 bottom-0 w-0.5 bg-slate-100 rounded-full" />
 
                   {[
                     { color: 'bg-emerald-500', title: 'Sales Recorded (POS)', detail: `${selectedItem.sales_qty} units sold via POS terminal`, badge: `${selectedItem.sales_qty} units`, badgeColor: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
-                    { color: 'bg-sky-500', title: 'Inventory Deductions', detail: `${selectedItem.stock_deducted} units deducted from stock`, badge: `-${selectedItem.stock_deducted}`, badgeColor: 'text-slate-700 bg-slate-50 border-slate-200' },
+                    { color: 'bg-sky-500', title: 'Inventory Deductions', detail: `${selectedItem.stock_deducted} units deducted from stock`, badge: `-${selectedItem.stock_deducted}`, badgeColor: 'text-slate-700 dark:text-slate-300 bg-slate-50 border-slate-200' },
                     { color: 'bg-rose-500', title: 'Unexplained Variance', detail: `${Math.abs(selectedItem.variance)} unit(s) unaccounted for`, badge: `${selectedItem.variance > 0 ? '+' : ''}${selectedItem.variance}`, badgeColor: 'text-rose-600 bg-rose-50 border-rose-100' },
                   ].map((step, i) => (
                     <div key={i} className="relative flex items-start mb-8 group">
                       <div className={`w-5 h-5 rounded-full ${step.color} border-4 border-white shadow-md shrink-0 -ml-2 mt-1 mr-5 group-hover:scale-125 transition-transform`} />
                       <div className="flex-1 flex justify-between items-start">
                         <div>
-                          <p className="text-sm font-bold text-slate-800">{step.title}</p>
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{step.title}</p>
                           <p className="text-xs text-slate-400 mt-1">{step.detail}</p>
                         </div>
                         <span className={`text-sm font-black px-3 py-1 rounded-full border ${step.badgeColor}`}>{step.badge}</span>
@@ -151,21 +151,21 @@ export default function ReconciliationTicket() {
                   ))}
 
                   <div className="flex items-center justify-between border-t border-dashed border-slate-200 pt-6 mt-2">
-                    <p className="text-base font-black text-slate-800 uppercase tracking-widest">Unexplained Variance</p>
+                    <p className="text-base font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest">Unexplained Variance</p>
                     <p className="text-3xl font-black text-rose-600">{selectedItem.variance > 0 ? '+' : ''}{selectedItem.variance} Units</p>
                   </div>
                 </div>
               </div>
 
               {/* Resolution Form */}
-              <div className="flex-[2] bg-white rounded-2xl shadow-lg border border-slate-100 flex flex-col overflow-hidden">
-                <div className="p-6 border-b border-slate-100">
-                  <h3 className="text-lg font-bold text-slate-800">Resolve Discrepancy</h3>
+              <div className="flex-[2] bg-white rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Resolve Discrepancy</h3>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-5">
                   <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Select Root Cause</p>
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Select Root Cause</p>
                     <div className="space-y-2">
                       {[
                         { id: 'theft', label: 'Theft / Loss' },
@@ -185,32 +185,32 @@ export default function ReconciliationTicket() {
                   </div>
 
                   <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quantity to Adjust</p>
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-3">
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Quantity to Adjust</p>
+                    <div className="bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex items-center gap-3">
                       <PackageMinus className="w-5 h-5 text-slate-400" />
-                      <span className="text-lg font-black text-slate-700">{selectedItem.variance > 0 ? '-' : '+'}{Math.abs(selectedItem.variance)} units</span>
+                      <span className="text-lg font-black text-slate-700 dark:text-slate-300">{selectedItem.variance > 0 ? '-' : '+'}{Math.abs(selectedItem.variance)} units</span>
                     </div>
                   </div>
 
                   <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Branch</p>
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Branch</p>
                     <select value={branchId} onChange={e => setBranchId(e.target.value)}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
                       {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                   </div>
 
                   <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Manager Notes</p>
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Manager Notes</p>
                     <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)}
                       placeholder="Add notes for the audit trail..."
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
+                      className="w-full bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                   </div>
 
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" checked={applyAdj} onChange={e => setApplyAdj(e.target.checked)}
                       className="w-4 h-4 rounded border-slate-300 text-sky-500 focus:ring-sky-500" />
-                    <span className="text-sm font-semibold text-slate-600">Apply stock adjustment automatically</span>
+                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Apply stock adjustment automatically</span>
                   </label>
 
                   {saveMsg && (
@@ -220,7 +220,7 @@ export default function ReconciliationTicket() {
                   )}
                 </div>
 
-                <div className="p-6 border-t border-slate-100 bg-slate-50">
+                <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50">
                   <button onClick={handleResolve} disabled={saving || selectedItem.status === 'resolved'}
                     className="w-full bg-slate-900 hover:bg-black text-white py-4 rounded-xl font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
                     {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : selectedItem.status === 'resolved' ? '✓ Already Resolved' : 'Confirm & Update Stock'}
