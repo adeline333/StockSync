@@ -112,44 +112,44 @@ export default function Profile() {
   const initials = profile?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '??';
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 md:p-10">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* Header card */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex items-center gap-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 flex items-center gap-5">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center text-white text-2xl font-black shadow">
             {initials}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">{profile?.name}</h1>
-            <p className="text-slate-500 text-sm">{profile?.email}</p>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{profile?.name}</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">{profile?.email}</p>
             <span className={`inline-flex items-center gap-1.5 mt-1 px-3 py-0.5 rounded-full text-xs font-bold ${role.color}`}>
               {role.icon} {role.label}
             </span>
           </div>
           <div className="ml-auto text-right text-xs text-slate-400">
             <p>Last login</p>
-            <p className="font-semibold text-slate-600">{profile?.last_login ? new Date(profile.last_login).toLocaleString() : 'N/A'}</p>
+            <p className="font-semibold text-slate-600 dark:text-slate-400">{profile?.last_login ? new Date(profile.last_login).toLocaleString() : 'N/A'}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* Edit Profile */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <h2 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2"><User className="w-4 h-4 text-sky-500" /> Edit Profile</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2"><User className="w-4 h-4 text-sky-500" /> Edit Profile</h2>
             <form onSubmit={saveProfile} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Full Name</label>
-                <input value={name} onChange={e => setName(e.target.value)} className="mt-1 w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-sky-500 outline-none" required />
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Full Name</label>
+                <input value={name} onChange={e => setName(e.target.value)} className="mt-1 w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-sky-500 outline-none" required />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</label>
-                <input value={profile?.email} disabled className="mt-1 w-full px-3 py-2.5 border border-slate-100 rounded-xl text-sm bg-slate-50 text-slate-400 cursor-not-allowed" />
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Email</label>
+                <input value={profile?.email} disabled className="mt-1 w-full px-3 py-2.5 border border-slate-100 dark:border-slate-800 rounded-xl text-sm bg-slate-50 text-slate-400 cursor-not-allowed" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Phone</label>
-                <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+250 7XX XXX XXX" className="mt-1 w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-sky-500 outline-none" />
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Phone</label>
+                <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+250 7XX XXX XXX" className="mt-1 w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-sky-500 outline-none" />
               </div>
               {profileMsg && (
                 <p className={`text-sm font-semibold flex items-center gap-1.5 ${profileMsg.ok ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -163,17 +163,17 @@ export default function Profile() {
           </div>
 
           {/* Change Password */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <h2 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2"><Lock className="w-4 h-4 text-sky-500" /> Change Password</h2>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2"><Lock className="w-4 h-4 text-sky-500" /> Change Password</h2>
             <form onSubmit={changePassword} className="space-y-4">
               {['Current Password', 'New Password', 'Confirm New Password'].map((label, i) => {
                 const vals = [currentPw, newPw, confirmPw];
                 const setters = [setCurrentPw, setNewPw, setConfirmPw];
                 return (
                   <div key={i}>
-                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{label}</label>
+                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">{label}</label>
                     <input type="password" value={vals[i]} onChange={e => setters[i](e.target.value)}
-                      className="mt-1 w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-bold tracking-wider focus:ring-2 focus:ring-sky-500 outline-none" placeholder="••••••••" required />
+                      className="mt-1 w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold tracking-wider focus:ring-2 focus:ring-sky-500 outline-none" placeholder="••••••••" required />
                   </div>
                 );
               })}
@@ -190,9 +190,9 @@ export default function Profile() {
         </div>
 
         {/* 2FA Section */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
               <Shield className="w-4 h-4 text-sky-500" /> Two-Factor Authentication
             </h2>
             <span className={`px-3 py-1 rounded-full text-xs font-bold ${profile?.two_fa_enabled ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
@@ -208,7 +208,7 @@ export default function Profile() {
 
           {!profile?.two_fa_enabled ? (
             <div>
-              <p className="text-sm text-slate-500 mb-4">Add an extra layer of security. Use an authenticator app like Google Authenticator or Authy to scan the QR code.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Add an extra layer of security. Use an authenticator app like Google Authenticator or Authy to scan the QR code.</p>
               {!showSetup ? (
                 <button onClick={setup2FA} disabled={twoFaLoading} className="flex items-center gap-2 bg-sky-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-sky-600 transition disabled:opacity-60">
                   {twoFaLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />} Enable 2FA
@@ -217,21 +217,21 @@ export default function Profile() {
                 <div className="space-y-4">
                   <div className="flex flex-col md:flex-row gap-6 items-start">
                     <div>
-                      <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">1. Scan this QR code</p>
-                      {qrCode && <img src={qrCode} alt="2FA QR Code" className="w-40 h-40 rounded-xl border border-slate-200" />}
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">1. Scan this QR code</p>
+                      {qrCode && <img src={qrCode} alt="2FA QR Code" className="w-40 h-40 rounded-xl border border-slate-200 dark:border-slate-700" />}
                     </div>
                     <div className="flex-1">
-                      <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">Or enter this key manually</p>
-                      <code className="block bg-slate-100 text-slate-700 text-xs font-mono px-3 py-2 rounded-lg break-all mb-4">{secret}</code>
-                      <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">2. Enter the 6-digit code</p>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">Or enter this key manually</p>
+                      <code className="block bg-slate-100 text-slate-700 dark:text-slate-300 text-xs font-mono px-3 py-2 rounded-lg break-all mb-4">{secret}</code>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">2. Enter the 6-digit code</p>
                       <form onSubmit={verify2FA} className="flex gap-2">
                         <input value={totpToken} onChange={e => setTotpToken(e.target.value)} maxLength={6}
-                          className="w-36 px-3 py-2.5 border border-slate-200 rounded-xl text-center text-lg font-black tracking-widest focus:ring-2 focus:ring-sky-500 outline-none"
+                          className="w-36 px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-center text-lg font-black tracking-widest focus:ring-2 focus:ring-sky-500 outline-none"
                           placeholder="000000" required />
                         <button type="submit" disabled={twoFaLoading} className="bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-emerald-600 transition disabled:opacity-60">
                           {twoFaLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify'}
                         </button>
-                        <button type="button" onClick={() => setShowSetup(false)} className="text-slate-400 hover:text-slate-600 px-3 text-sm font-semibold">Cancel</button>
+                        <button type="button" onClick={() => setShowSetup(false)} className="text-slate-400 hover:text-slate-600 dark:text-slate-400 px-3 text-sm font-semibold">Cancel</button>
                       </form>
                     </div>
                   </div>
@@ -240,10 +240,10 @@ export default function Profile() {
             </div>
           ) : (
             <div>
-              <p className="text-sm text-slate-500 mb-4">2FA is active on your account. To disable it, confirm your password below.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">2FA is active on your account. To disable it, confirm your password below.</p>
               <form onSubmit={disable2FA} className="flex gap-2 max-w-sm">
                 <input type="password" value={disablePw} onChange={e => setDisablePw(e.target.value)}
-                  className="flex-1 px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-bold tracking-wider focus:ring-2 focus:ring-rose-400 outline-none"
+                  className="flex-1 px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold tracking-wider focus:ring-2 focus:ring-rose-400 outline-none"
                   placeholder="Your password" required />
                 <button type="submit" disabled={twoFaLoading} className="flex items-center gap-1.5 bg-rose-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-rose-600 transition disabled:opacity-60">
                   {twoFaLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldOff className="w-4 h-4" />} Disable
