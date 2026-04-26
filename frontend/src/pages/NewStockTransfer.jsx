@@ -87,11 +87,11 @@ export default function NewStockTransfer() {
   const destName = branches.find(b => String(b.id) === destBranch)?.name || 'Select Destination';
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <button onClick={() => navigate('/locations')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border border-slate-200 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 text-slate-600 rounded-lg text-sm font-bold transition-all">
+            className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 text-slate-600 dark:text-slate-400 rounded-lg text-sm font-bold transition-all">
             <X className="w-4 h-4" /> Cancel Transfer
           </button>
           <span className="text-sm font-bold text-sky-500 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100 uppercase tracking-widest">
@@ -100,15 +100,15 @@ export default function NewStockTransfer() {
         </header>
 
         <div className="p-8 flex-1 space-y-6 max-w-4xl mx-auto w-full">
-          <h1 className="text-3xl font-black text-slate-800">New Stock Transfer</h1>
+          <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">New Stock Transfer</h1>
 
           {/* Route */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
             <div className="flex-1">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">From (Origin)</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">From (Origin)</label>
               <div className="relative">
                 <select value={sourceBranch} onChange={e => setSourceBranch(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 appearance-none focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+                  className="w-full bg-slate-50 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 dark:text-slate-100 appearance-none focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
                   {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>
@@ -121,7 +121,7 @@ export default function NewStockTransfer() {
               <label className="text-xs font-bold text-sky-600 uppercase tracking-widest block mb-2">To (Destination)</label>
               <div className="relative">
                 <select value={destBranch} onChange={e => setDestBranch(e.target.value)}
-                  className="w-full bg-sky-50 border-2 border-sky-500 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 appearance-none focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+                  className="w-full bg-sky-50 border-2 border-sky-500 px-4 py-3 rounded-xl text-sm font-bold text-slate-800 dark:text-slate-100 appearance-none focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
                   {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sky-500 pointer-events-none"/>
@@ -130,44 +130,44 @@ export default function NewStockTransfer() {
           </div>
 
           {/* Items */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="p-5 border-b border-slate-100">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"/>
                 <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
                   placeholder="Search products to add..."
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
               </div>
               {searchResults.length > 0 && (
-                <div className="mt-2 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
+                <div className="mt-2 bg-white border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden">
                   {searchResults.map(p => (
                     <div key={p.id} onClick={() => addItem(p)}
                       className="flex items-center justify-between px-4 py-3 hover:bg-sky-50 cursor-pointer border-b border-slate-50 last:border-0">
                       <div>
-                        <p className="text-sm font-bold text-slate-800">{p.name}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{p.name}</p>
                         <p className="text-xs text-slate-400 font-mono">{p.sku}</p>
                       </div>
-                      <span className="text-xs font-bold text-slate-500">{p.total_stock} in stock</span>
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{p.total_stock} in stock</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-[2fr_1fr_1.5fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+            <div className="grid grid-cols-[2fr_1fr_1.5fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
               <span>Product</span><span className="text-center">Source Stock</span><span className="text-center">Transfer Qty</span><span className="text-right">Status</span>
             </div>
 
-            <div className="divide-y divide-slate-50 min-h-[120px]">
+            <div className="divide-y divide-slate-50 dark:divide-slate-800 min-h-[120px]">
               {items.length === 0 ? (
                 <div className="text-center py-10 text-slate-400 text-sm">Search and add products above</div>
               ) : items.map(item => (
                 <div key={item.product_id} className="grid grid-cols-[2fr_1fr_1.5fr_1fr] items-center px-6 py-4">
                   <div>
-                    <p className="text-sm font-bold text-slate-800">{item.product_name}</p>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{item.product_name}</p>
                     <p className="text-[10px] font-mono text-slate-400">{item.product_sku}</p>
                   </div>
-                  <div className="text-center text-sm font-semibold text-slate-600">{item.source_stock} units</div>
+                  <div className="text-center text-sm font-semibold text-slate-600 dark:text-slate-400">{item.source_stock} units</div>
                   <div className="flex justify-center">
                     <input type="number" min="1" max={item.source_stock} value={item.quantity}
                       onChange={e => updateQty(item.product_id, e.target.value)}
@@ -185,14 +185,14 @@ export default function NewStockTransfer() {
               ))}
             </div>
 
-            <div className="border-t border-slate-200 bg-slate-50 p-5 grid grid-cols-3 gap-5">
+            <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 p-5 grid grid-cols-3 gap-5">
               <div className="col-span-1">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Transfer Reason</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">Transfer Reason</label>
                 <input value={reason} onChange={e => setReason(e.target.value)} placeholder="e.g., Weekend restock"
-                  className="w-full bg-white border border-slate-200 px-3 py-2.5 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"/>
+                  className="w-full bg-white border border-slate-200 dark:border-slate-700 px-3 py-2.5 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"/>
               </div>
               <div className="col-span-1">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Priority</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">Priority</label>
                 <div className="relative">
                   <select value={priority} onChange={e => setPriority(e.target.value)}
                     className="w-full bg-sky-50 border border-sky-200 px-3 py-2.5 rounded-lg text-sm font-bold text-sky-700 appearance-none focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
@@ -204,8 +204,8 @@ export default function NewStockTransfer() {
                 </div>
               </div>
               <div className="col-span-1 border-l border-slate-200 pl-5 flex flex-col justify-center">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Total Items</span>
-                <span className="text-4xl font-black text-slate-800">{totalItems}</span>
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-1">Total Items</span>
+                <span className="text-4xl font-black text-slate-800 dark:text-slate-100">{totalItems}</span>
               </div>
             </div>
           </div>
@@ -218,7 +218,7 @@ export default function NewStockTransfer() {
 
           <div className="flex justify-end gap-4">
             <button onClick={() => navigate('/transfers/approvals')}
-              className="px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-colors shadow-sm">
+              className="px-8 py-3.5 bg-white border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
               Save as Draft
             </button>
             <button onClick={handleSubmit} disabled={saving}
