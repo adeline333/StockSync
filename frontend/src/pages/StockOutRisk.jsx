@@ -57,17 +57,17 @@ export default function StockOutRisk() {
   const filtered = filter === 'all' ? (data?.items || []) : (data?.items || []).filter(i => i.risk_level === filter);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-black text-slate-800">Stock-Out Risk Report</h1>
-            <p className="text-sm text-slate-500">Items predicted to run out based on sales velocity</p>
+            <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">Stock-Out Risk Report</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Items predicted to run out based on sales velocity</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
               <select value={branchId} onChange={e => setBranchId(e.target.value)}
-                className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
+                className="appearance-none bg-slate-50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
                 <option value="">All Locations</option>
                 {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
@@ -75,7 +75,7 @@ export default function StockOutRisk() {
             </div>
             <div className="relative">
               <select value={filter} onChange={e => setFilter(e.target.value)}
-                className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
+                className="appearance-none bg-slate-50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
                 <option value="all">All Risks</option>
                 <option value="critical">Critical</option>
                 <option value="high">High Risk</option>
@@ -84,7 +84,7 @@ export default function StockOutRisk() {
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>
             </div>
-            <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+            <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
               <DownloadCloud className="w-4 h-4"/> Export
             </button>
           </div>
@@ -96,15 +96,15 @@ export default function StockOutRisk() {
           ) : (
             <>
               <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
                   <div className="absolute -right-4 -top-4 w-20 h-20 bg-rose-50 rounded-full"/>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Products At Risk</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Products At Risk</p>
                   <p className="text-4xl font-black text-rose-500">{data?.total_at_risk || 0} <span className="text-lg font-bold">Items</span></p>
                   <p className="text-xs text-slate-400 mt-2">Critical + High risk combined</p>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
                   <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-50 rounded-full"/>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Potential Revenue Loss</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Potential Revenue Loss</p>
                   <p className="text-4xl font-black text-amber-500">
                     {(parseFloat(data?.potential_loss || 0) / 1000000).toFixed(1)}M <span className="text-lg font-bold">RWF</span>
                   </p>
@@ -112,8 +112,8 @@ export default function StockOutRisk() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="grid grid-cols-[3fr_1.5fr_1.5fr_1.5fr_1.5fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="grid grid-cols-[3fr_1.5fr_1.5fr_1.5fr_1.5fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                   <span>Product</span><span>Current Stock</span><span>Velocity (Daily)</span>
                   <span className="text-center">Days Remaining</span><span>Status</span><span className="text-right">Action</span>
                 </div>
@@ -130,11 +130,11 @@ export default function StockOutRisk() {
                   return (
                     <div key={item.id} className={`grid grid-cols-[3fr_1.5fr_1.5fr_1.5fr_1.5fr_1fr] items-center px-6 py-5 border-b border-slate-50 transition-all ${isHighRisk ? 'bg-rose-50/30 hover:bg-rose-50/50' : 'hover:bg-slate-50'}`}>
                       <div className={isHighRisk ? 'pl-3 border-l-4 border-rose-500' : 'pl-3'}>
-                        <p className="text-sm font-bold text-slate-800">{item.name}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{item.name}</p>
                         <p className="text-[10px] font-mono text-slate-400">{item.sku}</p>
                       </div>
-                      <p className="text-sm font-bold text-slate-700">{item.current_stock} units</p>
-                      <p className="text-sm text-slate-500">~{item.daily_velocity} / day</p>
+                      <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{item.current_stock} units</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">~{item.daily_velocity} / day</p>
                       <div className="flex justify-center">
                         <span className={`text-xs font-black uppercase px-4 py-1.5 rounded-full w-24 text-center shadow-sm ${cfg.pill}`}>
                           {item.days_remaining >= 999 ? '∞' : `${item.days_remaining}d`}
@@ -144,11 +144,11 @@ export default function StockOutRisk() {
                       <div className="text-right">
                         {item.risk_level !== 'safe' ? (
                           <button onClick={() => navigate('/inventory/reorder')}
-                            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm ${isHighRisk ? 'bg-slate-900 hover:bg-black text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm ${isHighRisk ? 'bg-slate-900 hover:bg-black text-white' : 'bg-white border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50'}`}>
                             Reorder
                           </button>
                         ) : (
-                          <button disabled className="px-4 py-2 rounded-lg text-xs font-bold bg-slate-50 text-slate-300 border border-slate-100 cursor-not-allowed">
+                          <button disabled className="px-4 py-2 rounded-lg text-xs font-bold bg-slate-50 text-slate-300 border border-slate-100 dark:border-slate-800 cursor-not-allowed">
                             Reorder
                           </button>
                         )}
