@@ -71,7 +71,7 @@ export default function Transactions() {
       </div>
 
       {/* Timeline View */}
-      <div className="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 p-8">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 p-8">
         <div className="relative border-l-2 border-gray-100 pl-8 ml-4 space-y-10 group/timeline">
           
           {transactions.map((tx, idx) => {
