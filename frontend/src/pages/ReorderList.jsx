@@ -77,16 +77,16 @@ export default function ReorderList() {
   const selectedCost = selectedItems.reduce((s, r) => s + (quantities[r.id] || r.suggested_qty) * parseFloat(r.cost_price || r.price * 0.7), 0);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-black text-slate-800">Restock Recommendations</h1>
-            <p className="text-sm text-slate-500">Generated based on sales velocity & lead time</p>
+            <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">Restock Recommendations</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Generated based on sales velocity & lead time</p>
           </div>
           <div className="relative">
             <select value={branchId} onChange={e => setBranchId(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
+              className="appearance-none bg-slate-50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
               <option value="">All Locations</option>
               {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
@@ -100,14 +100,14 @@ export default function ReorderList() {
           ) : (
             <>
               <div className="flex gap-6 items-center">
-                <div className="flex-1 bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Est. Purchase Order Value</p>
-                  <p className="text-2xl font-black text-slate-800">{Number(selectedCost).toLocaleString()} <span className="text-sm font-bold text-slate-400">RWF</span></p>
+                <div className="flex-1 bg-white rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Est. Purchase Order Value</p>
+                  <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{Number(selectedCost).toLocaleString()} <span className="text-sm font-bold text-slate-400">RWF</span></p>
                   <p className="text-xs text-slate-400 mt-1">{selected.size} item(s) selected</p>
                 </div>
-                <div className="flex-1 bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Items Suggested</p>
-                  <p className="text-2xl font-black text-slate-800">{data?.total_skus || 0} <span className="text-sm font-bold text-slate-400">SKUs</span></p>
+                <div className="flex-1 bg-white rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Items Suggested</p>
+                  <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{data?.total_skus || 0} <span className="text-sm font-bold text-slate-400">SKUs</span></p>
                 </div>
                 <button disabled={selected.size === 0}
                   className="px-8 py-4 bg-slate-900 hover:bg-black text-white rounded-2xl text-base font-black transition-all shadow-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
@@ -115,8 +115,8 @@ export default function ReorderList() {
                 </button>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="grid grid-cols-[0.5fr_3fr_2fr_1.5fr_2fr_1.5fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 items-center">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="grid grid-cols-[0.5fr_3fr_2fr_1.5fr_2fr_1.5fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 items-center">
                   <div className="pl-1 cursor-pointer" onClick={toggleAll}>
                     {selected.size === data?.recommendations?.length && data?.recommendations?.length > 0
                       ? <CheckSquare className="w-5 h-5 text-sky-500"/>
@@ -143,11 +143,11 @@ export default function ReorderList() {
                           : <Square className="w-5 h-5 text-slate-300"/>}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-800">{item.name}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{item.name}</p>
                         <p className="text-[10px] font-mono text-slate-400">{item.sku}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-700">{item.supplier_name || 'Unknown'}</p>
+                        <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{item.supplier_name || 'Unknown'}</p>
                         <p className="text-xs text-slate-400">Lead: {item.supplier_lead_days || 3} days</p>
                       </div>
                       <div className="flex justify-center">
@@ -159,7 +159,7 @@ export default function ReorderList() {
                           className={`w-28 border-2 text-slate-900 text-base font-black px-3 py-2 rounded-xl text-center focus:outline-none transition-colors ${isChecked ? 'border-sky-500 bg-white' : 'border-slate-200 bg-slate-50'}`}/>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-black text-slate-700">
+                        <p className="text-sm font-black text-slate-700 dark:text-slate-300">
                           {Number((quantities[item.id] || item.suggested_qty) * parseFloat(item.cost_price || item.price * 0.7)).toLocaleString()}
                         </p>
                       </div>
