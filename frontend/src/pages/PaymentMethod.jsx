@@ -84,7 +84,7 @@ export default function PaymentMethod() {
   const quickAmounts = [total, Math.ceil(total / 1000) * 1000, Math.ceil(total / 5000) * 5000, Math.ceil(total / 10000) * 10000].filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans overflow-hidden">
       <aside className="w-[100px] bg-slate-900 flex flex-col items-center py-6 h-screen shrink-0 fixed z-20">
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center shadow-lg mb-10">
           <span className="text-white font-black text-xs uppercase">Sync</span>
@@ -104,18 +104,18 @@ export default function PaymentMethod() {
       </aside>
 
       <main className="flex-1 ml-[100px] flex flex-col h-screen overflow-hidden">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0">
-          <button onClick={() => navigate(-1)} className="flex items-center text-slate-500 hover:text-sky-600 font-bold group">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between shrink-0">
+          <button onClick={() => navigate(-1)} className="flex items-center text-slate-500 dark:text-slate-400 hover:text-sky-600 font-bold group">
             <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" /> Back
           </button>
-          <h1 className="text-2xl font-black text-slate-800">Select Payment Method</h1>
+          <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">Select Payment Method</h1>
           <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Total: {total.toLocaleString()} RWF</span>
         </header>
 
-        <div className="flex-1 p-8 overflow-y-auto bg-slate-50 flex gap-8 max-w-[1200px] mx-auto w-full items-start mt-4">
+        <div className="flex-1 p-8 overflow-y-auto bg-slate-50 dark:bg-slate-950 flex gap-8 max-w-[1200px] mx-auto w-full items-start mt-4">
           {/* Payment Options */}
-          <div className="flex-[3] bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-            <h2 className="text-lg font-black text-slate-800 uppercase tracking-wider mb-6">Payment Options</h2>
+          <div className="flex-[3] bg-white p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">
+            <h2 className="text-lg font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-6">Payment Options</h2>
             <div className="grid grid-cols-2 gap-5">
               {[
                 { id: 'cash', label: 'Cash Payment', sub: 'Accept RWF currency', icon: <Banknote className="w-7 h-7" />, iconBg: 'bg-sky-100', iconColor: 'text-sky-500' },
@@ -129,7 +129,7 @@ export default function PaymentMethod() {
                     <span className={opt.iconColor}>{opt.icon}</span>
                   </div>
                   <h3 className={`text-lg font-black mb-1 ${method === opt.id ? 'text-sky-600' : 'text-slate-800'}`}>{opt.label}</h3>
-                  <p className="text-sm text-slate-500">{opt.sub}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{opt.sub}</p>
                   {method === opt.id && <CheckCircle2 className="w-6 h-6 text-sky-500 absolute top-5 right-5" />}
                 </div>
               ))}
@@ -137,13 +137,13 @@ export default function PaymentMethod() {
           </div>
 
           {/* Calculator */}
-          <div className="flex-[2] bg-white p-8 rounded-3xl shadow-lg border border-slate-100 flex flex-col min-h-[560px]">
+          <div className="flex-[2] bg-white p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col min-h-[560px]">
             <div className="mb-6">
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Total Due</p>
-              <p className="text-5xl font-black text-slate-800">{total.toLocaleString()} <span className="text-xl text-slate-400 font-semibold">RWF</span></p>
+              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Total Due</p>
+              <p className="text-5xl font-black text-slate-800 dark:text-slate-100">{total.toLocaleString()} <span className="text-xl text-slate-400 font-semibold">RWF</span></p>
             </div>
 
-            <div className="border-t border-slate-100 pt-6 flex-1">
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-6 flex-1">
               <div className="grid grid-cols-4 gap-2 mb-5">
                 {quickAmounts.map(amt => (
                   <button key={amt} onClick={() => setTendered(amt)}
@@ -154,10 +154,10 @@ export default function PaymentMethod() {
               </div>
 
               <div className="mb-5">
-                <label className="text-sm font-bold text-slate-700 block mb-2">Amount Tendered (RWF)</label>
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Amount Tendered (RWF)</label>
                 <div className="w-full bg-slate-50 border-2 border-sky-500 rounded-xl p-4 flex items-center shadow-inner">
                   <input type="number" value={tendered} onChange={e => setTendered(e.target.value)}
-                    className="text-3xl font-black text-slate-800 flex-1 bg-transparent outline-none w-full" />
+                    className="text-3xl font-black text-slate-800 dark:text-slate-100 flex-1 bg-transparent outline-none w-full" />
                   <span className="text-sky-500 font-bold uppercase tracking-widest text-sm ml-2">RWF</span>
                 </div>
               </div>
