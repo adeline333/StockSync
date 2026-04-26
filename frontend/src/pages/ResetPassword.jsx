@@ -47,11 +47,11 @@ const ResetPassword = () => {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-10 shadow text-center max-w-md w-full border border-slate-100">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-10 shadow text-center max-w-md w-full border border-slate-100 dark:border-slate-800">
           <AlertTriangle className="w-12 h-12 text-rose-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Invalid Reset Link</h2>
-          <p className="text-slate-500 text-sm mb-6">This link is missing a reset token. Please request a new one.</p>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Invalid Reset Link</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">This link is missing a reset token. Please request a new one.</p>
           <Link to="/forgot-password" className="text-sky-500 font-semibold hover:text-sky-600">
             Request New Link
           </Link>
@@ -61,13 +61,13 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-10 border border-slate-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-10 border border-slate-100 dark:border-slate-800">
         {success ? (
           <div className="text-center py-6">
             <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-slate-800 mb-2">Password Reset!</h2>
-            <p className="text-slate-500 text-sm">Redirecting you to login...</p>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Password Reset!</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Redirecting you to login...</p>
           </div>
         ) : (
           <>
@@ -75,8 +75,8 @@ const ResetPassword = () => {
               <div className="w-16 h-16 bg-sky-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Lock className="w-8 h-8 text-sky-500" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-800">Set New Password</h2>
-              <p className="text-slate-500 text-sm mt-2">Choose a strong password for your account.</p>
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Set New Password</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">Choose a strong password for your account.</p>
             </div>
 
             {error && (
@@ -87,7 +87,7 @@ const ResetPassword = () => {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">New Password</label>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">New Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
                   <input
@@ -102,7 +102,7 @@ const ResetPassword = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Confirm New Password</label>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Confirm New Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
                   <input
@@ -126,7 +126,7 @@ const ResetPassword = () => {
             </form>
 
             <div className="mt-6">
-              <Link to="/login" className="flex items-center justify-center font-semibold text-slate-500 hover:text-slate-700 transition-colors group">
+              <Link to="/login" className="flex items-center justify-center font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 transition-colors group">
                 <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
                 Back to Login
               </Link>
