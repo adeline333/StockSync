@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { OfflineProvider } from './context/OfflineContext';
+import { ThemeProvider } from './context/ThemeContext';
 import AppLayout from './components/AppLayout';
 
 import Dashboard from './pages/Dashboard';
@@ -74,8 +75,9 @@ function App() {
   return (
     <AuthProvider>
       <OfflineProvider>
+      <ThemeProvider>
       <Router>
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans transition-colors duration-200">
           <div className="flex-1 w-full mx-auto">
             <Routes>
               {/* Public Auth Routes */}
@@ -126,6 +128,7 @@ function App() {
           </div>
         </div>
       </Router>
+      </ThemeProvider>
       </OfflineProvider>
     </AuthProvider>
   );
