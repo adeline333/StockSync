@@ -8,7 +8,7 @@ const API_URL = 'http://localhost:5000/api';
 
 const typeStyle = {
   corporate: 'bg-sky-50 text-sky-600 border-sky-100',
-  retail: 'bg-slate-100 text-slate-600 border-slate-200',
+  retail: 'bg-slate-100 text-slate-600 dark:text-slate-400 border-slate-200',
   wholesale: 'bg-violet-50 text-violet-600 border-violet-100',
 };
 
@@ -69,15 +69,15 @@ export default function CustomerDetail() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
     </div>
   );
 
   if (!data) return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center flex-col gap-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center flex-col gap-4">
       <AlertTriangle className="w-10 h-10 text-rose-400" />
-      <p className="text-slate-600 font-semibold">Customer not found</p>
+      <p className="text-slate-600 dark:text-slate-400 font-semibold">Customer not found</p>
       <Link to="/customers" className="text-sky-500 hover:underline text-sm">Back</Link>
     </div>
   );
@@ -86,20 +86,20 @@ export default function CustomerDetail() {
   const initials = customer.name.slice(0, 2).toUpperCase();
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center text-sm font-medium text-slate-500">
-            <Link to="/customers" className="hover:text-slate-700 flex items-center gap-1.5">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
+      <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center text-sm font-medium text-slate-500 dark:text-slate-400">
+            <Link to="/customers" className="hover:text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
               <ArrowLeft className="w-4 h-4" /> Customers
             </Link>
             <span className="mx-2">/</span>
-            <span className="text-slate-800 font-bold">{customer.name}</span>
+            <span className="text-slate-800 dark:text-slate-100 font-bold">{customer.name}</span>
           </div>
           <div className="flex items-center gap-3">
             {!editing ? (
               <>
-                <button onClick={() => setEditing(true)} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                <button onClick={() => setEditing(true)} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   <Edit className="w-4 h-4" /> Edit Profile
                 </button>
                 <button onClick={() => navigate('/pos')} className="flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-bold transition-colors shadow-md">
@@ -108,7 +108,7 @@ export default function CustomerDetail() {
               </>
             ) : (
               <>
-                <button onClick={() => { setEditing(false); setSaveMsg(null); }} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50">
+                <button onClick={() => { setEditing(false); setSaveMsg(null); }} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50">
                   <X className="w-4 h-4" /> Cancel
                 </button>
                 <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-bold transition-colors shadow-md disabled:opacity-60">
@@ -122,21 +122,21 @@ export default function CustomerDetail() {
         <div className="p-8 flex-1 flex gap-8">
           {/* Left: Profile Card */}
           <div className="w-96 shrink-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
               <div className="h-20 bg-slate-900" />
               <div className="px-6 pb-6 -mt-10">
                 <div className="w-20 h-20 rounded-full bg-slate-100 border-4 border-white shadow-md flex items-center justify-center mb-3">
-                  <span className="text-2xl font-black text-slate-500">{initials}</span>
+                  <span className="text-2xl font-black text-slate-500 dark:text-slate-400">{initials}</span>
                 </div>
                 {editing ? (
                   <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                    className="text-xl font-black text-slate-800 w-full border-b-2 border-sky-500 outline-none bg-transparent mb-2" />
+                    className="text-xl font-black text-slate-800 dark:text-slate-100 w-full border-b-2 border-sky-500 outline-none bg-transparent mb-2" />
                 ) : (
-                  <h2 className="text-xl font-black text-slate-800 mb-1">{customer.name}</h2>
+                  <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-1">{customer.name}</h2>
                 )}
                 {editing ? (
                   <select value={form.customer_type} onChange={e => setForm(p => ({ ...p, customer_type: e.target.value }))}
-                    className="text-xs border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500">
                     <option value="retail">Retail</option>
                     <option value="corporate">Corporate</option>
                     <option value="wholesale">Wholesale</option>
@@ -148,7 +148,7 @@ export default function CustomerDetail() {
                 )}
               </div>
 
-              <div className="px-6 pb-6 space-y-4 border-t border-slate-100 pt-4">
+              <div className="px-6 pb-6 space-y-4 border-t border-slate-100 dark:border-slate-800 pt-4">
                 {[
                   { label: 'TIN Number', key: 'tin', placeholder: '123-456-789' },
                   { label: 'Email', key: 'email', placeholder: 'email@company.rw' },
@@ -160,10 +160,10 @@ export default function CustomerDetail() {
                     {editing ? (
                       <input value={form[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
                         placeholder={f.placeholder}
-                        className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                        className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
                     ) : (
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-slate-700">{customer[f.key] || '—'}</p>
+                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{customer[f.key] || '—'}</p>
                         {f.key === 'tin' && customer.tin && (
                           customer.tin_verified
                             ? <BadgeCheck className="w-4 h-4 text-emerald-500" />
@@ -178,7 +178,7 @@ export default function CustomerDetail() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" checked={form.tin_verified} onChange={e => setForm(p => ({ ...p, tin_verified: e.target.checked }))}
                       className="w-4 h-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500" />
-                    <span className="text-sm font-semibold text-slate-600">Mark TIN as Verified</span>
+                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Mark TIN as Verified</span>
                   </label>
                 )}
 
@@ -186,7 +186,7 @@ export default function CustomerDetail() {
                   <div>
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block">Staff Notes</label>
                     <textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} rows={3}
-                      className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
+                      className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                   </div>
                 )}
 
@@ -210,17 +210,17 @@ export default function CustomerDetail() {
           {/* Right: Stats + Orders */}
           <div className="flex-1 flex flex-col gap-5">
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Lifetime Spend</p>
-                <p className="text-2xl font-black text-slate-800">
+                <p className="text-2xl font-black text-slate-800 dark:text-slate-100">
                   {(parseFloat(stats?.lifetime_spend || 0) / 1000000).toFixed(1)}M <span className="text-sm text-slate-400">RWF</span>
                 </p>
               </div>
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Orders</p>
-                <p className="text-2xl font-black text-slate-800">{stats?.total_orders || 0}</p>
+                <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{stats?.total_orders || 0}</p>
               </div>
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Credit Limit</p>
                 <p className="text-2xl font-black text-amber-500">
                   {(parseFloat(customer.credit_limit || 0) / 1000000).toFixed(1)}M <span className="text-sm text-slate-400">RWF</span>
@@ -228,24 +228,24 @@ export default function CustomerDetail() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex-1 overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-100">
-                <h3 className="text-base font-bold text-slate-800">Purchase History</h3>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex-1 overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">Purchase History</h3>
               </div>
-              <div className="grid grid-cols-[1fr_1.5fr_3fr_1.5fr_1fr] px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+              <div className="grid grid-cols-[1fr_1.5fr_3fr_1.5fr_1fr] px-6 py-3 bg-slate-50 dark:bg-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                 <span>Order #</span><span>Date</span><span>Items</span><span className="text-right">Amount</span><span className="text-right">Status</span>
               </div>
-              <div className="overflow-y-auto max-h-96 divide-y divide-slate-50">
+              <div className="overflow-y-auto max-h-96 divide-y divide-slate-50 dark:divide-slate-800">
                 {!orders || orders.length === 0 ? (
                   <div className="text-center py-12 text-slate-400">
                     <p className="font-semibold">No orders yet</p>
                   </div>
                 ) : orders.map(order => (
-                  <div key={order.id} className="grid grid-cols-[1fr_1.5fr_3fr_1.5fr_1fr] items-center px-6 py-4 hover:bg-slate-50 transition-colors">
+                  <div key={order.id} className="grid grid-cols-[1fr_1.5fr_3fr_1.5fr_1fr] items-center px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <span className="text-sm font-black text-sky-500">{order.order_number}</span>
-                    <span className="text-sm text-slate-500">{new Date(order.created_at).toLocaleDateString('en-GB')}</span>
-                    <span className="text-sm text-slate-700 truncate">{order.items_summary}</span>
-                    <span className="text-sm font-black text-slate-800 text-right">{Number(order.total_amount).toLocaleString()}</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">{new Date(order.created_at).toLocaleDateString('en-GB')}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 truncate">{order.items_summary}</span>
+                    <span className="text-sm font-black text-slate-800 dark:text-slate-100 text-right">{Number(order.total_amount).toLocaleString()}</span>
                     <div className="flex justify-end">
                       <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${order.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-500 border-rose-100'}`}>
                         {order.status}
