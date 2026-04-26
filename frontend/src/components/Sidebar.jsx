@@ -4,11 +4,12 @@ import {
   LayoutDashboard, PackageSearch, Receipt, ArrowRightLeft, MapPin,
   FileBarChart, Users, Bell, Settings, ShieldCheck, RefreshCw,
   ShoppingCart, History, Search, TrendingDown, ClipboardList,
-  BarChart2, BatteryWarning, ListChecks, LogOut, User, PackagePlus, Upload
+  BarChart2, BatteryWarning, ListChecks, LogOut, PackagePlus, Upload,
+  Sun, Moon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
-// Role-based nav config
 const NAV_CONFIG = {
   admin: [
     { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
@@ -61,6 +62,7 @@ const NAV_CONFIG = {
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
+  const { dark, toggle } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -71,7 +73,7 @@ export default function Sidebar() {
   const isActive = (to) => location.pathname === to || location.pathname.startsWith(to + '/');
 
   return (
-    <aside className="w-64 bg-slate-900 flex flex-col fixed h-full z-30 shrink-0">
+    <aside className="w-64 bg-slate-900 dark:bg-slate-950 dark:border-r dark:border-slate-800 flex flex-col fixed h-full z-30 shrink-0 transition-colors duration-200">
       {/* Logo */}
       <div className="h-20 flex items-center px-6 border-b border-slate-800 shrink-0">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center mr-3 shrink-0">
@@ -81,6 +83,15 @@ export default function Sidebar() {
           </svg>
         </div>
         <span className="text-xl font-bold text-white tracking-tight">StockSync</span>
+
+        {/* Dark mode toggle */}
+        <button
+          onClick={toggle}
+          className="ml-auto p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </button>
       </div>
 
       {/* Nav */}
