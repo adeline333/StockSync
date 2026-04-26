@@ -140,30 +140,30 @@ export default function ProductDetail() {
   const totalBranchQty = branchStock.reduce((s, b) => s + parseInt(b.quantity), 0);
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
     </div>
   );
 
   if (error) return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center flex-col gap-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center flex-col gap-4">
       <AlertTriangle className="w-10 h-10 text-rose-400" />
-      <p className="text-slate-600 font-semibold">{error}</p>
+      <p className="text-slate-600 dark:text-slate-400 font-semibold">{error}</p>
       <Link to="/inventory" className="text-sky-500 hover:underline text-sm">Back to Inventory</Link>
     </div>
   );
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen dark:bg-slate-950">
       {/* Main */}
       <main className="flex-1 flex flex-col min-h-screen">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center text-sm font-medium text-slate-500">
-            <Link to="/inventory" className="hover:text-slate-700 transition-colors">Inventory</Link>
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center text-sm font-medium text-slate-500 dark:text-slate-400">
+            <Link to="/inventory" className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">Inventory</Link>
             <span className="mx-2">/</span>
-            <Link to="/inventory" className="hover:text-slate-700 transition-colors">Product Catalog</Link>
+            <Link to="/inventory" className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">Product Catalog</Link>
             <span className="mx-2">/</span>
-            <span className="text-slate-800 font-bold truncate max-w-xs">{product?.name || 'Details'}</span>
+            <span className="text-slate-800 dark:text-slate-100 font-bold truncate max-w-xs">{product?.name || 'Details'}</span>
           </div>
           <button
             onClick={() => { setShowModal(true); setAdjMsg(null); }}
@@ -173,20 +173,20 @@ export default function ProductDetail() {
           </button>
         </header>
 
-        <div className="p-8 space-y-8 flex-1 bg-slate-50 max-w-7xl mx-auto w-full">
+        <div className="p-8 space-y-8 flex-1 bg-slate-50 dark:bg-slate-950 max-w-7xl mx-auto w-full">
 
           {/* Summary Card */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="flex items-center">
-              <div className="w-20 h-20 rounded-xl bg-slate-100 flex items-center justify-center mr-6 border-2 border-slate-200 shrink-0 overflow-hidden">
+              <div className="w-20 h-20 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-6 border-2 border-slate-200 dark:border-slate-700 shrink-0 overflow-hidden">
                 {product?.image_url
                   ? <img src={`http://localhost:5000${product.image_url}`} alt={product.name} className="w-full h-full object-cover" />
                   : <Package className="w-9 h-9 text-slate-400" />
                 }
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-slate-800 mb-1">{product?.name}</h2>
-                <p className="text-sm font-medium text-slate-500 mb-4">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-1">{product?.name}</h2>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">
                   SKU: {product?.sku}
                   {product?.category && <><span className="mx-2">|</span>Category: {product.category}</>}
                 </p>
@@ -198,15 +198,15 @@ export default function ProductDetail() {
                   }`}>
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> {product?.status}
                   </span>
-                  <span className="text-lg font-black text-slate-800">
+                  <span className="text-lg font-black text-slate-800 dark:text-slate-100">
                     RWF {Number(product?.price || 0).toLocaleString()}
                     <span className="text-sm font-medium text-slate-400 ml-1.5">/ unit</span>
                   </span>
                 </div>
               </div>
             </div>
-            <div className="mt-6 md:mt-0 flex flex-col items-center justify-center bg-slate-50 px-10 py-5 rounded-2xl border border-slate-200 shrink-0">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Available</p>
+            <div className="mt-6 md:mt-0 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-800 px-10 py-5 rounded-2xl border border-slate-200 dark:border-slate-700 shrink-0">
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Total Available</p>
               <p className="text-4xl font-black text-sky-500">{totalStock.toLocaleString()}</p>
               <p className="text-xs font-semibold text-sky-600 mt-1">Units</p>
             </div>
@@ -215,9 +215,9 @@ export default function ProductDetail() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             {/* Batch Table */}
-            <div className="lg:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
-                <h3 className="text-lg font-bold text-slate-800 flex items-center">
+            <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center">
                   <Clock className="w-5 h-5 mr-2 text-slate-400" /> Batch & Expiry Tracking
                 </h3>
               </div>
@@ -227,19 +227,19 @@ export default function ProductDetail() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                      <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                         <th className="py-3 px-2">Batch #</th>
                         <th className="py-3 px-2">Expiry Date</th>
                         <th className="py-3 px-2">Location</th>
                         <th className="py-3 px-2 text-right">Qty</th>
                       </tr>
                     </thead>
-                    <tbody className="text-sm divide-y divide-slate-50">
+                    <tbody className="text-sm divide-y divide-slate-50 dark:divide-slate-800">
                       {batches.map((b) => {
                         const style = getExpiryStyle(b.expiry_date);
                         return (
-                          <tr key={b.id} className="hover:bg-slate-50 transition-colors">
-                            <td className="py-4 px-2 font-bold text-slate-800">{b.batch_number}</td>
+                          <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <td className="py-4 px-2 font-bold text-slate-800 dark:text-slate-100">{b.batch_number}</td>
                             <td className="py-4 px-2">
                               <span className={`font-semibold ${style.color}`}>{formatDate(b.expiry_date)}</span>
                               {style.label && (
@@ -248,8 +248,8 @@ export default function ProductDetail() {
                                 </span>
                               )}
                             </td>
-                            <td className="py-4 px-2 font-medium text-slate-600">{b.branch_name}</td>
-                            <td className="py-4 px-2 font-bold text-slate-800 text-right">{b.quantity}</td>
+                            <td className="py-4 px-2 font-medium text-slate-600 dark:text-slate-400">{b.branch_name}</td>
+                            <td className="py-4 px-2 font-bold text-slate-800 dark:text-slate-100 text-right">{b.quantity}</td>
                           </tr>
                         );
                       })}
@@ -262,8 +262,8 @@ export default function ProductDetail() {
             <div className="lg:col-span-1 space-y-8">
 
               {/* Branch Distribution */}
-              <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center border-b border-slate-100 pb-4">
+              <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center border-b border-slate-100 dark:border-slate-800 pb-4">
                   <PieChart className="w-5 h-5 mr-2 text-slate-400" /> Stock Distribution
                 </h3>
                 {branchStock.length === 0 ? (
@@ -295,8 +295,8 @@ export default function ProductDetail() {
               </div>
 
               {/* Supplier */}
-              <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                <h3 className="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Primary Supplier</h3>
+              <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">Primary Supplier</h3>
                 {product?.supplier_name ? (
                   <div className="flex items-center">
                     <div className="w-14 h-14 rounded-full bg-sky-50 flex items-center justify-center mr-4 border-2 border-sky-100 shrink-0">
@@ -305,9 +305,9 @@ export default function ProductDetail() {
                       </span>
                     </div>
                     <div>
-                      <h4 className="text-base font-bold text-slate-800 leading-tight mb-1">{product.supplier_name}</h4>
-                      <p className="text-xs font-semibold text-slate-500">
-                        Lead time: <span className="text-slate-700">{product.supplier_lead_days || 0} days</span>
+                      <h4 className="text-base font-bold text-slate-800 dark:text-slate-100 leading-tight mb-1">{product.supplier_name}</h4>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        Lead time: <span className="text-slate-700 dark:text-slate-300">{product.supplier_lead_days || 0} days</span>
                       </p>
                     </div>
                   </div>
@@ -319,15 +319,15 @@ export default function ProductDetail() {
             </div>
           </div>
           {/* Serial Numbers Section */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
-              <h3 className="text-lg font-bold text-slate-800 flex items-center">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center">
                 <Hash className="w-5 h-5 mr-2 text-slate-400" /> Serial Number Tracking
-                <span className="ml-3 text-xs font-semibold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{serials.length} total</span>
+                <span className="ml-3 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full">{serials.length} total</span>
               </h3>
               <div className="flex items-center gap-3">
                 <select value={serialFilter} onChange={e => setSerialFilter(e.target.value)}
-                  className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                  className="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-600 dark:text-slate-300 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
                   <option value="all">All Status</option>
                   <option value="in_stock">In Stock</option>
                   <option value="sold">Sold</option>
@@ -351,7 +351,7 @@ export default function ProductDetail() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                    <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                       <th className="py-3 px-3">Serial Number</th>
                       <th className="py-3 px-3">Branch</th>
                       <th className="py-3 px-3">Status</th>
@@ -359,7 +359,7 @@ export default function ProductDetail() {
                       <th className="py-3 px-3">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="text-sm divide-y divide-slate-50">
+                  <tbody className="text-sm divide-y divide-slate-50 dark:divide-slate-800">
                     {serials.map(s => {
                       const statusStyles = {
                         in_stock: 'bg-emerald-50 text-emerald-600 border-emerald-100',
@@ -368,9 +368,9 @@ export default function ProductDetail() {
                         returned: 'bg-amber-50 text-amber-600 border-amber-100',
                       };
                       return (
-                        <tr key={s.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="py-3 px-3 font-mono font-bold text-slate-800">{s.serial_number}</td>
-                          <td className="py-3 px-3 text-slate-600">{s.branch_name || '—'}</td>
+                        <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                          <td className="py-3 px-3 font-mono font-bold text-slate-800 dark:text-slate-100">{s.serial_number}</td>
+                          <td className="py-3 px-3 text-slate-600 dark:text-slate-400">{s.branch_name || '—'}</td>
                           <td className="py-3 px-3">
                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black border uppercase tracking-wider ${statusStyles[s.status] || 'bg-slate-50 text-slate-500 border-slate-100'}`}>
                               {s.status.replace('_', ' ')}
@@ -379,7 +379,7 @@ export default function ProductDetail() {
                           <td className="py-3 px-3 text-slate-400 text-xs">{formatDate(s.created_at)}</td>
                           <td className="py-3 px-3">
                             <select value={s.status} onChange={e => updateSerialStatus(s.id, e.target.value)}
-                              className="text-xs border border-slate-200 rounded-lg px-2 py-1 text-slate-600 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer">
+                              className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-slate-600 dark:text-slate-300 dark:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer">
                               <option value="in_stock">In Stock</option>
                               <option value="sold">Mark Sold</option>
                               <option value="damaged">Mark Damaged</option>
@@ -401,26 +401,26 @@ export default function ProductDetail() {
       {/* Add Serials Modal */}
       {showSerialModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Add Serial Numbers</h2>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Add Serial Numbers</h2>
               <button onClick={() => setShowSerialModal(false)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleAddSerials} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Branch</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Branch</label>
                 <select value={serialBranch} onChange={e => setSerialBranch(e.target.value)} required
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                  className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
                   {branchStock.map(b => <option key={b.branch_id} value={b.branch_id}>{b.branch_name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                   Serial Numbers <span className="normal-case font-normal text-slate-400">(one per line)</span>
                 </label>
                 <textarea value={serialInput} onChange={e => setSerialInput(e.target.value)} rows={6} required
                   placeholder={"SN-001\nSN-002\nSN-003"}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
+                  className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                 <p className="text-xs text-slate-400 mt-1">{serialInput.split('\n').filter(s => s.trim()).length} serial(s) entered</p>
               </div>
               {serialMsg && (
@@ -430,7 +430,7 @@ export default function ProductDetail() {
               )}
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setShowSerialModal(false)}
-                  className="flex-1 py-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                  className="flex-1 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
                 <button type="submit" disabled={serialSaving}
                   className="flex-1 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center">
                   {serialSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add Serials'}
@@ -444,9 +444,9 @@ export default function ProductDetail() {
       {/* Adjust Stock Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Adjust Stock</h2>
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Adjust Stock</h2>
               <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
@@ -454,12 +454,12 @@ export default function ProductDetail() {
 
             <form onSubmit={handleAdjust} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Branch</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Branch</label>
                 <select
                   value={adjBranchId}
                   onChange={e => setAdjBranchId(e.target.value)}
                   required
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 >
                   {branchStock.map(b => (
                     <option key={b.branch_id} value={b.branch_id}>{b.branch_name} ({b.quantity} in stock)</option>
@@ -468,11 +468,11 @@ export default function ProductDetail() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Adjustment Type</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Adjustment Type</label>
                 <select
                   value={adjType}
                   onChange={e => setAdjType(e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 >
                   <option value="receive">Receive (+)</option>
                   <option value="adjustment">Adjustment (+/-)</option>
@@ -483,7 +483,7 @@ export default function ProductDetail() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quantity</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Quantity</label>
                 <input
                   type="number"
                   min="1"
@@ -491,18 +491,18 @@ export default function ProductDetail() {
                   onChange={e => setAdjQty(e.target.value)}
                   required
                   placeholder="Enter quantity"
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Reason</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Reason</label>
                 <input
                   type="text"
                   value={adjReason}
                   onChange={e => setAdjReason(e.target.value)}
                   placeholder="Optional reason"
-                  className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>
 
@@ -516,7 +516,7 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 py-3 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                  className="flex-1 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Cancel
                 </button>
