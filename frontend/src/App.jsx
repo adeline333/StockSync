@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import AppLayout from './components/AppLayout';
 
 import Dashboard from './pages/Dashboard';
+import UserManagement from './pages/UserManagement';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -31,6 +32,7 @@ import ReorderList from './pages/ReorderList';
 import Locations from './pages/Locations';
 import NewStockTransfer from './pages/NewStockTransfer';
 import TransferApproval from './pages/TransferApproval';
+import MyTransfers from './pages/MyTransfers';
 
 import Customers from './pages/Customers';
 import CustomerDetail from './pages/CustomerDetail';
@@ -96,9 +98,11 @@ function App() {
               <Route path="/locations" element={<ProtectedRoute><Locations /></ProtectedRoute>} />
               <Route path="/transfers/new" element={<ProtectedRoute><NewStockTransfer /></ProtectedRoute>} />
               <Route path="/transfers/approvals" element={<ProtectedRoute><TransferApproval /></ProtectedRoute>} />
+              <Route path="/transfers/my" element={<ProtectedRoute><MyTransfers /></ProtectedRoute>} />
 
               <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
               <Route path="/inventory/new" element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
+              <Route path="/inventory/edit/:id" element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
               <Route path="/inventory/import" element={<ProtectedRoute><BulkImport /></ProtectedRoute>} />
               <Route path="/inventory/reorder" element={<ProtectedRoute><ReorderList /></ProtectedRoute>} />
               <Route path="/inventory/:id" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
@@ -113,6 +117,7 @@ function App() {
               <Route path="/customers/:id" element={<ProtectedRoute><CustomerDetail /></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
               <Route path="/admin/audit" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
               <Route path="/admin/reports" element={<ProtectedRoute><ReportBuilder /></ProtectedRoute>} />
               <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/admin/sync" element={<ProtectedRoute><SyncStatus /></ProtectedRoute>} />
