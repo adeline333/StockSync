@@ -82,6 +82,11 @@ exports.createTransfer = async (req, res) => {
   if (!items || items.length === 0) return res.status(400).json({ message: 'Add at least one item' });
   if (source_branch_id === dest_branch_id) return res.status(400).json({ message: 'Source and destination cannot be the same' });
 
+  // BUSINESS RULE: Only managers and admins can create transfer requests
+  if (req.user.role === 'staff') {
+    return res.status(403).json({ message: 'Staff users cannot create transfer requests. Contact your manager.' });
+  }
+
   try {
     const transferNumber = genTransferNumber();
     const result = await db.query(
@@ -118,6 +123,16 @@ exports.approveTransfer = async (req, res) => {
     if (transferResult.rows.length === 0) throw new Error('Transfer not found');
     const transfer = transferResult.rows[0];
     if (transfer.status !== 'pending') throw new Error(`Transfer is already ${transfer.status}`);
+
+    // BUSINESS RULE: Only admins can approve transfers
+    if (req.user.role !== 'admin') {
+      throw new Error('Only administrators can approve transfers');
+    }
+
+    // BUSINESS RULE: Cannot approve your own transfer request
+    if (transfer.requested_by === req.user.id) {
+      throw new Error('You cannot approve your own transfer request');
+    }
 
     const items = await client.query('SELECT * FROM stock_transfer_items WHERE transfer_id = $1', [transfer.id]);
 
@@ -178,6 +193,16 @@ exports.rejectTransfer = async (req, res) => {
     const result = await db.query('SELECT * FROM stock_transfers WHERE id=$1', [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ message: 'Transfer not found' });
     if (result.rows[0].status !== 'pending') return res.status(400).json({ message: 'Transfer is not pending' });
+
+    // BUSINESS RULE: Only admins can reject transfers
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Only administrators can reject transfers' });
+    }
+
+    // BUSINESS RULE: Cannot reject your own transfer request
+    if (result.rows[0].requested_by === req.user.id) {
+      return res.status(403).json({ message: 'You cannot reject your own transfer request' });
+    }
 
     await db.query(
       'UPDATE stock_transfers SET status=$1, rejected_reason=$2, approved_by=$3, updated_at=NOW() WHERE id=$4',
