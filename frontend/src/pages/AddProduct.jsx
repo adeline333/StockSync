@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Image as ImageIcon, RefreshCcw, Loader2, AlertTriangle, CheckCircle2, X } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const API_URL = 'http://localhost:5000/api';
@@ -8,19 +8,68 @@ const API_URL = 'http://localhost:5000/api';
 const genSKU = (name, category) => {
   const cat = (category || 'GEN').substring(0, 3).toUpperCase();
   const nm = (name || 'ITEM').replace(/\s+/g, '-').substring(0, 6).toUpperCase();
-  const rand = Math.floor(Math.random() * 900 + 100);
+  const rand = Math.floor(Math.random() + 900 + 100);
   return `${cat}-${nm}-${rand}`;
 };
 
 export default function AddProduct() {
+  const { id } = useParams(); // If id exists, we're editing
+  const isEditMode = !!id;
   const { token } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [useVat, setUseVat] = useState(true);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+
+  const [form, setForm] = useState({
+    name: '', description: '', category: 'Beer', brand: '',
+    price: '', cost_price: '', sku: '', barcode: '',
+    supplier_name: '', supplier_lead_days: '', min_stock_level: 10
+  });
+
+  // Fetch product data if editing
+  useEffect(() => {
+    if (!isEditMode) return;
+    
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`${API_URL}/inventory/products/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        
+        const p = data.product;
+        setForm({
+          name: p.name || '',
+          description: p.description || '',
+          category: p.category || 'Beer',
+          brand: p.brand || '',
+          price: p.price || '',
+          cost_price: p.cost_price || '',
+          sku: p.sku || '',
+          barcode: p.barcode || '',
+          supplier_name: p.supplier_name || '',
+          supplier_lead_days: p.supplier_lead_days || '',
+          min_stock_level: p.min_stock_level || 10
+        });
+        setUseVat(p.is_vat_inclusive !== false);
+        if (p.image_url) {
+          setImagePreview(`http://localhost:5000${p.image_url}`);
+        }
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProduct();
+  }, [id, isEditMode, token]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -36,12 +85,6 @@ export default function AddProduct() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const [form, setForm] = useState({
-    name: '', description: '', category: 'Beer', brand: '',
-    price: '', cost_price: '', sku: '', barcode: '',
-    supplier_name: '', supplier_lead_days: '', min_stock_level: 10
-  });
-
   const set = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }));
 
   const handleSubmit = async (e) => {
@@ -50,18 +93,34 @@ export default function AddProduct() {
     if (!form.name || !form.sku || !form.price) { setError('Name, SKU and Price are required.'); return; }
     setSaving(true);
     try {
-      const body = new FormData();
-      Object.entries({ ...form, is_vat_inclusive: useVat }).forEach(([k, v]) => body.append(k, v));
-      if (imageFile) body.append('image', imageFile);
+      if (isEditMode) {
+        // Update existing product
+        const res = await fetch(`${API_URL}/inventory/products/${id}`, {
+          method: 'PUT',
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ...form, is_vat_inclusive: useVat })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        navigate(`/inventory/${id}`);
+      } else {
+        // Create new product
+        const body = new FormData();
+        Object.entries({ ...form, is_vat_inclusive: useVat }).forEach(([k, v]) => body.append(k, v));
+        if (imageFile) body.append('image', imageFile);
 
-      const res = await fetch(`${API_URL}/inventory/products`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      navigate(`/inventory/${data.product.id}`);
+        const res = await fetch(`${API_URL}/inventory/products`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        navigate(`/inventory/${data.product.id}`);
+      }
     } catch (e) {
       setError(e.message);
       setSaving(false);
@@ -74,22 +133,28 @@ export default function AddProduct() {
         <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center text-sm font-medium text-slate-500 dark:text-slate-400">
             <Link to="/inventory" className="flex items-center hover:text-slate-700 dark:hover:text-slate-300 mr-2"><ArrowLeft className="w-4 h-4 mr-1" /> Back to List</Link>
-            <span className="mx-2">/</span><span className="text-slate-800 dark:text-slate-100 font-bold">New Product</span>
+            <span className="mx-2">/</span><span className="text-slate-800 dark:text-slate-100 font-bold">{isEditMode ? 'Edit Product' : 'New Product'}</span>
           </div>
-          <button onClick={handleSubmit} disabled={saving}
+          <button onClick={handleSubmit} disabled={saving || loading}
             className="bg-gradient-to-r from-sky-500 to-teal-500 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:opacity-90 transition flex items-center disabled:opacity-60">
-            {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</> : 'Save Product'}
+            {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</> : (isEditMode ? 'Update Product' : 'Save Product')}
           </button>
         </header>
 
         <div className="p-8 space-y-8 flex-1 max-w-7xl">
-          <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">Add New Product</h2>
-
-          {error && (
-            <div className="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" /> {error}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
             </div>
-          )}
+          ) : (
+            <>
+              <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{isEditMode ? 'Edit Product' : 'Add New Product'}</h2>
+
+              {error && (
+                <div className="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" /> {error}
+                </div>
+              )}
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -235,6 +300,8 @@ export default function AddProduct() {
               </div>
             </div>
           </form>
+            </>
+          )}
         </div>
       </main>
     </div>
