@@ -7,7 +7,6 @@ const roles = [
   { id: 'admin', label: 'Admin', icon: <Crown className="w-6 h-6" /> },
   { id: 'manager', label: 'Manager', icon: <Package className="w-6 h-6" /> },
   { id: 'staff', label: 'Retail Staff', icon: <Store className="w-6 h-6" /> },
-  { id: 'auditor', label: 'Auditor', icon: <Hash className="w-6 h-6" /> }
 ];
 
 const Register = () => {
@@ -16,12 +15,28 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [branchId, setBranchId] = useState('');
+  const [branches, setBranches] = useState([]);
   
   const [errorBanner, setErrorBanner] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const navigate = useNavigate();
   const { register } = useAuth();
+
+  // Fetch branches on mount
+  React.useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/locations');
+        const data = await res.json();
+        setBranches(data.locations || []);
+      } catch (e) {
+        console.error('Failed to fetch branches:', e);
+      }
+    };
+    fetchBranches();
+  }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -42,7 +57,7 @@ const Register = () => {
     }
 
     // Call context
-    const res = await register(name, email, password, selectedRole);
+    const res = await register(name, email, password, selectedRole, branchId || null);
     
     if (res.success) {
       // Direct user after creation
@@ -142,6 +157,31 @@ const Register = () => {
                   required
                 />
               </div>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                Branch Assignment {(selectedRole === 'manager' || selectedRole === 'staff') && <span className="text-rose-500">*</span>}
+              </label>
+              <select
+                value={branchId}
+                onChange={(e) => setBranchId(e.target.value)}
+                required={selectedRole === 'manager' || selectedRole === 'staff'}
+                disabled={selectedRole === 'admin'}
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {selectedRole === 'admin' ? 'No branch (Admin sees all)' : 'Select a branch...'}
+                </option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+              <p className="text-xs text-slate-400 mt-2">
+                {selectedRole === 'admin' && '💡 Admins have access to all branches'}
+                {selectedRole === 'manager' && '💡 Managers are typically assigned to Central Warehouse'}
+                {selectedRole === 'staff' && '💡 Staff are assigned to specific retail branches'}
+              </p>
             </div>
 
             <div className="md:col-span-2">
