@@ -6,37 +6,38 @@ const getIP = (req) => req.headers['x-forwarded-for'] || req.socket.remoteAddres
 exports.getNotifications = async (req, res) => {
   const { category, unread_only, page = 1, limit = 30 } = req.query;
   const offset = (page - 1) * limit;
-  let conditions = [`(n.user_id = $1 OR n.user_id IS NULL)`];
+  let conditions = ['(n.user_id = $1 OR n.user_id IS NULL)'];
   let params = [req.user.id];
-  let idx = 2;
+  let paramIndex = 2;
 
   if (category && category !== 'all') {
-    conditions.push(`n.category = $${idx++}`);
+    conditions.push('n.category = $' + paramIndex);
     params.push(category);
+    paramIndex++;
   }
   if (unread_only === 'true') {
-    conditions.push(`n.is_read = FALSE`);
+    conditions.push('n.is_read = FALSE');
   }
 
-  const where = `WHERE ${conditions.join(' AND ')}`;
+  const where = 'WHERE ' + conditions.join(' AND ');
   params.push(parseInt(limit), parseInt(offset));
+  const limitParam = paramIndex;
+  const offsetParam = paramIndex + 1;
 
   try {
     const result = await db.query(
-      `SELECT * FROM notifications ${where}
-       ORDER BY n.created_at DESC
-       LIMIT $${idx} OFFSET $${idx + 1}`,
+      'SELECT * FROM notifications n ' + where + ' ORDER BY n.created_at DESC LIMIT $' + limitParam + ' OFFSET $' + offsetParam,
       params
     );
 
     const unreadCount = await db.query(
-      `SELECT COUNT(*) FROM notifications n WHERE (n.user_id = $1 OR n.user_id IS NULL) AND n.is_read = FALSE`,
+      'SELECT COUNT(*) FROM notifications n WHERE (n.user_id = $1 OR n.user_id IS NULL) AND n.is_read = FALSE',
       [req.user.id]
     );
 
     res.json({ notifications: result.rows, unread_count: parseInt(unreadCount.rows[0].count) });
   } catch (e) {
-    console.error(e);
+    console.error('Notification fetch error:', e);
     res.status(500).json({ message: 'Server error' });
   }
 };
