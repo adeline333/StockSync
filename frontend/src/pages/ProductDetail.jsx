@@ -21,7 +21,7 @@ const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const headers = { Authorization: `Bearer ${token}` };
 
   const [data, setData] = useState(null);
@@ -53,7 +53,14 @@ export default function ProductDetail() {
       if (!res.ok) throw new Error('Product not found');
       const json = await res.json();
       setData(json);
-      if (json.branchStock?.length > 0) {
+      
+      // Auto-select branch based on user role
+      if (user?.branch_id) {
+        // Manager/Staff: use their assigned branch
+        setAdjBranchId(user.branch_id);
+        setSerialBranch(user.branch_id);
+      } else if (json.branchStock?.length > 0) {
+        // Admin: default to first branch
         setAdjBranchId(json.branchStock[0].branch_id);
         setSerialBranch(json.branchStock[0].branch_id);
       }
@@ -165,12 +172,20 @@ export default function ProductDetail() {
             <span className="mx-2">/</span>
             <span className="text-slate-800 dark:text-slate-100 font-bold truncate max-w-xs">{product?.name || 'Details'}</span>
           </div>
-          <button
-            onClick={() => { setShowModal(true); setAdjMsg(null); }}
-            className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm"
-          >
-            <PenTool className="w-4 h-4 mr-2" /> Adjust Stock
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => { setShowModal(true); setAdjMsg(null); }}
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm"
+            >
+              <PenTool className="w-4 h-4 mr-2" /> Adjust Stock
+            </button>
+            <Link
+              to={`/inventory/edit/${id}`}
+              className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm"
+            >
+              <PenTool className="w-4 h-4 mr-2" /> Edit Product
+            </Link>
+          </div>
         </header>
 
         <div className="p-8 space-y-8 flex-1 bg-slate-50 dark:bg-slate-950 max-w-7xl mx-auto w-full">
@@ -454,17 +469,26 @@ export default function ProductDetail() {
 
             <form onSubmit={handleAdjust} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Branch</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                  Branch
+                  {user?.role !== 'admin' && <span className="ml-2 text-[10px] font-normal text-slate-400">(Your assigned branch)</span>}
+                </label>
                 <select
                   value={adjBranchId}
                   onChange={e => setAdjBranchId(e.target.value)}
+                  disabled={user?.role !== 'admin'}
                   required
-                  className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {branchStock.map(b => (
                     <option key={b.branch_id} value={b.branch_id}>{b.branch_name} ({b.quantity} in stock)</option>
                   ))}
                 </select>
+                {user?.role !== 'admin' && (
+                  <p className="text-xs text-slate-400 mt-1">
+                    💡 {user?.role === 'manager' ? 'Managers adjust stock for their assigned warehouse' : 'Staff adjust stock for their assigned retail branch'}
+                  </p>
+                )}
               </div>
 
               <div>
