@@ -22,6 +22,7 @@ router.delete('/products/:id', inventoryController.deleteProduct);
 
 // Stock operations
 router.post('/adjust', inventoryController.adjustStock);
+router.put('/min-stock', inventoryController.updateMinStock);
 router.post('/batch', inventoryController.addBatch);
 
 // Movements log
