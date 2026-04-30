@@ -27,6 +27,12 @@ export default function POS() {
     const params = new URLSearchParams({ limit: 100 });
     if (searchInput) params.append('search', searchInput);
     if (activeCategory !== 'All Items') params.append('category', activeCategory);
+    
+    // For staff users, filter by their branch to show only available stock
+    if (user?.role === 'staff' && user?.branch_id) {
+      params.append('branch_id', user.branch_id);
+    }
+    
     try {
       const [prodRes, sumRes] = await Promise.all([
         fetch(`${API_URL}/inventory/products?${params}`, { headers }),
@@ -39,7 +45,7 @@ export default function POS() {
       setCategories(['All Items', ...cats]);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  }, [searchInput, activeCategory, token]);
+  }, [searchInput, activeCategory, token, user]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
