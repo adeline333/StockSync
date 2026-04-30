@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Bell, TrendingUp, AlertCircle, AlertTriangle,
   Loader2, RefreshCw, Plus, Search, ShoppingCart, CheckCircle2, Activity,
-  Database, Clock, Users, LayoutDashboard } from 'lucide-react';
+  Database, Clock, Users, LayoutDashboard, Package } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -87,9 +87,9 @@ export default function Dashboard() {
               {/* KPI Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                 {[
-                  { icon: <LayoutDashboard className="w-6 h-6"/>, bg: 'bg-sky-50 text-sky-500', label: 'Total Inventory Value', value: `RWF ${(data?.inventory_value / 1000000).toFixed(1)}M`, sub: null },
+                  { icon: <Package className="w-6 h-6"/>, bg: 'bg-violet-50 text-violet-500', label: 'Total Products', value: `${data?.total_products || 0} Items`, sub: 'In Catalog' },
+                  { icon: <LayoutDashboard className="w-6 h-6"/>, bg: 'bg-sky-50 text-sky-500', label: 'Inventory Value', value: `RWF ${(data?.inventory_value / 1000000).toFixed(1)}M`, sub: null },
                   { icon: <TrendingUp className="w-6 h-6"/>, bg: 'bg-emerald-50 text-emerald-500', label: 'Sales Today', value: `RWF ${(data?.sales_today?.revenue / 1000).toFixed(0)}k`, sub: `${data?.sales_today?.count} transactions` },
-                  { icon: <AlertCircle className="w-6 h-6"/>, bg: 'bg-rose-50 text-rose-500', label: 'Pending Issues', value: `${data?.pending_issues} Items`, sub: 'Needs Review', valueColor: 'text-rose-500' },
                   { icon: <AlertTriangle className="w-6 h-6"/>, bg: 'bg-orange-50 text-orange-500', label: 'Low Stock Alerts', value: `${data?.low_stock_count} SKUs`, sub: null, valueColor: 'text-orange-500' },
                 ].map((card, i) => (
                   <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col">
