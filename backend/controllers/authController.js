@@ -36,7 +36,7 @@ exports.register = async (req, res) => {
   const ip = getIP(req);
 
   // Validate role
-  const allowedRoles = ['admin', 'manager', 'staff', 'auditor'];
+  const allowedRoles = ['admin', 'manager', 'staff'];
   const assignedRole = allowedRoles.includes(role) ? role : 'staff';
 
   try {
