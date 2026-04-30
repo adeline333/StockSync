@@ -5,7 +5,7 @@ exports.getAdminDashboard = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
 
-    const [inventoryValue, salesToday, pendingIssues, lowStock, recentActivity, warehouseStatus] = await Promise.all([      // Total inventory value
+    const [inventoryValue, salesToday, pendingIssues, lowStock, recentActivity, warehouseStatus, totalProducts] = await Promise.all([      // Total inventory value
       db.query(`SELECT COALESCE(SUM(i.quantity * p.price), 0) as value FROM inventory i JOIN products p ON i.product_id = p.id`),
 
       // Sales today
@@ -29,7 +29,10 @@ exports.getAdminDashboard = async (req, res) => {
        LEFT JOIN inventory i ON b.id = i.branch_id
        LEFT JOIN products p ON i.product_id = p.id
        WHERE b.is_active = TRUE
-       GROUP BY b.id ORDER BY b.name LIMIT 5`)
+       GROUP BY b.id ORDER BY b.name LIMIT 5`),
+
+      // Total products count
+      db.query(`SELECT COUNT(*) as count FROM products WHERE status = 'active'`)
     ]);
 
     // Sales trend (last 7 days)
@@ -65,6 +68,7 @@ exports.getAdminDashboard = async (req, res) => {
       sales_today: { revenue: parseFloat(salesToday.rows[0].revenue), count: parseInt(salesToday.rows[0].count) },
       pending_issues: parseInt(pendingIssues.rows[0].count),
       low_stock_count: parseInt(lowStock.rows[0].count),
+      total_products: parseInt(totalProducts.rows[0].count),
       recent_activity: recentActivity.rows,
       warehouse_status: warehouseStatus.rows,
       sales_trend: salesTrend.rows,
@@ -80,34 +84,40 @@ exports.getAdminDashboard = async (req, res) => {
 exports.getWarehouseDashboard = async (req, res) => {
   const branch_id = req.user.branch_id;
   const bf = branch_id ? `AND i.branch_id = ${parseInt(branch_id)}` : '';
-  const tbf = branch_id ? `AND (t.source_branch_id = ${parseInt(branch_id)} OR t.dest_branch_id = ${parseInt(branch_id)})` : '';
+  const tbf = branch_id ? `AND (st.source_branch_id = ${parseInt(branch_id)} OR st.dest_branch_id = ${parseInt(branch_id)})` : '';
+
+  console.log('🔍 Warehouse Dashboard Debug:');
+  console.log('User:', req.user.name, 'Role:', req.user.role, 'Branch ID:', req.user.branch_id);
+  console.log('Filter:', bf);
 
   try {
     const [totalStock, inboundPending, criticalStock, recentMovements, weeklyMovements] = await Promise.all([
       db.query(`SELECT COALESCE(SUM(i.quantity), 0) as total FROM inventory i WHERE 1=1 ${bf}`),
       db.query(`SELECT COUNT(*) as count FROM stock_transfers WHERE status = 'pending' ${branch_id ? `AND dest_branch_id = ${parseInt(branch_id)}` : ''}`),
       db.query(`SELECT COUNT(*) as count FROM inventory i WHERE i.quantity <= i.min_stock_level AND i.quantity > 0 ${bf}`),
-      db.query(`SELECT t.*, p.name as product_name, p.sku, sb.name as source_branch_name, db.name as dest_branch_name
-       FROM transactions t
-       LEFT JOIN products p ON t.product_id = p.id
-       LEFT JOIN branches sb ON t.source_branch_id = sb.id
-       LEFT JOIN branches db ON t.dest_branch_id = db.id
-       WHERE 1=1 ${tbf}
-       ORDER BY t.created_at DESC LIMIT 5`),
-      db.query(`SELECT DATE(created_at) as date, type, SUM(quantity) as qty
-       FROM transactions WHERE created_at >= NOW() - INTERVAL '7 days' ${tbf}
-       GROUP BY DATE(created_at), type ORDER BY date ASC`)
+      db.query(`SELECT sa.*, p.name as product_name, p.sku, b.name as branch_name
+       FROM stock_adjustments sa
+       LEFT JOIN products p ON sa.product_id = p.id
+       LEFT JOIN branches b ON sa.branch_id = b.id
+       WHERE 1=1 ${branch_id ? `AND sa.branch_id = ${parseInt(branch_id)}` : ''}
+       ORDER BY sa.created_at DESC LIMIT 5`),
+      db.query(`SELECT DATE(created_at) as date, 'adjustment' as type, SUM(ABS(quantity_change)) as qty
+       FROM stock_adjustments WHERE created_at >= NOW() - INTERVAL '7 days' ${branch_id ? `AND branch_id = ${parseInt(branch_id)}` : ''}
+       GROUP BY DATE(created_at) ORDER BY date ASC`)
     ]);
 
-    res.json({
+    const result = {
       total_stock: parseInt(totalStock.rows[0].total),
       inbound_pending: parseInt(inboundPending.rows[0].count),
       critical_stock: parseInt(criticalStock.rows[0].count),
       recent_movements: recentMovements.rows,
       weekly_movements: weeklyMovements.rows
-    });
+    };
+
+    console.log('📊 Dashboard Result:', result);
+    res.json(result);
   } catch (e) {
-    console.error(e);
+    console.error('❌ Warehouse Dashboard Error:', e);
     res.status(500).json({ message: 'Server error' });
   }
 };
