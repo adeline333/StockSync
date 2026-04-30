@@ -74,8 +74,8 @@ export default function Inventory() {
           {summary && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Total Stock', value: Number(summary.total_stock).toLocaleString() + ' units', color: 'text-slate-800' },
-                { label: 'Total Value', value: 'RWF ' + Number(summary.total_value).toLocaleString(), color: 'text-sky-600' },
+                { label: 'Total Products', value: (summary.total_products || total) + ' items', color: 'text-slate-800' },
+                { label: 'Total Stock', value: Number(summary.total_stock).toLocaleString() + ' units', color: 'text-sky-600' },
                 { label: 'Low Stock', value: summary.low_stock_count + ' SKUs', color: 'text-amber-600' },
                 { label: 'Out of Stock', value: summary.out_of_stock_count + ' SKUs', color: 'text-rose-600' },
               ].map((card, i) => (
