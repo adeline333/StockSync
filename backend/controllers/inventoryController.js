@@ -83,11 +83,19 @@ exports.getProductById = async (req, res) => {
     );
     if (result.rows.length === 0) return res.status(404).json({ message: 'Product not found' });
 
-    // Get per-branch stock
+    // Get per-branch stock - include ALL branches, not just those with inventory
     const branchStock = await db.query(
-      `SELECT i.quantity, i.min_stock_level, b.name as branch_name, b.id as branch_id
-       FROM inventory i JOIN branches b ON i.branch_id = b.id
-       WHERE i.product_id = $1`, [req.params.id]
+      `SELECT 
+        b.id as branch_id,
+        b.name as branch_name,
+        COALESCE(i.quantity, 0) as quantity,
+        COALESCE(i.min_stock_level, p.min_stock_level, 0) as min_stock_level
+       FROM branches b
+       CROSS JOIN products p
+       LEFT JOIN inventory i ON i.branch_id = b.id AND i.product_id = p.id
+       WHERE p.id = $1 AND b.is_active = TRUE
+       ORDER BY b.id`, 
+      [req.params.id]
     );
 
     // Get batches
@@ -99,6 +107,7 @@ exports.getProductById = async (req, res) => {
 
     res.json({ product: result.rows[0], branchStock: branchStock.rows, batches: batches.rows });
   } catch (e) {
+    console.error('Get product by ID error:', e);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -235,6 +244,39 @@ exports.adjustStock = async (req, res) => {
   }
 };
 
+// ─── UPDATE MIN STOCK LEVEL ──────────────────────────────────────────────────
+
+exports.updateMinStock = async (req, res) => {
+  const { product_id, min_stock_level } = req.body;
+  const ip = getIP(req);
+
+  try {
+    console.log('Updating min stock:', { product_id, min_stock_level });
+    
+    // Update the product's min_stock_level
+    const productResult = await db.query(
+      `UPDATE products SET min_stock_level = $1 WHERE id = $2 RETURNING *`,
+      [min_stock_level, product_id]
+    );
+
+    console.log('Product updated:', productResult.rows[0]);
+
+    // Sync to all inventory records for this product
+    const inventoryResult = await db.query(
+      `UPDATE inventory SET min_stock_level = $1 WHERE product_id = $2 RETURNING *`,
+      [min_stock_level, product_id]
+    );
+
+    console.log('Inventory records updated:', inventoryResult.rowCount);
+
+    await logActivity(req.user.id, 'MIN_STOCK_UPDATED', `Updated min stock level to ${min_stock_level} for product ${product_id}`, ip);
+    res.json({ message: 'Min stock level updated successfully' });
+  } catch (e) {
+    console.error('Error updating min stock:', e);
+    res.status(500).json({ message: 'Server error: ' + e.message });
+  }
+};
+
 // ─── STOCK MOVEMENTS ─────────────────────────────────────────────────────────
 
 exports.getMovements = async (req, res) => {
@@ -311,7 +353,14 @@ exports.getDashboardSummary = async (req, res) => {
     );
 
     const categories = await db.query(
-      `SELECT p.category, COUNT(*) as count FROM products p GROUP BY p.category ORDER BY count DESC`
+      `SELECT p.category, COUNT(*) as count FROM products p 
+       WHERE p.category IS NOT NULL 
+       GROUP BY p.category ORDER BY count DESC`
+    );
+
+    // Get total product count
+    const totalProducts = await db.query(
+      `SELECT COUNT(*) as count FROM products WHERE status = 'active'`
     );
 
     res.json({
@@ -319,6 +368,7 @@ exports.getDashboardSummary = async (req, res) => {
       total_value: parseFloat(totalValue.rows[0].value),
       low_stock_count: parseInt(lowStock.rows[0].count),
       out_of_stock_count: parseInt(outOfStock.rows[0].count),
+      total_products: parseInt(totalProducts.rows[0].count),
       categories: categories.rows
     });
   } catch (e) {
