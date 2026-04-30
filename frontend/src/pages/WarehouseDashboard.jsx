@@ -21,14 +21,25 @@ export default function WarehouseDashboard() {
   const [loading, setLoading] = useState(true);
 
   const fetchDashboard = useCallback(async () => {
+    console.log('🔍 Frontend: Fetching warehouse dashboard...');
+    console.log('🔍 Frontend: User:', user);
+    console.log('🔍 Frontend: Token:', token ? 'Present' : 'Missing');
+    console.log('🔍 Frontend: API URL:', `${API_URL}/dashboard/warehouse`);
+    
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/dashboard/warehouse`, { headers });
+      console.log('🔍 Frontend: Response status:', res.status);
+      
       const json = await res.json();
+      console.log('🔍 Frontend: Response data:', json);
+      
       setData(json);
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error('❌ Frontend: Fetch error:', e); 
+    }
     finally { setLoading(false); }
-  }, [token]);
+  }, [token, user]);
 
   useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
 
