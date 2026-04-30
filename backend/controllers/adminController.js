@@ -14,7 +14,7 @@ exports.getUsers = async (req, res) => {
   try {
     const result = await db.query(
       `SELECT u.id, u.name, u.email, u.role, u.branch_id, u.last_login, u.created_at,
-        u.failed_attempts, u.locked_until, u.two_fa_enabled,
+        u.failed_attempts, u.locked_until,
         b.name as branch_name
        FROM users u
        LEFT JOIN branches b ON u.branch_id = b.id
@@ -22,7 +22,8 @@ exports.getUsers = async (req, res) => {
     );
     res.json({ users: result.rows });
   } catch (e) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Get users error:', e);
+    res.status(500).json({ message: 'Server error', error: e.message });
   }
 };
 
