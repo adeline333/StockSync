@@ -124,7 +124,7 @@ export default function POS() {
           </div>
         </header>
 
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-white shrink-0 overflow-x-auto">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shrink-0 overflow-x-auto">
           <div className="flex space-x-2">
             {categories.map(cat => (
               <button key={cat} onClick={() => setActiveCategory(cat)}
@@ -150,12 +150,24 @@ export default function POS() {
               {products.map(prod => {
                 const stock = parseInt(prod.total_stock);
                 const inCart = cart.find(i => i.id === prod.id);
+                const imageUrl = prod.image_url ? `http://localhost:5000${prod.image_url}` : null;
                 return (
                   <div key={prod.id} onClick={() => addToCart(prod)}
-                    className={`bg-white p-4 rounded-2xl shadow-sm border cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col relative overflow-hidden ${stock === 0 ? 'opacity-50 cursor-not-allowed' : 'border-slate-100 hover:border-sky-200'} ${inCart ? 'border-sky-300 bg-sky-50/30' : ''}`}>
-                    <div className="w-full aspect-square bg-slate-50 rounded-xl mb-3 flex items-center justify-center border border-slate-100 dark:border-slate-800 relative">
-                      <Package className="w-10 h-10 text-slate-300" />
-                      <div className="absolute top-2 left-2 bg-white px-1.5 py-0.5 rounded text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest shadow-sm">{prod.category || '—'}</div>
+                    className={`bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col relative overflow-hidden ${stock === 0 ? 'opacity-50 cursor-not-allowed' : 'border-slate-100 dark:border-slate-700 hover:border-sky-200 dark:hover:border-sky-600'} ${inCart ? 'border-sky-300 dark:border-sky-600 bg-sky-50/30 dark:bg-sky-900/30' : ''}`}>
+                    <div className="w-full aspect-square bg-slate-50 rounded-xl mb-3 flex items-center justify-center border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+                      {imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={prod.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <Package className={`w-10 h-10 text-slate-300 ${imageUrl ? 'hidden' : ''}`} />
+                      <div className="absolute top-2 left-2 bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest shadow-sm">{prod.category || '—'}</div>
                       <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-bold shadow-sm ${stock === 0 ? 'bg-rose-100 text-rose-600' : stock <= (prod.min_stock_level || 10) ? 'bg-amber-100 text-amber-600' : 'bg-slate-800 text-white'}`}>{stock}</div>
                       {inCart && <div className="absolute bottom-2 right-2 w-6 h-6 bg-sky-500 rounded-full flex items-center justify-center text-white text-xs font-black">{inCart.qty}</div>}
                     </div>
@@ -170,8 +182,8 @@ export default function POS() {
       </main>
 
       {/* Cart Panel */}
-      <aside className="w-[420px] bg-white border-l border-slate-200 flex flex-col h-screen fixed right-0 z-20">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50">
+      <aside className="w-[420px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 flex flex-col h-screen fixed right-0 z-20">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
           <div className="flex justify-between items-start">
             <h2 className="text-xl font-black text-slate-800 dark:text-slate-100">Current Order</h2>
             <span className="bg-sky-100 text-sky-700 text-xs font-bold uppercase px-3 py-1.5 rounded-full">Walk-in</span>
@@ -207,11 +219,11 @@ export default function POS() {
                 </div>
               </div>
               <div className="flex items-center bg-slate-100 rounded-lg p-1 w-fit border border-slate-200 dark:border-slate-700">
-                <button onClick={() => updateQty(item.id, -1)} className="w-8 h-7 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:bg-white rounded transition-all">
+                <button onClick={() => updateQty(item.id, -1)} className="w-8 h-7 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-700 rounded transition-all">
                   <Minus className="w-3 h-3" />
                 </button>
                 <span className="w-10 text-center text-sm font-black text-slate-800 dark:text-slate-100">{item.qty}</span>
-                <button onClick={() => updateQty(item.id, 1)} className="w-8 h-7 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:bg-white rounded transition-all">
+                <button onClick={() => updateQty(item.id, 1)} className="w-8 h-7 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-700 rounded transition-all">
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
@@ -247,7 +259,7 @@ export default function POS() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <button onClick={clearCart} className="py-3 bg-white border border-rose-200 text-rose-500 rounded-xl font-bold text-sm hover:bg-rose-50 transition-colors flex items-center justify-center gap-2">
+            <button onClick={clearCart} className="py-3 bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-800 text-rose-500 dark:text-rose-400 rounded-xl font-bold text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors flex items-center justify-center gap-2">
               <Trash2 className="w-4 h-4" /> Void
             </button>
             <button className="py-3 bg-white border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
