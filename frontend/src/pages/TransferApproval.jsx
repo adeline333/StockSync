@@ -130,7 +130,7 @@ export default function TransferApproval() {
               { id: 'rejected', label: 'Rejected' },
             ].map(tab => (
               <button key={tab.id} onClick={() => { setActiveTab(tab.id); setSelected(null); setSelectedItems([]); }}
-                className={`px-5 py-2 rounded-md text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-white text-sky-600 shadow-sm border border-slate-100' : 'text-slate-900 dark:text-slate-400 hover:text-slate-900'}`}>
+                className={`px-5 py-2 rounded-md text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-sm border border-slate-100 dark:border-slate-700' : 'text-slate-900 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}>
                 {tab.label}
               </button>
             ))}
@@ -150,7 +150,7 @@ export default function TransferApproval() {
               </div>
             ) : transfers.map(t => (
               <div key={t.id} onClick={() => selectTransfer(t)}
-                className={`bg-white rounded-2xl p-5 border-2 shadow-sm cursor-pointer transition-all relative overflow-hidden ${selected?.id === t.id ? 'border-sky-500' : 'border-slate-100 hover:border-sky-300'}`}>
+                className={`bg-white dark:bg-slate-800 rounded-2xl p-5 border-2 shadow-sm cursor-pointer transition-all relative overflow-hidden ${selected?.id === t.id ? 'border-sky-500' : 'border-slate-100 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-600'}`}>
                 {selected?.id === t.id && <div className="absolute left-0 top-0 bottom-0 w-2 bg-sky-500"/>}
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="text-sm font-black text-slate-800 dark:text-slate-100" style={{color: '#0f172a'}}>{t.transfer_number}</h3>
@@ -172,7 +172,7 @@ export default function TransferApproval() {
           </div>
 
           {/* Detail */}
-          <div className="flex-1 bg-white rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden">
+          <div className="flex-1 bg-white dark:bg-slate-900 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden">
             {!selected ? (
               <div className="flex-1 flex items-center justify-center text-slate-900 dark:text-slate-400">
                 <div className="text-center">
@@ -200,7 +200,7 @@ export default function TransferApproval() {
                     </p>
                   </div>
                   <div className="flex-1 flex justify-center">
-                    <div className="w-10 h-10 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm">
                       <MapPin className="w-5 h-5 text-sky-500"/>
                     </div>
                   </div>
@@ -249,7 +249,7 @@ export default function TransferApproval() {
 
                 {/* Actions */}
                 {selected.status === 'pending' && (
-                  <div className="border-t border-slate-100 dark:border-slate-800 p-6 bg-white">
+                  <div className="border-t border-slate-100 dark:border-slate-800 p-6 bg-white dark:bg-slate-900">
                     {actionMsg && (
                       <div className={`mb-4 p-3 rounded-xl text-sm font-semibold ${actionMsg.ok ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
                         {actionMsg.text}
@@ -265,7 +265,7 @@ export default function TransferApproval() {
                     <div className="flex gap-4">
                       {!showRejectInput ? (
                         <button onClick={() => setShowRejectInput(true)}
-                          className="flex-1 bg-white hover:bg-rose-50 text-rose-500 border border-rose-200 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                          className="flex-1 bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-900/30 text-rose-500 dark:text-rose-400 border border-rose-200 dark:border-rose-800 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
                           <X className="w-5 h-5"/> Reject
                         </button>
                       ) : (
