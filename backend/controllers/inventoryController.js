@@ -331,6 +331,13 @@ exports.getDashboardSummary = async (req, res) => {
   const branchFilter = branch_id ? `WHERE i.branch_id = ${parseInt(branch_id)}` : '';
 
   try {
+    // Get branch name if filtering by branch
+    let branchName = null;
+    if (branch_id) {
+      const branchResult = await db.query('SELECT name FROM branches WHERE id = $1', [parseInt(branch_id)]);
+      branchName = branchResult.rows[0]?.name || null;
+    }
+
     const totalStock = await db.query(
       `SELECT COALESCE(SUM(i.quantity), 0) as total FROM inventory i ${branchFilter}`
     );
@@ -369,7 +376,8 @@ exports.getDashboardSummary = async (req, res) => {
       low_stock_count: parseInt(lowStock.rows[0].count),
       out_of_stock_count: parseInt(outOfStock.rows[0].count),
       total_products: parseInt(totalProducts.rows[0].count),
-      categories: categories.rows
+      categories: categories.rows,
+      branch_name: branchName
     });
   } catch (e) {
     console.error(e);
