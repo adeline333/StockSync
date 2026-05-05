@@ -13,7 +13,7 @@ const StockBadge = ({ qty, min }) => {
 };
 
 export default function Inventory() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [products, setProducts] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,10 +31,16 @@ export default function Inventory() {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({ search, category, status, page, limit: LIMIT });
+    
+    // FILTER BY BRANCH: Staff and managers see only their branch inventory
+    if (user?.branch_id && user?.role !== 'admin') {
+      params.append('branch_id', user.branch_id);
+    }
+    
     try {
       const [prodRes, sumRes] = await Promise.all([
         fetch(`${API_URL}/inventory/products?${params}`, { headers }),
-        fetch(`${API_URL}/inventory/summary`, { headers })
+        fetch(`${API_URL}/inventory/summary${user?.branch_id && user?.role !== 'admin' ? `?branch_id=${user.branch_id}` : ''}`, { headers })
       ]);
       const prodData = await prodRes.json();
       const sumData = await sumRes.json();
@@ -44,7 +50,7 @@ export default function Inventory() {
       setCategories(sumData.categories || []);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  }, [search, category, status, page, token]);
+  }, [search, category, status, page, token, user]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
@@ -61,7 +67,14 @@ export default function Inventory() {
       <main className="flex-1 flex flex-col min-h-screen">
         <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Inventory Management</h1>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+              Inventory Management
+              {user?.branch_id && user?.role !== 'admin' && summary?.branch_name && (
+                <span className="text-lg font-normal text-sky-600 dark:text-sky-400 ml-2">
+                  — {summary.branch_name}
+                </span>
+              )}
+            </h1>
             {summary && <p className="text-sm text-slate-500 dark:text-slate-400">{total} products · RWF {Number(summary.total_value).toLocaleString()} total value</p>}
           </div>
           <Link to="/inventory/new" className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm">
