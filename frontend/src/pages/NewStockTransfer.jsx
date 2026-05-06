@@ -204,8 +204,8 @@ export default function NewStockTransfer() {
                 </div>
               </div>
               <div className="col-span-1 border-l-2 border-slate-300 dark:border-slate-600 pl-6 flex flex-col justify-center">
-                <span className="text-xs font-black text-slate-900 dark:text-slate-300 uppercase tracking-widest block mb-1" style={{color: '#0f172a'}}>Total Items</span>
-                <span className="text-4xl font-black text-slate-900 dark:text-white">{totalItems}</span>
+                <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-1">Total Items</span>
+                <span className="text-4xl font-black text-sky-600 dark:text-sky-400">{totalItems}</span>
               </div>
             </div>
           </div>
