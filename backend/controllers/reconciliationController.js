@@ -208,3 +208,80 @@ exports.resolveItem = async (req, res) => {
     res.status(500).json({ message: e.message });
   }
 };
+
+// POST /api/reconciliation/physical-count — compare physical count vs system count
+exports.runPhysicalCount = async (req, res) => {
+  const { branch_id, counts, notes } = req.body;
+  // counts = [{ product_id, physical_count }]
+  const ip = getIP(req);
+
+  if (!branch_id) return res.status(400).json({ message: 'Branch is required for physical count' });
+  if (!counts || counts.length === 0) return res.status(400).json({ message: 'No counts provided' });
+
+  try {
+    const results = [];
+    let totalItems = counts.length;
+    let matchedItems = 0;
+    let varianceValue = 0;
+
+    for (const count of counts) {
+      // Get system count
+      const invResult = await db.query(
+        'SELECT quantity FROM inventory WHERE product_id = $1 AND branch_id = $2',
+        [count.product_id, branch_id]
+      );
+      const systemCount = invResult.rows.length > 0 ? parseInt(invResult.rows[0].quantity) : 0;
+      const physicalCount = parseInt(count.physical_count);
+      const variance = physicalCount - systemCount; // negative = loss, positive = surplus
+      const status = variance === 0 ? 'matched' : Math.abs(variance) <= 1 ? 'flagged' : 'mismatched';
+
+      if (status === 'matched') matchedItems++;
+
+      // Get product price for variance value
+      const prodResult = await db.query('SELECT name, sku, price FROM products WHERE id = $1', [count.product_id]);
+      const product = prodResult.rows[0];
+      if (product) {
+        varianceValue += Math.abs(variance) * parseFloat(product.price);
+      }
+
+      results.push({
+        product_id: count.product_id,
+        product_name: product?.name || 'Unknown',
+        product_sku: product?.sku || '',
+        system_count: systemCount,
+        physical_count: physicalCount,
+        variance,
+        status,
+        price: product?.price || 0
+      });
+    }
+
+    const score = totalItems > 0 ? parseFloat(((matchedItems / totalItems) * 100).toFixed(2)) : 100;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Save as reconciliation record
+    const finalNotes = notes ? `[Physical Count] ${notes}` : '[Physical Count] Manual reconciliation';
+    const reconResult = await db.query(
+      `INSERT INTO reconciliations (branch_id, period_start, period_end, total_items, matched_items, mismatched_items, variance_value, score, status, run_by, notes)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'completed',$9,$10) RETURNING *`,
+      [branch_id, today, today, totalItems, matchedItems, totalItems - matchedItems, varianceValue.toFixed(2), score, req.user.id, finalNotes]
+    );
+    const recon = reconResult.rows[0];
+
+    // Save items
+    for (const item of results) {
+      await db.query(
+        `INSERT INTO reconciliation_items (reconciliation_id, product_id, product_name, product_sku, sales_qty, stock_deducted, variance, status)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+        [recon.id, item.product_id, item.product_name, item.product_sku, item.physical_count, item.system_count, item.variance, item.status]
+      );
+    }
+
+    await logActivity(req.user.id, 'PHYSICAL_COUNT_RUN', `Physical count at branch ${branch_id}: score ${score}%, ${totalItems - matchedItems} discrepancies`, ip);
+
+    res.json({ reconciliation: recon, items: results });
+  } catch (e) {
+    console.error('Physical count error:', e);
+    res.status(500).json({ message: e.message });
+  }
+};
