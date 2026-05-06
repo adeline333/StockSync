@@ -218,12 +218,12 @@ export default function POS() {
                   </button>
                 </div>
               </div>
-              <div className="flex items-center bg-slate-100 rounded-lg p-1 w-fit border border-slate-200 dark:border-slate-700">
-                <button onClick={() => updateQty(item.id, -1)} className="w-8 h-7 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-700 rounded transition-all">
+              <div className="flex items-center bg-slate-200 dark:bg-slate-700 rounded-lg p-1 w-fit border border-slate-300 dark:border-slate-600">
+                <button onClick={() => updateQty(item.id, -1)} className="w-8 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-600 rounded transition-all font-black">
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="w-10 text-center text-sm font-black text-slate-800 dark:text-slate-100">{item.qty}</span>
-                <button onClick={() => updateQty(item.id, 1)} className="w-8 h-7 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-700 rounded transition-all">
+                <span className="w-10 text-center text-sm font-black" style={{color: '#0f172a'}}>{item.qty}</span>
+                <button onClick={() => updateQty(item.id, 1)} className="w-8 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-600 rounded transition-all font-black">
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
