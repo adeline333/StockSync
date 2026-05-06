@@ -50,6 +50,7 @@ const NAV_CONFIG = {
     { label: 'Sales History', icon: History, to: '/sales-history' },
     { label: 'Item Search', icon: Search, to: '/inventory' },
     { label: 'Scanner', icon: Search, to: '/scanner' },
+    { label: 'My Transfers', icon: ListChecks, to: '/transfers/my' },
     { label: 'Notifications', icon: Bell, to: '/notifications' },
   ],
   auditor: [
