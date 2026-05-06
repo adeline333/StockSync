@@ -126,16 +126,25 @@ exports.getWarehouseDashboard = async (req, res) => {
 exports.getRetailDashboard = async (req, res) => {
   const branch_id = req.user.branch_id;
   const today = new Date().toISOString().split('T')[0];
-  const bf = branch_id ? `AND o.branch_id = ${parseInt(branch_id)}` : '';
 
   try {
+    const branchCondition = branch_id ? `AND branch_id = ${parseInt(branch_id)}` : '';
+
     const [salesToday, recentOrders, returns] = await Promise.all([
-      db.query(`SELECT COALESCE(SUM(total_amount), 0) as revenue, COUNT(*) as count,
-        COALESCE(SUM(CASE WHEN payment_method = 'cash' THEN amount_tendered - total_amount ELSE 0 END), 0) as cash_in_drawer
-       FROM orders WHERE status = 'completed' AND DATE(created_at) = $1 ${bf}`, [today]),
-      db.query(`SELECT o.*, u.name as cashier_name FROM orders o LEFT JOIN users u ON o.user_id = u.id
-       WHERE o.status = 'completed' ${bf} ORDER BY o.created_at DESC LIMIT 10`),
-      db.query(`SELECT COUNT(*) as count FROM orders WHERE status = 'voided' AND DATE(created_at) = $1 ${bf}`, [today])
+      db.query(
+        `SELECT COALESCE(SUM(total_amount), 0) as revenue, COUNT(*) as count,
+          COALESCE(SUM(CASE WHEN payment_method = 'cash' THEN total_amount ELSE 0 END), 0) as cash_in_drawer
+         FROM orders WHERE status = 'completed' AND DATE(created_at) = $1 ${branchCondition}`,
+        [today]
+      ),
+      db.query(
+        `SELECT o.*, u.name as cashier_name FROM orders o LEFT JOIN users u ON o.user_id = u.id
+         WHERE o.status = 'completed' ${branch_id ? `AND o.branch_id = ${parseInt(branch_id)}` : ''} ORDER BY o.created_at DESC LIMIT 10`
+      ),
+      db.query(
+        `SELECT COUNT(*) as count FROM orders WHERE status = 'voided' AND DATE(created_at) = $1 ${branchCondition}`,
+        [today]
+      )
     ]);
 
     res.json({
