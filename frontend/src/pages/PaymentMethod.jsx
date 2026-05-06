@@ -73,7 +73,7 @@ export default function PaymentMethod() {
       // Store completed order for receipt
       sessionStorage.setItem('last_order', JSON.stringify({ order: data.order, items: data.items, cart, subtotal, vat, total, discount, tendered: tenderedNum, change: changeDue, method, customerName }));
       sessionStorage.removeItem('pos_cart');
-      navigate('/sales-history');
+      navigate('/retail-dashboard');
     } catch (e) {
       setError(e.message);
     } finally {

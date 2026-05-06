@@ -8,6 +8,7 @@ router.use(authMiddleware);
 router.post('/run', ctrl.runReconciliation);
 router.get('/', ctrl.getReconciliations);
 router.get('/latest', ctrl.getLatest);
+router.post('/physical-count', ctrl.runPhysicalCount);
 router.get('/:id', ctrl.getById);
 router.post('/items/:id/resolve', ctrl.resolveItem);
 

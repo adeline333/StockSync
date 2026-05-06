@@ -31,8 +31,10 @@ export default function MyTransfers() {
     try {
       const res = await fetch(`${API_URL}/transfers`, { headers });
       const data = await res.json();
-      // Filter to only show transfers requested by current user
-      const myTransfers = (data.transfers || []).filter(t => t.requested_by === user?.id);
+      // Filter to show transfers involving the user's branch, or all if admin
+      const myTransfers = (data.transfers || []).filter(t => 
+        user?.role === 'admin' ? true : (t.source_branch_id === user?.branch_id || t.dest_branch_id === user?.branch_id)
+      );
       setTransfers(myTransfers);
     } catch (e) { 
       console.error(e); 

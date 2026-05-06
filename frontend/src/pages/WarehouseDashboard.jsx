@@ -79,7 +79,7 @@ export default function WarehouseDashboard() {
                   <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col">
                     <div className={`w-12 h-12 ${card.bg} rounded-full flex items-center justify-center mb-4`}>{card.icon}</div>
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{card.label}</p>
-                    <h3 className={`text-2xl font-bold ${card.valueColor || 'text-slate-800'}`}>{card.value}</h3>
+                    <h3 className={`text-2xl font-bold ${card.valueColor || 'text-slate-800 dark:text-slate-100'}`}>{card.value}</h3>
                     {card.sub && <p className={`text-xs mt-1 ${card.subColor || 'text-slate-400'}`}>{card.sub}</p>}
                   </div>
                 ))}

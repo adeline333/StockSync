@@ -30,7 +30,18 @@ export default function RetailDashboard() {
     finally { setLoading(false); }
   }, [token]);
 
-  useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
+  useEffect(() => { 
+    fetchDashboard(); 
+    // Auto-refresh every 10 seconds
+    const interval = setInterval(fetchDashboard, 10000);
+    // Refresh when tab becomes visible (coming back from POS)
+    const handleVisibility = () => { if (!document.hidden) fetchDashboard(); };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [fetchDashboard]);
 
   return (
     <div className="flex flex-col min-h-screen dark:bg-slate-950">
@@ -85,19 +96,19 @@ export default function RetailDashboard() {
 
                 {/* Split metrics */}
                 <div className="flex flex-col gap-4">
-                  <div className="flex-1 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
+                  <div className="flex-1 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
                     <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Cash in Drawer</p>
                     <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                       {Number(data?.sales_today?.cash_in_drawer || 0).toLocaleString()} <span className="text-sm text-slate-400 font-normal">RWF</span>
                     </h3>
                     <div className="absolute bottom-0 left-5 w-14 h-1.5 bg-emerald-500 rounded-t-full"/>
-                    <Banknote className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 text-slate-50"/>
+                    <Banknote className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 text-slate-50 dark:text-slate-700"/>
                   </div>
-                  <div className="flex-1 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
+                  <div className="flex-1 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
                     <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Returns Today</p>
                     <h3 className="text-2xl font-bold text-rose-500">{data?.returns_today || 0} Items</h3>
                     <div className="absolute bottom-0 left-5 w-10 h-1.5 bg-rose-500 rounded-t-full"/>
-                    <History className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 text-slate-50"/>
+                    <History className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 text-slate-50 dark:text-slate-700"/>
                   </div>
                 </div>
               </div>

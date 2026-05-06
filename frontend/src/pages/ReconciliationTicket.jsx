@@ -106,8 +106,14 @@ export default function ReconciliationTicket() {
               <div className="pl-4">
                 <h2 className="text-xl font-black text-rose-800 mb-1">Variance Detected: {selectedItem.product_name}</h2>
                 <p className="text-sm text-rose-700 flex flex-wrap gap-3">
-                  <span>Expected: <strong className="bg-white px-2 py-0.5 rounded border border-rose-100 text-rose-900">{selectedItem.sales_qty} Units</strong></span>
-                  <span>Deducted: <strong className="bg-white px-2 py-0.5 rounded border border-rose-100 text-rose-900">{selectedItem.stock_deducted} Units</strong></span>
+                  <span>
+                    {recon?.notes?.toLowerCase().includes('physical') ? 'Physical Count: ' : 'Expected (POS): '}
+                    <strong className="bg-white px-2 py-0.5 rounded border border-rose-100 text-rose-900">{selectedItem.sales_qty} Units</strong>
+                  </span>
+                  <span>
+                    {recon?.notes?.toLowerCase().includes('physical') ? 'System Expected: ' : 'Deducted: '}
+                    <strong className="bg-white px-2 py-0.5 rounded border border-rose-100 text-rose-900">{selectedItem.stock_deducted} Units</strong>
+                  </span>
                   <span>Difference: <strong className="bg-rose-600 px-2 py-0.5 rounded text-white">{selectedItem.variance > 0 ? '+' : ''}{selectedItem.variance} Units</strong></span>
                 </p>
               </div>
@@ -119,9 +125,19 @@ export default function ReconciliationTicket() {
 
           {!selectedItem && (
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-12 text-center text-slate-400">
-              <AlertOctagon className="w-12 h-12 mx-auto mb-4 opacity-30" />
-              <p className="font-semibold">No mismatched items in this reconciliation run</p>
-              <p className="text-sm mt-2">All transactions matched successfully</p>
+              {items.some(i => i.status === 'resolved') ? (
+                <>
+                  <CheckCircle className="w-12 h-12 mx-auto mb-4 text-emerald-500 opacity-80" />
+                  <p className="font-semibold text-emerald-600 dark:text-emerald-400">All discrepancies have been resolved!</p>
+                  <p className="text-sm mt-2">There are no pending items requiring your attention in this ticket.</p>
+                </>
+              ) : (
+                <>
+                  <AlertOctagon className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                  <p className="font-semibold">No mismatched items in this reconciliation run</p>
+                  <p className="text-sm mt-2">All transactions matched successfully</p>
+                </>
+              )}
             </div>
           )}
 
@@ -133,11 +149,15 @@ export default function ReconciliationTicket() {
                 <div className="relative pl-8">
                   <div className="absolute left-10 top-2 bottom-0 w-0.5 bg-slate-100 rounded-full" />
 
-                  {[
+                  {(recon?.notes?.toLowerCase().includes('physical') ? [
+                    { color: 'bg-emerald-500', title: 'Physical Count Entered', detail: `${selectedItem.sales_qty} units counted on the shelf by staff`, badge: `${selectedItem.sales_qty} units`, badgeColor: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
+                    { color: 'bg-sky-500', title: 'System Expected Stock', detail: `${selectedItem.stock_deducted} units expected based on database records`, badge: `${selectedItem.stock_deducted} units`, badgeColor: 'text-slate-700 dark:text-slate-300 bg-slate-50 border-slate-200' },
+                    { color: 'bg-rose-500', title: 'Unexplained Variance', detail: `${Math.abs(selectedItem.variance)} unit(s) unaccounted for`, badge: `${selectedItem.variance > 0 ? '+' : ''}${selectedItem.variance}`, badgeColor: 'text-rose-600 bg-rose-50 border-rose-100' },
+                  ] : [
                     { color: 'bg-emerald-500', title: 'Sales Recorded (POS)', detail: `${selectedItem.sales_qty} units sold via POS terminal`, badge: `${selectedItem.sales_qty} units`, badgeColor: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
                     { color: 'bg-sky-500', title: 'Inventory Deductions', detail: `${selectedItem.stock_deducted} units deducted from stock`, badge: `-${selectedItem.stock_deducted}`, badgeColor: 'text-slate-700 dark:text-slate-300 bg-slate-50 border-slate-200' },
                     { color: 'bg-rose-500', title: 'Unexplained Variance', detail: `${Math.abs(selectedItem.variance)} unit(s) unaccounted for`, badge: `${selectedItem.variance > 0 ? '+' : ''}${selectedItem.variance}`, badgeColor: 'text-rose-600 bg-rose-50 border-rose-100' },
-                  ].map((step, i) => (
+                  ]).map((step, i) => (
                     <div key={i} className="relative flex items-start mb-8 group">
                       <div className={`w-5 h-5 rounded-full ${step.color} border-4 border-white shadow-md shrink-0 -ml-2 mt-1 mr-5 group-hover:scale-125 transition-transform`} />
                       <div className="flex-1 flex justify-between items-start">
