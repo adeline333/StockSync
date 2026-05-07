@@ -56,13 +56,13 @@ export default function DemandForecasting() {
       <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
         <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">Demand Forecasting</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">AI-Powered Sales Predictions</p>
+            <h1 className="text-2xl font-black text-black dark:text-slate-100">Demand Forecasting</h1>
+            <p className="text-sm font-bold text-black dark:text-slate-400">AI-Powered Sales Predictions</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
               <select value={months} onChange={e => setMonths(parseInt(e.target.value))}
-                className="appearance-none bg-slate-50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
+                className="appearance-none bg-slate-50 border border-slate-200 dark:border-slate-700 text-black dark:text-slate-300 font-bold text-sm py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
                 <option value={3}>3 Months</option>
                 <option value={6}>6 Months</option>
                 <option value={12}>12 Months</option>
@@ -91,23 +91,23 @@ export default function DemandForecasting() {
                 ].map((card, i) => (
                   <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
                     <div className={`absolute -right-4 -top-4 w-20 h-20 ${card.bg} rounded-full`}/>
-                    <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center relative z-10">{card.icon}{card.label}</h3>
+                    <h3 className="text-xs font-black text-black dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center relative z-10">{card.icon}{card.label}</h3>
                     <p className={`text-4xl font-black tracking-tight relative z-10 ${card.color}`}>{card.value}</p>
-                    <p className="text-xs text-slate-400 mt-2 relative z-10">{card.sub}</p>
+                    <p className="text-xs font-bold text-black dark:text-slate-400 mt-2 relative z-10">{card.sub}</p>
                   </div>
                 ))}
               </div>
 
               <div className="flex gap-6">
                 {/* Chart */}
-                <div className="flex-[2] bg-white p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                  <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">Sales Trend & Forecast</h2>
+                <div className="flex-[2] bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                  <h2 className="text-lg font-bold text-black dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">Sales Trend & Forecast</h2>
                   {trend.length === 0 ? (
-                    <div className="flex items-center justify-center h-48 text-slate-400">
+                    <div className="flex items-center justify-center h-48 text-black dark:text-slate-400">
                       <div className="text-center">
-                        <BarChart2 className="w-10 h-10 mx-auto mb-3 opacity-30"/>
-                        <p className="font-semibold">No sales data yet</p>
-                        <p className="text-sm mt-1">Start making sales to see trends</p>
+                        <BarChart2 className="w-10 h-10 mx-auto mb-3 opacity-60"/>
+                        <p className="font-black text-lg">No sales data yet</p>
+                        <p className="text-sm font-bold mt-1">Start making sales to see trends</p>
                       </div>
                     </div>
                   ) : (
@@ -136,30 +136,30 @@ export default function DemandForecasting() {
                           </>
                         )}
                       </svg>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs font-bold text-slate-400 px-1">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs font-black text-black dark:text-slate-400 px-1">
                         {trend.map((t, i) => <span key={i}>{t.month}</span>)}
-                        <span className="text-violet-500">FC →</span>
+                        <span className="text-violet-700 dark:text-violet-500">FC →</span>
                       </div>
                     </div>
                   )}
 
                   {/* Top products table */}
                   {data?.topProducts?.length > 0 && (
-                    <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-5">
-                      <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Top Selling Products</p>
+                    <div className="mt-6 border-t border-slate-200 dark:border-slate-800 pt-5">
+                      <p className="text-xs font-black text-black dark:text-slate-300 uppercase tracking-wider mb-3">Top Selling Products</p>
                       <div className="space-y-2">
                         {data.topProducts.slice(0, 5).map((p, i) => (
                           <div key={p.product_id} className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <span className="text-xs font-black text-slate-400 w-4">{i+1}</span>
+                              <span className="text-xs font-black text-black dark:text-slate-400 w-4">{i+1}</span>
                               <div>
-                                <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{p.name}</p>
-                                <p className="text-[10px] font-mono text-slate-400">{p.sku}</p>
+                                <p className="text-sm font-black text-black dark:text-slate-100">{p.name}</p>
+                                <p className="text-[10px] font-bold font-mono text-black dark:text-slate-400">{p.sku}</p>
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="text-sm font-black text-slate-700 dark:text-slate-300">{parseInt(p.total_sold).toLocaleString()} units</p>
-                              <p className="text-[10px] text-slate-400">{p.daily_velocity}/day avg</p>
+                              <p className="text-sm font-black text-black dark:text-slate-300">{parseInt(p.total_sold).toLocaleString()} units</p>
+                              <p className="text-xs font-bold text-black dark:text-slate-400">{p.daily_velocity}/day avg</p>
                             </div>
                           </div>
                         ))}
@@ -169,9 +169,9 @@ export default function DemandForecasting() {
                 </div>
 
                 {/* AI Insights */}
-                <div className="flex-1 bg-white rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden">
+                <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden">
                   <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-                    <h2 className="text-lg font-black text-slate-800 dark:text-slate-100">AI Insights</h2>
+                    <h2 className="text-lg font-black text-black dark:text-slate-100">AI Insights</h2>
                   </div>
                   <div className="p-6 flex-1 space-y-6 overflow-y-auto">
                     {data?.projectedGrowth > 0 ? (
@@ -180,8 +180,8 @@ export default function DemandForecasting() {
                           <TrendingUp className="w-5 h-5 text-emerald-500"/>
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">Rising Demand</h4>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Sales trending up {data.projectedGrowth}% based on recent velocity. Consider increasing stock levels.</p>
+                          <h4 className="text-sm font-black text-black dark:text-slate-100 mb-1">Rising Demand</h4>
+                          <p className="text-sm font-semibold text-black dark:text-slate-300 leading-relaxed">Sales trending up {data.projectedGrowth}% based on recent velocity. Consider increasing stock levels.</p>
                         </div>
                       </div>
                     ) : (
@@ -190,8 +190,8 @@ export default function DemandForecasting() {
                           <AlertTriangle className="w-5 h-5 text-amber-500"/>
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">Demand Softening</h4>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Sales velocity has slowed. Review pricing and promotions to stimulate demand.</p>
+                          <h4 className="text-sm font-black text-black dark:text-slate-100 mb-1">Demand Softening</h4>
+                          <p className="text-sm font-semibold text-black dark:text-slate-300 leading-relaxed">Sales velocity has slowed. Review pricing and promotions to stimulate demand.</p>
                         </div>
                       </div>
                     )}
@@ -202,21 +202,21 @@ export default function DemandForecasting() {
                           <BatteryWarning className="w-5 h-5 text-rose-500"/>
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">Stockout Warning</h4>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                            <span className="font-bold text-slate-700 dark:text-slate-300">{data.topProducts[0]?.name}</span> is your fastest moving product at {data.topProducts[0]?.daily_velocity} units/day.
+                          <h4 className="text-sm font-black text-black dark:text-slate-100 mb-1">Stockout Warning</h4>
+                          <p className="text-sm font-semibold text-black dark:text-slate-300 leading-relaxed">
+                            <span className="font-black text-rose-600">{data.topProducts[0]?.name}</span> is your fastest moving product at {data.topProducts[0]?.daily_velocity} units/day.
                           </p>
                         </div>
                       </div>
                     )}
 
-                    <div className="border-t border-slate-100 dark:border-slate-800 pt-5">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Recommendation</p>
-                      <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 mb-4">
-                        <h4 className="text-sm font-black text-violet-800 mb-1 flex items-center gap-1.5">
+                    <div className="border-t border-slate-200 dark:border-slate-800 pt-5">
+                      <p className="text-xs font-black text-black dark:text-slate-400 uppercase tracking-widest mb-3">Recommendation</p>
+                      <div className="bg-violet-100 border-2 border-violet-300 rounded-xl p-4 mb-4">
+                        <h4 className="text-sm font-black text-violet-900 dark:text-violet-300 mb-1 flex items-center gap-1.5">
                           <Info className="w-4 h-4"/> Place Reorder Now
                         </h4>
-                        <p className="text-xs text-violet-600">Based on current velocity, restock top items before depletion.</p>
+                        <p className="text-xs font-semibold text-violet-800 dark:text-violet-400">Based on current velocity, restock top items before depletion.</p>
                       </div>
                       <button onClick={() => navigate('/inventory/reorder')}
                         className="w-full bg-violet-500 hover:bg-violet-600 text-white rounded-xl py-3 flex items-center justify-center font-bold text-sm transition-colors shadow-md">
