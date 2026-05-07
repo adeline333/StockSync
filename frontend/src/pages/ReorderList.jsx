@@ -115,8 +115,8 @@ export default function ReorderList() {
                 </button>
               </div>
 
-              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
-                <div className="grid grid-cols-[0.5fr_3fr_2fr_1.5fr_2fr_1.5fr_1fr] bg-slate-50 px-6 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 items-center">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div className="grid grid-cols-[0.5fr_3fr_2fr_1.5fr_2fr_1.5fr_1fr] bg-slate-100 dark:bg-slate-800 px-6 py-3 text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-300 dark:border-slate-600 items-center">
                   <div className="pl-1 cursor-pointer" onClick={toggleAll}>
                     {selected.size === data?.recommendations?.length && data?.recommendations?.length > 0
                       ? <CheckSquare className="w-5 h-5 text-sky-500"/>
@@ -127,8 +127,8 @@ export default function ReorderList() {
                 </div>
 
                 {(data?.recommendations || []).length === 0 ? (
-                  <div className="text-center py-16 text-slate-400">
-                    <ClipboardList className="w-10 h-10 mx-auto mb-3 opacity-30"/>
+                  <div className="text-center py-16 text-slate-500 dark:text-slate-400">
+                    <ClipboardList className="w-10 h-10 mx-auto mb-3 opacity-40"/>
                     <p className="font-semibold">No reorder recommendations</p>
                     <p className="text-sm mt-1">All products are sufficiently stocked</p>
                   </div>
@@ -136,7 +136,7 @@ export default function ReorderList() {
                   const cfg = statusConfig[item.stock_status] || statusConfig.steady;
                   const isChecked = selected.has(item.id);
                   return (
-                    <div key={item.id} className={`grid grid-cols-[0.5fr_3fr_2fr_1.5fr_2fr_1.5fr_1fr] items-center px-6 py-4 border-b border-slate-50 transition-colors ${isChecked ? 'bg-sky-50/30' : 'hover:bg-slate-50'}`}>
+                    <div key={item.id} className={`grid grid-cols-[0.5fr_3fr_2fr_1.5fr_2fr_1.5fr_1fr] items-center px-6 py-4 border-b border-slate-200 dark:border-slate-700 transition-colors ${isChecked ? 'bg-sky-50/50 dark:bg-sky-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}>
                       <div className="pl-1 cursor-pointer" onClick={() => toggleSelect(item.id)}>
                         {isChecked
                           ? <CheckSquare className="w-5 h-5 text-sky-500"/>
