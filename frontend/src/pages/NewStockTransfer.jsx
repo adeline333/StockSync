@@ -109,7 +109,7 @@ export default function NewStockTransfer() {
               <div className="relative">
                 <select value={sourceBranch} onChange={e => setSourceBranch(e.target.value)}
                   className="w-full bg-white dark:bg-slate-700 border-2 border-slate-400 dark:border-slate-500 px-4 py-3 rounded-xl text-sm font-bold text-slate-900 dark:text-white appearance-none focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 cursor-pointer hover:border-slate-500 dark:hover:border-slate-400 transition-colors shadow-sm">
-                  {branches.map(b => <option key={b.id} value={b.id} className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" style={{color: '#0f172a', backgroundColor: '#ffffff'}}>{b.name}</option>)}
+                  {branches.map(b => <option key={b.id} value={b.id} className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">{b.name}</option>)}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-900 dark:text-slate-300 pointer-events-none"/>
               </div>
@@ -122,7 +122,7 @@ export default function NewStockTransfer() {
               <div className="relative">
                 <select value={destBranch} onChange={e => setDestBranch(e.target.value)}
                   className="w-full bg-white dark:bg-slate-700 border-2 border-sky-500 dark:border-sky-400 px-4 py-3 rounded-xl text-sm font-bold text-slate-900 dark:text-white appearance-none focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer hover:border-sky-600 dark:hover:border-sky-300 transition-colors shadow-sm">
-                  {branches.map(b => <option key={b.id} value={b.id} className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" style={{color: '#0f172a', backgroundColor: '#ffffff'}}>{b.name}</option>)}
+                  {branches.map(b => <option key={b.id} value={b.id} className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">{b.name}</option>)}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-sky-900 dark:text-sky-300 pointer-events-none"/>
               </div>
@@ -155,7 +155,7 @@ export default function NewStockTransfer() {
             </div>
 
             <div className="grid grid-cols-[2fr_1fr_1.5fr_1fr] bg-slate-100 dark:bg-slate-750 px-6 py-4 text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider border-b-2 border-slate-200 dark:border-slate-700">
-              <span className="text-slate-900 dark:text-slate-100 font-black" style={{color: '#0f172a'}}>Product</span><span className="text-center text-slate-900 dark:text-slate-100 font-black" style={{color: '#0f172a'}}>Source Stock</span><span className="text-center text-slate-900 dark:text-slate-100 font-black" style={{color: '#0f172a'}}>Transfer Qty</span><span className="text-right text-slate-900 dark:text-slate-100 font-black" style={{color: '#0f172a'}}>Status</span>
+              <span className="text-slate-900 dark:text-slate-100 font-black">Product</span><span className="text-center text-slate-900 dark:text-slate-100 font-black">Source Stock</span><span className="text-center text-slate-900 dark:text-slate-100 font-black">Transfer Qty</span><span className="text-right text-slate-900 dark:text-slate-100 font-black">Status</span>
             </div>
 
             <div className="divide-y-2 divide-slate-200 dark:divide-slate-700 min-h-[120px]">
@@ -187,18 +187,18 @@ export default function NewStockTransfer() {
 
             <div className="border-t-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-750 p-6 grid grid-cols-3 gap-6">
               <div className="col-span-1">
-                <label className="text-xs font-black text-slate-900 dark:text-slate-300 uppercase tracking-widest block mb-2" style={{color: '#0f172a'}}>Transfer Reason</label>
+                <label className="text-xs font-black text-slate-900 dark:text-slate-300 uppercase tracking-widest block mb-2">Transfer Reason</label>
                 <input value={reason} onChange={e => setReason(e.target.value)} placeholder="e.g., Weekend restock"
                   className="w-full bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-900 dark:placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm"/>
               </div>
               <div className="col-span-1">
-                <label className="text-xs font-black text-slate-900 dark:text-slate-300 uppercase tracking-widest block mb-2" style={{color: '#0f172a'}}>Priority</label>
+                <label className="text-xs font-black text-slate-900 dark:text-slate-300 uppercase tracking-widest block mb-2">Priority</label>
                 <div className="relative">
                   <select value={priority} onChange={e => setPriority(e.target.value)}
                     className="w-full bg-white dark:bg-slate-700 border-2 border-sky-400 dark:border-sky-500 px-3 py-2.5 rounded-lg text-sm font-bold text-slate-900 dark:text-white appearance-none focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer hover:border-sky-500 dark:hover:border-sky-400 transition-colors shadow-sm">
-                    <option value="low" className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" style={{color: '#0f172a', backgroundColor: '#ffffff'}}>Low</option>
-                    <option value="normal" className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" style={{color: '#0f172a', backgroundColor: '#ffffff'}}>Normal</option>
-                    <option value="high" className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" style={{color: '#0f172a', backgroundColor: '#ffffff'}}>High / Urgent</option>
+                    <option value="low" className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">Low</option>
+                    <option value="normal" className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">Normal</option>
+                    <option value="high" className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">High / Urgent</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-sky-900 dark:text-sky-300 pointer-events-none"/>
                 </div>
