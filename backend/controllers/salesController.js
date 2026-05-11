@@ -14,7 +14,7 @@ const genOrderNumber = () => {
 
 // POST /api/sales/orders — create a new order
 exports.createOrder = async (req, res) => {
-  const { branch_id, customer_id, items, discount_amount = 0, payment_method, amount_tendered, notes } = req.body;
+  const { branch_id, customer_id, customer_name, customer_tin, items, discount_amount = 0, payment_method, amount_tendered, notes } = req.body;
   const ip = getIP(req);
   const client = await db.pool.connect();
 
@@ -55,11 +55,30 @@ exports.createOrder = async (req, res) => {
 
     const orderNumber = genOrderNumber();
 
+    let finalCustomerId = customer_id || null;
+
+    if (!finalCustomerId && (customer_name || customer_tin)) {
+      if (customer_tin) {
+        const existingCust = await client.query('SELECT id FROM customers WHERE tin = $1', [customer_tin]);
+        if (existingCust.rows.length > 0) {
+          finalCustomerId = existingCust.rows[0].id;
+        }
+      }
+      
+      if (!finalCustomerId) {
+        const newCust = await client.query(
+          `INSERT INTO customers (name, tin, customer_type) VALUES ($1, $2, 'retail') RETURNING id`,
+          [customer_name || 'Walk-in Customer', customer_tin || null]
+        );
+        finalCustomerId = newCust.rows[0].id;
+      }
+    }
+
     // Insert order
     const orderResult = await client.query(
       `INSERT INTO orders (order_number, branch_id, customer_id, user_id, subtotal, discount_amount, vat_amount, total_amount, payment_method, amount_tendered, change_amount, notes, status)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'completed') RETURNING *`,
-      [orderNumber, branch_id, customer_id || null, req.user.id, subtotal, discountAmt, vatAmount, totalAmount, payment_method || 'cash', amount_tendered || totalAmount, changeAmount, notes || null]
+      [orderNumber, branch_id, finalCustomerId, req.user.id, subtotal, discountAmt, vatAmount, totalAmount, payment_method || 'cash', amount_tendered || totalAmount, changeAmount, notes || null]
     );
     const order = orderResult.rows[0];
 
