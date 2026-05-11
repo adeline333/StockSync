@@ -27,7 +27,7 @@ export default function PaymentMethod() {
 
   if (!posData) return null;
 
-  const { cart, discount, subtotal, vat, total, notes, customerName, branch_id } = posData;
+  const { cart, discount, subtotal, vat, total, notes, customerName, customerTIN, branch_id } = posData;
   const tenderedNum = parseFloat(tendered) || 0;
   const changeDue = Math.max(0, tenderedNum - total);
 
@@ -47,6 +47,8 @@ export default function PaymentMethod() {
         payment_method: method,
         amount_tendered: tenderedNum,
         notes: notes || null,
+        customer_name: customerName || null,
+        customer_tin: customerTIN || null,
       };
       queueTransaction({ type: 'order', data: orderData });
       showNotification('Sale Queued Offline', `Order of ${total.toLocaleString()} RWF saved. Will sync when online.`);
@@ -65,13 +67,15 @@ export default function PaymentMethod() {
           payment_method: method,
           amount_tendered: tenderedNum,
           notes: notes || null,
+          customer_name: customerName || null,
+          customer_tin: customerTIN || null,
         })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
       // Store completed order for receipt
-      sessionStorage.setItem('last_order', JSON.stringify({ order: data.order, items: data.items, cart, subtotal, vat, total, discount, tendered: tenderedNum, change: changeDue, method, customerName }));
+      sessionStorage.setItem('last_order', JSON.stringify({ order: data.order, items: data.items, cart, subtotal, vat, total, discount, tendered: tenderedNum, change: changeDue, method, customerName, customerTIN }));
       sessionStorage.removeItem('pos_cart');
       navigate('/retail-dashboard');
     } catch (e) {
