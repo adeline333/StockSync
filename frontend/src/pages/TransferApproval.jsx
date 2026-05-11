@@ -153,17 +153,17 @@ export default function TransferApproval() {
                 className={`bg-white dark:bg-slate-800 rounded-2xl p-5 border-2 shadow-sm cursor-pointer transition-all relative overflow-hidden ${selected?.id === t.id ? 'border-sky-500' : 'border-slate-100 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-600'}`}>
                 {selected?.id === t.id && <div className="absolute left-0 top-0 bottom-0 w-2 bg-sky-500"/>}
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-sm font-black text-slate-800 dark:text-slate-100" style={{color: '#0f172a'}}>{t.transfer_number}</h3>
+                  <h3 className="text-sm font-black text-slate-800 dark:text-slate-100">{t.transfer_number}</h3>
                   {t.priority === 'high' && (
                     <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${priorityStyle.high}`}>Urgent</span>
                   )}
                 </div>
-                <p className="text-sm font-bold text-slate-900 dark:text-slate-300 mb-1 flex items-center gap-1.5" style={{color: '#0f172a'}}>
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-300 mb-1 flex items-center gap-1.5">
                   <Store className="w-3.5 h-3.5 text-sky-500"/> {t.dest_branch_name}
                 </p>
-                <p className="text-xs text-slate-900 dark:text-slate-400 mb-1" style={{color: '#0f172a'}}>Req: {t.requested_by_name || 'Unknown'} · {new Date(t.created_at).toLocaleString('en-RW', { dateStyle: 'short', timeStyle: 'short' })}</p>
+                <p className="text-xs text-slate-900 dark:text-slate-400 mb-1">Req: {t.requested_by_name || 'Unknown'} · {new Date(t.created_at).toLocaleString('en-RW', { dateStyle: 'short', timeStyle: 'short' })}</p>
                 <div className="flex items-center justify-between mt-2">
-                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${statusStyle[t.status] || 'bg-slate-50 text-slate-900 dark:text-slate-400 border-slate-200'}`} style={{color: '#0f172a'}}>
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border ${statusStyle[t.status] || 'bg-slate-50 text-slate-900 dark:text-slate-400 border-slate-200'}`}>
                     {t.status}
                   </span>
                 </div>
@@ -184,18 +184,18 @@ export default function TransferApproval() {
               <>
                 <div className="flex justify-between items-start p-8 border-b border-slate-100 dark:border-slate-800">
                   <div>
-                    <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-1" style={{color: '#0f172a'}}>{selected.transfer_number}</h2>
-                    <p className="text-sm text-slate-900 dark:text-slate-400" style={{color: '#0f172a'}}>{new Date(selected.created_at).toLocaleString('en-RW', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                    <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-1">{selected.transfer_number}</h2>
+                    <p className="text-sm text-slate-900 dark:text-slate-400">{new Date(selected.created_at).toLocaleString('en-RW', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                   </div>
-                  <span className={`text-xs font-black uppercase px-4 py-2 rounded-full border ${statusStyle[selected.status] || 'bg-slate-50 text-slate-900 dark:text-slate-400 border-slate-200'}`} style={{color: '#0f172a'}}>
+                  <span className={`text-xs font-black uppercase px-4 py-2 rounded-full border ${statusStyle[selected.status] || 'bg-slate-50 text-slate-900 dark:text-slate-400 border-slate-200'}`}>
                     {selected.status}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between px-10 py-6 border-b border-slate-100 dark:border-slate-800">
                   <div>
-                    <p className="text-xs font-bold text-slate-900 dark:text-slate-400 uppercase tracking-widest mb-2" style={{color: '#0f172a'}}>From</p>
-                    <p className="text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-2" style={{color: '#0f172a'}}>
+                    <p className="text-xs font-bold text-slate-900 dark:text-slate-400 uppercase tracking-widest mb-2">From</p>
+                    <p className="text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
                       <Building2 className="w-5 h-5 text-slate-900 dark:text-slate-400"/> {selected.source_branch_name}
                     </p>
                   </div>
@@ -205,8 +205,8 @@ export default function TransferApproval() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-bold text-sky-600 uppercase tracking-widest mb-2" style={{color: '#0369a1'}}>To</p>
-                    <p className="text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 justify-end" style={{color: '#0f172a'}}>
+                    <p className="text-xs font-bold text-sky-600 uppercase tracking-widest mb-2">To</p>
+                    <p className="text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 justify-end">
                       {selected.dest_branch_name} <Store className="w-5 h-5 text-sky-500"/>
                     </p>
                   </div>
@@ -216,23 +216,23 @@ export default function TransferApproval() {
                 {selected.reason && (
                   <div className="mx-8 my-4 bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 relative overflow-hidden">
                     <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-slate-300 rounded-l-xl"/>
-                    <p className="text-xs font-bold text-slate-900 dark:text-slate-400 mb-1" style={{color: '#0f172a'}}>Transfer Reason:</p>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-300 italic" style={{color: '#0f172a'}}>"{selected.reason}"</p>
+                    <p className="text-xs font-bold text-slate-900 dark:text-slate-400 mb-1">Transfer Reason:</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-300 italic">"{selected.reason}"</p>
                   </div>
                 )}
 
                 {/* Items */}
                 <div className="flex-1 overflow-y-auto px-8 py-4">
-                  <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 mb-3" style={{color: '#0f172a'}}>Items to Transfer</h3>
+                  <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 mb-3">Items to Transfer</h3>
                   <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
                     <div className="grid grid-cols-[3fr_1.5fr_1fr] bg-slate-50 px-5 py-3 text-[11px] font-bold text-slate-900 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                      <span style={{color: '#0f172a'}}>Product</span><span className="text-center" style={{color: '#0f172a'}}>WH Availability</span><span className="text-center" style={{color: '#0f172a'}}>Request Qty</span>
+                      <span>Product</span><span className="text-center">WH Availability</span><span className="text-center">Request Qty</span>
                     </div>
                     {selectedItems.map(item => (
                       <div key={item.id} className="grid grid-cols-[3fr_1.5fr_1fr] items-center px-5 py-4 border-b border-slate-50 last:border-0">
                         <div>
-                          <p className="text-sm font-bold text-slate-800 dark:text-slate-100" style={{color: '#0f172a'}}>{item.product_name}</p>
-                          <p className="text-[10px] font-mono text-slate-900 dark:text-slate-400" style={{color: '#0f172a'}}>{item.product_sku}</p>
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{item.product_name}</p>
+                          <p className="text-[10px] font-mono text-slate-900 dark:text-slate-400">{item.product_sku}</p>
                         </div>
                         <div className="text-center">
                           <span className={`text-sm font-bold ${item.source_stock >= item.quantity ? 'text-emerald-600' : 'text-rose-600'}`}>
