@@ -307,3 +307,5 @@ export default function AddProduct() {
     </div>
   );
 }
+
+// Code cleanup 1778534036218
