@@ -1,6 +1,7 @@
 const db = require('../db');
+const ForecastingEngine = require('../utils/ForecastingEngine');
 
-// GET /api/analytics/forecast — sales trend + simple forecast
+// GET /api/analytics/forecast — sales trend + OLS linear forecast
 exports.getForecast = async (req, res) => {
   const { branch_id, months = 6 } = req.query;
   const branchFilter = branch_id ? `AND o.branch_id = ${parseInt(branch_id)}` : '';
@@ -40,23 +41,23 @@ exports.getForecast = async (req, res) => {
        LIMIT 10`
     );
 
-    // Simple linear forecast for next 2 months
+    // Advanced Linear Regression Forecast
     const trend = salesTrend.rows;
-    let projectedGrowth = 0;
-    if (trend.length >= 2) {
-      const last = parseFloat(trend[trend.length - 1]?.revenue || 0);
-      const prev = parseFloat(trend[trend.length - 2]?.revenue || 0);
-      projectedGrowth = prev > 0 ? ((last - prev) / prev * 100).toFixed(1) : 0;
-    }
+    const revenues = trend.map(t => parseFloat(t.revenue));
+    const model = ForecastingEngine.linearRegression(revenues);
 
-    // Model confidence based on data points available
-    const confidence = Math.min(95, 60 + trend.length * 5);
+    // Projected growth for next month vs last month
+    const lastRevenue = revenues[revenues.length - 1] || 0;
+    const nextMonthForecast = model.forecast[0] || 0;
+    const projectedGrowth = lastRevenue > 0 ? ((nextMonthForecast - lastRevenue) / lastRevenue * 100).toFixed(1) : 0;
 
     res.json({
       trend: salesTrend.rows,
       topProducts: topProducts.rows,
+      forecast: model.forecast,
       projectedGrowth: parseFloat(projectedGrowth),
-      confidence,
+      confidence: Math.max(model.confidence, 40), // Minimum 40% confidence for UI
+      model_type: model.modelName,
       months: parseInt(months)
     });
   } catch (e) {
@@ -102,12 +103,16 @@ exports.getStockOutRisk = async (req, res) => {
       const sold30d = parseInt(velocityResult.rows[0].sold_30d);
       const dailyVelocity = parseFloat((sold30d / 30).toFixed(2));
       const currentStock = parseInt(product.current_stock);
-      const daysRemaining = dailyVelocity > 0 ? Math.floor(currentStock / dailyVelocity) : 999;
       const leadDays = parseInt(product.supplier_lead_days) || 3;
+      
+      // Calculate sensible metrics
+      const optimalSafetyStock = ForecastingEngine.calculateSafetyStock(dailyVelocity, leadDays);
+      const reorderPoint = (dailyVelocity * leadDays) + optimalSafetyStock;
+      const daysRemaining = dailyVelocity > 0 ? Math.floor(currentStock / dailyVelocity) : 999;
 
       let riskLevel = 'safe';
-      if (daysRemaining <= leadDays) riskLevel = 'critical';
-      else if (daysRemaining <= 7) riskLevel = 'high';
+      if (currentStock <= dailyVelocity * leadDays) riskLevel = 'critical';
+      else if (currentStock <= reorderPoint) riskLevel = 'high';
       else if (daysRemaining <= 14) riskLevel = 'moderate';
       else if (daysRemaining <= 30) riskLevel = 'low';
 
@@ -117,6 +122,8 @@ exports.getStockOutRisk = async (req, res) => {
           daily_velocity: dailyVelocity,
           days_remaining: daysRemaining,
           risk_level: riskLevel,
+          optimal_safety_stock: optimalSafetyStock,
+          reorder_point: Math.ceil(reorderPoint),
           potential_loss: (dailyVelocity * Math.min(daysRemaining, 7) * parseFloat(product.price)).toFixed(0)
         });
       }
@@ -131,7 +138,8 @@ exports.getStockOutRisk = async (req, res) => {
     res.json({
       items: riskItems,
       total_at_risk: riskItems.filter(i => ['critical', 'high'].includes(i.risk_level)).length,
-      potential_loss: totalPotentialLoss.toFixed(0)
+      potential_loss: totalPotentialLoss.toFixed(0),
+      model_type: 'Demand-Variance Safety Stock (95% Service Level)'
     });
   } catch (e) {
     console.error(e);
