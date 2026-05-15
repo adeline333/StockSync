@@ -1,10 +1,12 @@
 import React from 'react';
 import Sidebar from './Sidebar';
+import AIChatbot from './AIChatbot';
 
 export default function AppLayout({ children }) {
   return (
     <div className="min-h-screen flex font-sans bg-slate-100 dark:bg-slate-950 transition-colors duration-200">
       <Sidebar />
+      <AIChatbot />
 
       {/* Background decoration */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
