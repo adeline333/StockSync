@@ -22,15 +22,17 @@ export default function TransferApproval() {
   const { token, user } = useAuth();
   const headers = { Authorization: `Bearer ${token}` };
 
-  // ROLE-BASED ACCESS CONTROL: Only admins can access transfer approvals
-  if (user?.role !== 'admin') {
+  // HIERARCHICAL ACCESS CONTROL: Admins and Managers can access this page
+  const canAccess = user?.role === 'admin' || user?.role === 'manager';
+  
+  if (!canAccess) {
     return (
       <div className="flex flex-col min-h-screen dark:bg-slate-950">
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center p-8">
             <AlertCircle className="w-16 h-16 text-rose-500 mx-auto mb-4"/>
             <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Access Denied</h1>
-            <p className="text-slate-600 dark:text-slate-400 mb-4">Only administrators can approve transfer requests.</p>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">You do not have the hierarchical authority to manage stock transfers.</p>
             <Link to="/dashboard" className="inline-flex items-center px-4 py-2 bg-sky-600 text-white rounded-lg font-medium hover:bg-sky-700 transition-colors">
               Return to Dashboard
             </Link>
@@ -53,12 +55,28 @@ export default function TransferApproval() {
   const fetchTransfers = useCallback(async () => {
     setLoading(true);
     const status = activeTab === 'pending' ? 'pending' : activeTab === 'history' ? 'approved' : 'rejected';
+    
+    // HIERARCHY: If user is a manager, they only see transfers WHERE THEY ARE THE SOURCE
+    // (Meaning they are the ones who have to give the stock)
+    let url = `${API_URL}/transfers?status=${status}`;
+    if (user?.role === 'manager' && user?.branch_id) {
+      url += `&branch_id=${user.branch_id}`;
+    }
+
     try {
-      const res = await fetch(`${API_URL}/transfers?status=${status}`, { headers });
+      const res = await fetch(url, { headers });
       const data = await res.json();
-      setTransfers(data.transfers || []);
-      if (data.transfers?.length > 0 && !selected) {
-        selectTransfer(data.transfers[0]);
+      
+      // Secondary client-side filter for managers to be safe: 
+      // Only show transfers where their branch is the source
+      let filtered = data.transfers || [];
+      if (user?.role === 'manager') {
+        filtered = filtered.filter(t => parseInt(t.source_branch_id) === parseInt(user.branch_id));
+      }
+
+      setTransfers(filtered);
+      if (filtered.length > 0 && !selected) {
+        selectTransfer(filtered[0]);
       }
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
