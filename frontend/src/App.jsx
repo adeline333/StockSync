@@ -19,7 +19,6 @@ import RetailDashboard from './pages/RetailDashboard';
 import Transactions from './pages/Transactions'; 
 import StockMovements from './pages/StockMovements';
 import BulkImport from './pages/BulkImport';
-import ScannerStation from './pages/ScannerStation';
 import POS from './pages/POS';
 import POSCheckout from './pages/POSCheckout';
 import PaymentMethod from './pages/PaymentMethod';
@@ -123,7 +122,6 @@ function App() {
               <Route path="/admin/sync" element={<ProtectedRoute><SyncStatus /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-              <Route path="/scanner" element={<ProtectedRoute><ScannerStation /></ProtectedRoute>} />
               <Route path="/pos" element={<ProtectedRoute><POS /></ProtectedRoute>} />
               <Route path="/pos/checkout" element={<ProtectedRoute><POSCheckout /></ProtectedRoute>} />
               <Route path="/pos/payment" element={<ProtectedRoute><PaymentMethod /></ProtectedRoute>} />
