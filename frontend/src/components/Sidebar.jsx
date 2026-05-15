@@ -5,7 +5,7 @@ import {
   FileBarChart, Users, Bell, Settings, ShieldCheck, RefreshCw,
   ShoppingCart, History, Search, TrendingDown, ClipboardList,
   BarChart2, BatteryWarning, ListChecks, LogOut, PackagePlus, Upload,
-  Sun, Moon
+  Sun, Moon, Cpu
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -37,6 +37,7 @@ const NAV_CONFIG = {
     { label: 'Movements', icon: TrendingDown, to: '/movements' },
     { label: 'New Transfer', icon: ArrowRightLeft, to: '/transfers/new' },
     { label: 'My Transfers', icon: ListChecks, to: '/transfers/my' },
+    { label: 'Transfer Approvals', icon: ListChecks, to: '/transfers/approvals' },
     { label: 'Locations', icon: MapPin, to: '/locations' },
     { label: 'Reconciliation', icon: ArrowRightLeft, to: '/reconciliation' },
     { label: 'Analytics', icon: BarChart2, to: '/analytics/forecasting' },
@@ -49,7 +50,6 @@ const NAV_CONFIG = {
     { label: 'POS Terminal', icon: ShoppingCart, to: '/pos' },
     { label: 'Sales History', icon: History, to: '/sales-history' },
     { label: 'Item Search', icon: Search, to: '/inventory' },
-    { label: 'Scanner', icon: Search, to: '/scanner' },
     { label: 'My Transfers', icon: ListChecks, to: '/transfers/my' },
     { label: 'Notifications', icon: Bell, to: '/notifications' },
   ],
