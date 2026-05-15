@@ -29,6 +29,7 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/ai', require('./routes/ai'));
 
 // Start scheduled jobs
 require('./scheduler');
