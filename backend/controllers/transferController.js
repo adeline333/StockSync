@@ -82,9 +82,9 @@ exports.createTransfer = async (req, res) => {
   if (!items || items.length === 0) return res.status(400).json({ message: 'Add at least one item' });
   if (source_branch_id === dest_branch_id) return res.status(400).json({ message: 'Source and destination cannot be the same' });
 
-  // BUSINESS RULE: Only managers and admins can create transfer requests
-  if (req.user.role === 'staff') {
-    return res.status(403).json({ message: 'Staff users cannot create transfer requests. Contact your manager.' });
+  // BUSINESS RULE: Anyone logged in can create a transfer request (Staff notice low stock first!)
+  if (!req.user) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
   try {
@@ -124,14 +124,19 @@ exports.approveTransfer = async (req, res) => {
     const transfer = transferResult.rows[0];
     if (transfer.status !== 'pending') throw new Error(`Transfer is already ${transfer.status}`);
 
-    // BUSINESS RULE: Only admins can approve transfers
-    if (req.user.role !== 'admin') {
-      throw new Error('Only administrators can approve transfers');
+    // HIERARCHICAL RULE: 
+    // 1. Admins can approve anything.
+    // 2. Managers can ONLY approve transfers LEAVING their own branch (Source Branch).
+    const isSourceManager = req.user.role === 'manager' && parseInt(req.user.branch_id) === parseInt(transfer.source_branch_id);
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isAdmin && !isSourceManager) {
+      throw new Error('You do not have the hierarchical authority to approve this transfer. Only the Source Branch Manager or Admin can approve.');
     }
 
-    // BUSINESS RULE: Cannot approve your own transfer request
-    if (transfer.requested_by === req.user.id) {
-      throw new Error('You cannot approve your own transfer request');
+    // SECURITY RULE: Cannot approve your own transfer request (Prevents fraud)
+    if (transfer.requested_by === req.user.id && !isAdmin) {
+      throw new Error('Security Alert: You cannot approve a transfer request that you created yourself.');
     }
 
     const items = await client.query('SELECT * FROM stock_transfer_items WHERE transfer_id = $1', [transfer.id]);
@@ -194,14 +199,17 @@ exports.rejectTransfer = async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Transfer not found' });
     if (result.rows[0].status !== 'pending') return res.status(400).json({ message: 'Transfer is not pending' });
 
-    // BUSINESS RULE: Only admins can reject transfers
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Only administrators can reject transfers' });
+    // HIERARCHICAL RULE: Only Source Manager or Admin can reject
+    const isSourceManager = req.user.role === 'manager' && parseInt(req.user.branch_id) === parseInt(result.rows[0].source_branch_id);
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isAdmin && !isSourceManager) {
+      return res.status(403).json({ message: 'You do not have the authority to reject this transfer.' });
     }
 
-    // BUSINESS RULE: Cannot reject your own transfer request
-    if (result.rows[0].requested_by === req.user.id) {
-      return res.status(403).json({ message: 'You cannot reject your own transfer request' });
+    // SECURITY RULE: Cannot reject your own transfer request (unless Admin)
+    if (result.rows[0].requested_by === req.user.id && !isAdmin) {
+      return res.status(403).json({ message: 'You cannot reject your own transfer request.' });
     }
 
     await db.query(
