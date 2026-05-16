@@ -170,14 +170,22 @@ export default function ReportBuilder() {
               </div>
             ) : (
               <>
-                <div className="mb-6">
-                  <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-1">
-                    {source === 'sales' ? 'Sales Performance Report' : 'Inventory Valuation Report'}
-                  </h1>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Period: {data.period?.start} — {data.period?.end || new Date().toISOString().split('T')[0]}</p>
+                <div className="flex items-center justify-between mb-6 border-b-2 border-slate-900 pb-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-white font-black">SS</div>
+                      <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter">StockSync</h2>
+                    </div>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">B Special Business Ltd · Inventory Report</p>
+                  </div>
+                  <div className="text-right">
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-1">
+                      {source === 'sales' ? 'Sales Performance Report' : 'Inventory Valuation Report'}
+                    </h1>
+                    <p className="text-xs font-bold text-slate-400">Generated on {new Date().toLocaleString('en-GB')}</p>
+                    <p className="text-[10px] text-slate-500 font-medium">Period: {data.period?.start} — {data.period?.end || new Date().toISOString().split('T')[0]}</p>
+                  </div>
                 </div>
-
-                <div className="w-full h-px bg-slate-200 mb-6"/>
 
                 {source === 'sales' && data.summary && (
                   <>
