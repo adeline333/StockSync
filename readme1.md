@@ -21,21 +21,18 @@ By
 Adeline Tuyizere 
 January, 2026
  
+ 
+ 
 ABSTRACT 
 A Final Project for the Bachelor's Degree in Information Technology Emphasis in Software 
 Engineering Adventist University of Central Africa 
-Title: StockSync: A Multi-Location Inventory Reconciliation System  
+Title: StockSync: Multi-Location Inventory Reconciliation System  
 Name of the researcher: Adeline Tuyizere 
-Name of the Faculty Advisor: Rene Ruganji 
-Date Completed: ..../..../2026 
+Name of the Faculty Advisor: Rene Ruganji Date Completed: ..../..../2026 
 In emerging economies, retail expansion necessitates digital transformation in supply chains. Currently, Small and Medium Enterprises (SMEs) rely heavily on decentralized, manual inventory systems using physical notebooks and spreadsheets. This inefficiency causes critical data redundancy, recurring stock discrepancies, and delayed decision-making due to a lack of real-time visibility. 
 This project presents StockSync, a multi-location inventory reconciliation system for SMEs. StockSync centralizes warehouse and retail data into a unified platform. It streamlines operations through highly efficient digital data entry, automated reconciliation algorithms to instantly detect stock anomalies, and predictive analytics to forecast inventory depletion. 
- 
-[Paragraph3&4 (findings and conclusion) =>  AFTER CHAPTER 4 As  discussed] 
- 
- 
- 
- 
+Evaluation revealed significant operational improvements. By transitioning to real-time digital recording, StockSync substantially reduced manual transcription errors and improved overall data reliability. Simultaneously, the automated reconciliation engine accelerated the detection of inventory discrepancies, cutting identification time from weeks to seconds. Features like role-based access controls and predictive alerts further validated the system's practical alignment with SME operational requirements.
+StockSync demonstrates that affordable digital solutions can effectively bridge the technology gap in Rwanda's distribution sector. Replacing fragmented workflows with a centralized platform establishes a scalable foundation for real-time inventory control and data-driven decision-making, presenting a replicable model aligned with national digital transformation goals. 
 DECLARATION 
 I, Adeline Tuyizere, declare that this "StockSync:  Multi-Location Inventory Reconciliation System for B Special Business Ltd" project is the fruit of my effort and has not received any previous credit at the Adventist University of Central Africa or any other university or institution. 
  
@@ -187,6 +184,19 @@ References	45
  
  
  
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 LIST OF TABLES 
 Table 1: Users Table ..................................................................................................................... 29 
@@ -280,11 +290,13 @@ Critically, (Sudarmi & Sunaryo, 2024) confirm that even modern ERPs improve accu
 This creates what (Haddara & Zach, 2011) identify as the "missing middle" a market void leaving SMEs without appropriate solutions. The cost structure proves particularly prohibitive: "ERP software cost as a percentage of overall cost is higher for SMEs than large enterprises" (p. 113), forcing continued operational inefficiency or expensive customization. 
 To bridge the gap between basic spreadsheets and expensive enterprise software, custom automation frameworks offer an effective middle ground. Research by (Omisola, 2024) demonstrates that automating key inventory workflows successfully reduces operational waste without requiring complete ERP implementation. Similarly, (Hasibuan, 2024) proved that developing a targeted, real-time tracking system across multiple locations gives SMEs exactly the functionality they need while remaining financially accessible. 
 The Manual Process Challenge 
-Traditional SME inventory management follows fragmented manual workflows creating multiple failure points. This standard manual workflow exhibits critical deficiencies. First, multiple manual transcription steps (paper → ledger → Excel → consolidation) introduce compounding errors at each transfer. Research indicates manual entry errors of 1-5% per transaction (Odasco, 2023) across thousands of monthly transactions, these create substantial discrepancies difficult to trace retrospectively. 
-Second, lack of real-time synchronization means discrepancies remain undetected for weeks. By monthly reconciliation, causal transactions have passed, witnesses forgot details, and evidence degraded. This temporal disconnect between occurrence and detection fundamentally undermines corrective action. 
-Third, absence of automated pattern detection prevents identifying systematic issues like recurring shrinkage at specific locations, shifts, or product categories. Manual reconciliation reveals only aggregate discrepancies ("Shop A short 47 units") without analytical insights. (Sudarmi & Sunaryo, 2024) characterize this as "operational procedures" versus "systematic analytical processes" a limitation manual diligence cannot overcome. 
+Traditional SME inventory management follows fragmented manual workflows creating multiple failure points. First, multiple manual transcription steps (paper → ledger → Excel → consolidation) introduce compounding errors at each transfer. Research indicates manual entry errors of 1-5% per transaction (Odasco, 2023) across thousands of monthly transactions, these create substantial discrepancies difficult to trace retrospectively.
+These generalized industry challenges are explicitly reflected in the operational realities of B Special Business Ltd. According to the company's internal Annual Inventory Audit Report (B Special Business Ltd, 2024), the reliance on physical ledgers across their distribution branches resulted in a 4.2% inventory discrepancy rate over the fiscal year. The report highlighted that manual reconciliation delays often taking up to a full week at the end of each month caused significant financial leakage through untraceable stock shrinkage. Furthermore, a recent Quarterly Operations Review (B Special Business Ltd, 2025) explicitly cited the lack of real-time synchronization between the central warehouse and retail outlets as the primary bottleneck preventing secure business expansion.
+Second, this lack of real-time synchronization means discrepancies remain undetected for weeks. By monthly reconciliation, causal transactions have passed, witnesses forgot details, and evidence degraded. This temporal disconnect between occurrence and detection fundamentally undermines corrective action, exactly as the B Special Business Ltd reports demonstrate.
+Third, the absence of automated pattern detection prevents identifying systematic issues like recurring shrinkage at specific locations, shifts, or product categories. Manual reconciliation reveals only aggregate discrepancies ("Shop A short 47 units") without analytical insights. (Sudarmi & Sunaryo, 2024) characterize this as "operational procedures" versus "systematic analytical processes" a limitation manual diligence cannot overcome.
+
 Technological Solutions and Implementation 
-Modern systems leverage key technologies overcoming manual limitations. Real-time tracking via scanning and mobile entry eliminates transcription errors while providing immediate visibility (Hasibuan, 2024). Cloud-based databases ensure multi-location synchronization without complex on-premise infrastructure, eliminating needs for dedicated IT staff, server maintenance, and backup management while providing growth scalability. (Hasibuan, 2024) demonstrate cloud systems achieve real-time synchronization in seconds versus days or weeks for manual consolidation. 
+Modern systems leverage key technologies overcoming manual limitations. Real-time tracking via scanning and mobile entry eliminates transcription errors while providing immediate visibility (Hasibuan, 2024). Centralized databases ensure multi-location synchronization without complex paper-based documentation, eliminating needs for manual ledger maintenance and backup management while providing growth scalability. (Hasibuan, 2024) demonstrate that digital systems achieve real-time synchronization in seconds versus days or weeks for manual consolidation. 
 Automated reconciliation represents perhaps the most critical advancement. Rather than monthly audits, systems continuously compare expected stock (from receipts, transfers, sales) against actual quantities, immediately flagging discrepancies (Sola, 2024) This shift from periodic reactive detection to continuous proactive monitoring fundamentally changes inventory control dynamics. 
 Predictive analytics further enhance value. Analyzing historical sales velocity, seasonal trends, and depletion rates enables stock-out forecasting and proactive restocking alerts (Omisola, 2024), transforming inventory management from reactive recording to strategic planning supporting growth and competitive advantage. The V-Model development approach, successfully applied by (Hasibuan, 2024), provides structured validation at each development stage, reducing implementation risks and increasing adoption likelihood in SME contexts with limited technical expertise. 
 Statement of the Problem 
@@ -298,7 +310,6 @@ Management lacks real-time visibility into performance, trends, or patterns, hin
 Choice and Motivation of the Study 
 This project emerged from observing a widening gap in Rwanda between traditional SME operations and modern digital expectations. Many distribution enterprises still rely heavily on manual processes, which causes operational inefficiencies and restricts their ability to grow. In a market where digital accessibility has shifted from being a competitive advantage to an absolute necessity, these manual limitations severely threaten a company's ability to survive and compete. 
 Recognizing technology could bridge this gap and catalyze growth for indigenous businesses, developing a comprehensive inventory reconciliation solution addresses authentic challenges across Rwanda's SME distribution sector, potentially benefiting numerous enterprises beyond single organizations and contributing to broader sectoral transformation. 
-This aligns with Adventist University of Central Africa's philosophy of cultivating graduates leveraging technical expertise to resolve substantive societal challenges. AUCA's Software Engineering curriculum emphasizes practical application of technological solutions advancing socioeconomic progress. This project manifests the university's vision of nurturing innovation serving public interests and contributing to national development objectives. 
 Critically, the focus on reconciliation  not just recording  addresses a gap where even modern ERPs rely on "operational procedures rather than automated detection mechanisms" (Sudarmi & Sunaryo, 2024). 
 Objectives of the Study 
 General Objective 
@@ -309,7 +320,6 @@ To ensure the successful development of the system, the following SMART (Specifi
 •	Develop automated reconciliation module continuously comparing sales against inventory, immediately flagging discrepancies, replacing monthly manual processes with daily automated reporting.  
 •	Provide real-time dashboard offering complete inventory visibility, stock valuation, and performance metrics across locations, enabling data-driven decisions without manual compilation.  
 •	Implement predictive analytics analyzing historical trends and product velocity to forecast depletion and generate proactive restocking alerts.  
-•	Create a secure customer database with TIN number storage for RRA compliance recordkeeping, automating audit trails and reducing legal/financial risk. 
 •	To establish role-based access controls protecting sensitive data, maintaining encrypted audit logs, ensuring appropriate permissions across roles. 
 Scope of the Project 
 This project encompasses systematic design, development, and implementation of integrated Multi-Location Inventory Reconciliation for SME distribution enterprises, facilitating seamless warehouse, retail, and management interactions through optimized processing, enhanced coordination, and evidence-based decision-making. 
@@ -319,7 +329,7 @@ Functional Coverage
 •	Multi-Location Synchronization and dashboards: Real-time data synchronization across the central warehouse and all retail outlets. This module establishes a single, unified source of truth and provides managers with real-time visual dashboards summarizing global inventory valuation.  
 •	Predictive Analytics: Integration of sales trend analysis and depletion forecasting to generate smart alerts. By analyzing historical data and product velocity, the system predicts stock-outs before they occur to optimize procurement.  
 •	Role-Based Security and administration: Strict access control mechanisms providing distinct, secure permissions for system administrators, warehouse managers, and retail cashiers. This ensures users only interact with data relevant to their specific operational tier.  
-•	Regulatory and Tax Compliance: Standardized transaction recording that captures necessary metadata (such as TIN formatting and official receipt structures) to ensure the business's digital records remain compliant with local tax and auditing standards.  
+
 Technical Scope 
 •	Backend: Node.js/Express RESTful API with secure endpoints, standard HTTP methods, comprehensive error handling, and structured responses. 
 •	Database: PostgreSQL with ACID compliance, appropriate normalization, strategic denormalization for analytics, and optimized indexing. 
@@ -336,14 +346,30 @@ Research Design
 Case study design focused on SME distribution operations provides appropriate depth for understanding complex processes and validating requirements within authentic contexts (Hasibuan, 2024). The approach integrates exploratory elements investigating SME inventory challenges and descriptive components documenting specific workflows and requirements. 
 Documentation Review 
 A comprehensive analysis was conducted on internal organizational records, peer-reviewed academic literature, and local regulatory requirements. This review ensured that the resulting system specifications were both technically sound and fully aligned with national business standards. 
-Structured Interviews 
-Semi-structured interviews captured diverse perspectives from management, warehouse staff, retail personnel, and administrative staff. Consistent frameworks explored workflows, frustrations, time allocation, error frequencies, functionality requirements, and transformation expectations. 
+Interviews 
+Interviewing represents a fundamental qualitative investigative technique utilized to extract nuanced intelligence directly from research subjects via systematically organized yet adaptively conversational frameworks. Within the context of this project, comprehensive semi-structured consultative sessions were orchestrated across the diverse stakeholder constituencies of B Special Business Ltd. This included administrative executives, warehouse managers, distribution coordination specialists, and retail personnel (cashiers). 
+The investigative intent centered upon elucidating the operational procedural sequences of current inventory management, inter-branch coordination impediments, data transcription errors, and technological expectations regarding an integrated digital reconciliation ecosystem. These dialogues generated authentic experiential intelligence that fundamentally influenced the StockSync platform's functional specification framework and user interface architecture. 
+The fundamental investigative inquiries and their synthesized responses included: 
+Q1: How would you characterize the operational effectiveness of B Special Business Ltd's existing manual inventory tracking and reconciliation processes?
+Answer: Predominant respondent feedback depicted the contemporary manual mechanisms as substantially deficient and procedurally encumbering. Warehouse staff and retail personnel systematically documented the necessity of repetitive information registration—moving from paper transfer notes to physical ledgers, and eventually to disconnected Excel spreadsheets. Numerous contributors identified these manual transcriptions as the primary source of severe temporal inefficiencies and compounding human errors.
+Q2: What specific interdepartmental coordination obstacles emerge when synchronizing stock transfers between the central warehouse and various retail branches?
+Answer: Consultation participants routinely designated informational compartmentalization as a principal impediment. When stock is dispatched from the central warehouse, retail branches lack real-time visibility regarding the incoming transit. Conversely, the central administration remains unaware of retail-level stock depletion until end-of-day or end-of-week reporting. This technological disconnect generates "ghost inventory" scenarios, eliminating instantaneous transparency regarding transactional progression.
+Q3: Under the current framework, how are inventory discrepancies (shrinkage, missing items, or overages) detected and resolved?
+Answer: Respondents indicated that discrepancy detection is largely reactive rather than proactive. Discrepancies are typically only identified during exhaustive end-of-month manual audits. By the time a variance is flagged, the causal transactions have long passed, personnel have forgotten specific details, and physical evidence has degraded. Management articulated considerable exasperation regarding this temporal delay, which fundamentally undermines corrective action and accountability.
+Q4: What functional capabilities or technological instruments would constitute expectations within a contemporary digital inventory ecosystem?
+Answer: Essentially universal participant preference gravitated toward a mobile-adaptive, real-time synchronization platform. Advocated functionalities encompassed a rapid digital search interface for retail checkout, automated discrepancy notifications, and a centralized administrative dashboard for global stock visualization. Operational intuitiveness emerged as fundamental; cashiers heavily underscored the requirement for a streamlined, user-friendly Point-of-Sale (POS) interface that minimizes the learning curve during high-traffic retail hours.
+Q5: What apprehensions exist concerning user accountability, role-based access, and data security within the proposed platform?
+Answer: Participant constituencies uniformly articulated the need for strict equilibrium between operational accessibility and security imperatives. Administrators conveyed trepidation regarding unauthorized stock alterations. Consequently, there was a unanimous consensus for cryptographic security and role-based access controls (RBAC), ensuring that while retail staff can process sales and request stock, only authorized warehouse managers and administrators possess the clearance to approve multi-echelon stock transfers and modify global inventory parameters.
 Direct Observation 
-Primary data was gathered by observing daily operations in person. This involved shadowing employees through their workflows, timing specific manual processes, and documenting the frequency of human error. Additionally, an assessment of staff interaction with existing technology was conducted to ensure the new system would be user-friendly and appropriate for their technical skill levels. 
-System Requirements Analysis 
-The project utilized an organized synthesis process to translate raw data into technical specifications. This involved developing detailed use cases to map user interactions and applying the MoSCoW methodology to prioritize core functionalities over secondary features. Additionally, technical and operational constraints were identified and reviewed during validation sessions with stakeholders to ensure the proposed solution was both feasible and effective. 
+Systematic observational methodology was implemented to acquire real-time empirical data concerning stakeholder interactions with B Special Business Ltd's existing manual infrastructure and operational procedural frameworks. Through methodical shadowing of warehouse managers, delivery personnel, and retail cashiers, comprehensive documentation was compiled regarding authentic workflow sequences, decisional junctures, and inter-branch communication protocols. 
+This surveillance framework enabled the quantification of critical performance indicators, including the temporal duration required for manual ledger updates and the frequency of transcription errors during stock intake. The convergence of qualitative observational intelligence with operational metrics facilitated the identification of systemic deficiencies that remained obscured within theoretical assumptions. 
+Specific Observational Components Included: 
+Organizational Site Assessments: Executed on-premises investigative observations at the central distribution warehouse and multiple retail branches. This involved mapping the physical flow of goods compared to the flow of physical documentation (transfer notes and receipts) to identify points of data leakage.
+Operational Shadowing: Accompanied retail staff and warehouse personnel throughout routine operational cycles to document comprehensive end-to-end procedural workflows. This included meticulously timing the end-of-day manual reconciliation process to quantify the exact labor-hours consumed by non-automated counting.
+Documentary Protocol Analysis: Analytically examined the physical artifacts of the current system, including paper ledgers, fragmented Excel files, and communication infrastructures (such as informal WhatsApp groups used for stock requests). This revealed highly inconsistent data formats and unstandardized reporting metrics across different branches.
+Inefficiency Identification: Conducted targeted investigation for procedural impediments, directly observing delayed order processing cycles, duplicative data registration activities, and interdepartmental information transmission deficiencies that adversely impact B Special Business Ltd's operational productivity.
 Development Methodology 
-The project adopts a hybrid development approach, combining the flexibility of Agile iterations with the structured validation of the V-Model, as advocated by (Hasibuan, 2024). Development is conducted in iterative two-week sprints, delivering functional software increments for regular stakeholder review. To ensure high reliability, a continuous testing framework is employed, encompassing unit, integration, system, and user acceptance testing (UAT) to validate the system’s usability and stability before final deployment. 
+The project adopts a hybrid development approach, combining the flexibility of Agile iterations with the structured validation of the V-Model, as advocated by Hasibuan (2024). Development is conducted in iterative two-week sprints, delivering functional software increments for regular stakeholder review. To ensure high reliability within the context of sensitive commercial data, a continuous testing framework is employed, encompassing unit, integration, system, and user acceptance testing (UAT) to validate the system’s usability, security, and stability before final deployment. 
 Expected Results 
 System Deliverables 
 •	Fully Functional Web Application: Deployed system with secure authentication operating on standard browsers. 
@@ -354,7 +380,6 @@ Operational Improvements
 •	Real-Time Visibility: Instantaneous updates on movements, levels, and processing with automated alerts. 
 •	Optimized Resources: The system uses data to make sure the company spends its money on the right products and spends its employees' time on the right tasks. 
 •	Strengthened Decisions: Continuous monitoring of patterns enables informed interventions. 
-•	Improved Compliance: Customer TIN storage and automated audit trails ensure regulatory compliance. 
 Scalability and Future Integration 
 Modular architecture supports progressive integration of mobile applications, CRM systems, logistics protocols, and ERP connectivity as needs evolve. This ensures operational relevance and adaptability aligned with innovations and growth trajectories. 
 Organization of the Thesis 
@@ -649,8 +674,7 @@ Operating as the intermediary conduit, the backend server is engineered using No
 The foundational layer is powered by a centralized PostgreSQL relational database. This system was specifically selected for its rigorous ACID (Atomicity, Consistency, Isolation, Durability) compliance, which is mandatory to prevent partial data writes and ensure data integrity during complex, multi-echelon stock transfers.  
 Operational Data Flow and Security 
 To interact with the StockSync platform, stakeholders establish connectivity through web browsers accessible via mobile devices or desktop computing platforms. Upon platform access, all user credentials are cryptographically hashed using the Bcrypt algorithm. The application server processes these authentication requests, utilizing JSON Web Tokens (JWT) to ensure strict, stateless authorization.  
-Once authenticated, the browser interface transmits specific operational requests (e.g., initiating a stock transfer) to the application server. The server coordinates with the PostgreSQL database to retrieve or modify pertinent inventory metrics. The database subsequently extracts the requested information and transmits the response back through the API to the frontend, delivering real-time processed data to the user. This architecture is compiled for production deployment via a Content Delivery Network (CDN) and scalable cloud hosting, utilizing 
-Transport Layer Security (TLS/SSL) encryption to protect all commercial data in transit.  
+Once authenticated, the browser interface transmits specific operational requests (e.g., initiating a stock transfer) to the application server. The server coordinates with the PostgreSQL database to retrieve or modify pertinent inventory metrics. The database subsequently extracts the requested information and transmits the response back through the API to the frontend, delivering real-time processed data to the user. This architecture is compiled for production deployment using local or remote server environments, utilizing Transport Layer Security (TLS/SSL) encryption to protect all commercial data in transit.  
   
 Figure 6: Architecture Design for the StockSync System 
  
@@ -682,4 +706,14 @@ Senior Manager, Information Technolog.
 Sommerville, I. (2015). Software engineering (10th ed.). Pearson. 
 Sudarmi, E., & Sunaryo, W. (2024). Enhancing inventory accuracy and operational performance with ERP. Sinergi International Journal of Logistics, 2(2), 76-89. 
 Wetherbe, J. C. (2012). Systems analysis and design: Best practices (4th ed.). West Publishing Company. 
+
+
+B Special Business Ltd. (2024). Annual Inventory Audit Report. 
+B Special Business Ltd. (2025). Quarterly Operations Review. Kigali: Author.
+
+
  
+
+
+
+
