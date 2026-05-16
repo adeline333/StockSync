@@ -57,11 +57,38 @@ export default function Customers() {
   const handleCreate = async (e) => {
     e.preventDefault();
     setSaving(true); setSaveError('');
+
+    // --- STRICT CUSTOMER VALIDATION ---
+    if (!form.name.trim()) { setSaveError('Customer Name is required.'); setSaving(false); return; }
+    if (/[0-9]/.test(form.name)) { setSaveError('Customer Name cannot contain numbers.'); setSaving(false); return; }
+    
+    if (form.tin && !/^\d{9}$/.test(form.tin.replace(/[-\s]/g, ''))) {
+      setSaveError('TIN must be exactly 9 digits (e.g. 123456789).');
+      setSaving(false);
+      return;
+    }
+
+    if (form.phone && !/^\+?[0-9\s-]{8,15}$/.test(form.phone)) {
+      setSaveError('Please enter a valid phone number.');
+      setSaving(false);
+      return;
+    }
+
+    if (parseFloat(form.credit_limit) < 0) {
+      setSaveError('Credit limit cannot be negative.');
+      setSaving(false);
+      return;
+    }
+    // --- END VALIDATION ---
+
     try {
       const res = await fetch(`${API_URL}/customers`, {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          ...form,
+          tin: form.tin.replace(/[-\s]/g, '') // Normalize TIN to just numbers
+        })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
