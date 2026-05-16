@@ -46,6 +46,12 @@ export default function POSCheckout() {
   };
 
   const handleProceed = () => {
+    // Validate Customer Name if provided
+    if (customerName && /[0-9]/.test(customerName)) {
+      setTinError('Customer Name cannot contain numbers.');
+      return;
+    }
+
     if (posData?.total >= TIN_THRESHOLD) {
       const err = validateTIN(customerTIN);
       if (err) { setTinError(err); setShowCustomer(true); return; }
