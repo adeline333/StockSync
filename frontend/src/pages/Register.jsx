@@ -43,7 +43,13 @@ const Register = () => {
     setIsSubmitting(true);
     setErrorBanner('');
 
-    // Pre-flight check
+    // Strict Validations
+    if (/[0-9]/.test(name)) {
+       setErrorBanner('Full Legal Name cannot contain numbers.');
+       setIsSubmitting(false);
+       return;
+    }
+
     if (password !== confirmPassword) {
        setErrorBanner('Passwords do not match. Please verify your typing.');
        setIsSubmitting(false);
