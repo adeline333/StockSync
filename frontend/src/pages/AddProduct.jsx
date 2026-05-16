@@ -13,7 +13,7 @@ const genSKU = (name, category) => {
 };
 
 export default function AddProduct() {
-  const { id } = useParams(); // If id exists, we're editing
+  const { id } = useParams();
   const isEditMode = !!id;
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -31,10 +31,8 @@ export default function AddProduct() {
     supplier_name: '', supplier_lead_days: '', min_stock_level: 10
   });
 
-  // Fetch product data if editing
   useEffect(() => {
     if (!isEditMode) return;
-    
     const fetchProduct = async () => {
       try {
         const res = await fetch(`${API_URL}/inventory/products/${id}`, {
@@ -42,7 +40,6 @@ export default function AddProduct() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
-        
         const p = data.product;
         setForm({
           name: p.name || '',
@@ -58,16 +55,9 @@ export default function AddProduct() {
           min_stock_level: p.min_stock_level || 10
         });
         setUseVat(p.is_vat_inclusive !== false);
-        if (p.image_url) {
-          setImagePreview(`http://localhost:5000${p.image_url}`);
-        }
-      } catch (e) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
+        if (p.image_url) setImagePreview(`http://localhost:5000${p.image_url}`);
+      } catch (e) { setError(e.message); } finally { setLoading(false); }
     };
-    
     fetchProduct();
   }, [id, isEditMode, token]);
 
@@ -90,28 +80,36 @@ export default function AddProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!form.name || !form.sku || !form.price) { setError('Name, SKU and Price are required.'); return; }
+
+    // --- STRICT VALIDATION SUITE ---
+    if (!form.name.trim()) { setError('Product Name is required.'); return; }
+    if (/^\d+$/.test(form.name)) { setError('Product Name cannot be only numbers.'); return; }
+    if (!form.sku.trim()) { setError('SKU/Code is required.'); return; }
+    
+    const priceNum = parseFloat(form.price);
+    if (isNaN(priceNum) || priceNum <= 0) { setError('Selling Price must be greater than 0.'); return; }
+
+    const costNum = parseFloat(form.cost_price || 0);
+    if (isNaN(costNum) || costNum < 0) { setError('Cost Price cannot be negative.'); return; }
+
+    const leadTime = parseInt(form.supplier_lead_days || 0);
+    if (isNaN(leadTime) || leadTime < 0) { setError('Lead Time cannot be negative.'); return; }
+    // --- END VALIDATION ---
+
     setSaving(true);
     try {
       if (isEditMode) {
-        // Update existing product
         const res = await fetch(`${API_URL}/inventory/products/${id}`, {
           method: 'PUT',
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...form, is_vat_inclusive: useVat })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+        if (!res.ok) throw new Error('Failed to update product');
         navigate(`/inventory/${id}`);
       } else {
-        // Create new product
         const body = new FormData();
         Object.entries({ ...form, is_vat_inclusive: useVat }).forEach(([k, v]) => body.append(k, v));
         if (imageFile) body.append('image', imageFile);
-
         const res = await fetch(`${API_URL}/inventory/products`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
@@ -121,10 +119,7 @@ export default function AddProduct() {
         if (!res.ok) throw new Error(data.message);
         navigate(`/inventory/${data.product.id}`);
       }
-    } catch (e) {
-      setError(e.message);
-      setSaving(false);
-    }
+    } catch (e) { setError(e.message); setSaving(false); }
   };
 
   return (
@@ -149,157 +144,97 @@ export default function AddProduct() {
           ) : (
             <>
               <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{isEditMode ? 'Edit Product' : 'Add New Product'}</h2>
-
               {error && (
-                <div className="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2">
+                <div className="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 animate-pulse">
                   <AlertTriangle className="w-4 h-4" /> {error}
                 </div>
               )}
 
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-8">
-                <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-sky-500" />
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">General Information</h3>
-                  <div className="space-y-5">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Product Name *</label>
-                      <input value={form.name} onChange={set('name')} placeholder="e.g., Tusker Malt 330ml"
-                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-700 outline-none transition-all dark:text-slate-200" required />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Description</label>
-                      <textarea value={form.description} onChange={set('description')} rows={3}
-                        placeholder="Enter product details..."
-                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-700 outline-none transition-all dark:text-slate-200" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Category *</label>
-                        <select value={form.category} onChange={set('category')}
-                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none cursor-pointer dark:text-slate-200">
-                          {['Beer', 'Spirits', 'Soft Drinks', 'Wines', 'Water', 'Energy Drinks', 'Other'].map(c => <option key={c}>{c}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Brand</label>
-                        <input value={form.brand} onChange={set('brand')} placeholder="e.g., Bralirwa"
-                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all dark:text-slate-200" />
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <div className="lg:col-span-2 space-y-8">
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b pb-4">General Information</h3>
+                      <div className="space-y-5">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Product Name *</label>
+                          <input value={form.name} onChange={set('name')} placeholder="e.g., Tusker Malt 330ml"
+                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Description</label>
+                          <textarea value={form.description} onChange={set('description')} rows={3} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-5">
+                          <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">Category *</label>
+                            <select value={form.category} onChange={set('category')} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg">
+                              {['Beer', 'Spirits', 'Soft Drinks', 'Wines', 'Water', 'Energy Drinks', 'Other'].map(c => <option key={c}>{c}</option>)}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">Brand</label>
+                            <input value={form.brand} onChange={set('brand')} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg" />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Supplier Name</label>
-                        <input value={form.supplier_name} onChange={set('supplier_name')} placeholder="e.g., EABL"
-                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all dark:text-slate-200" />
+
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b pb-4">Pricing (RWF)</h3>
+                      <div className="grid grid-cols-2 gap-5">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Cost Price</label>
+                          <input type="number" value={form.cost_price} onChange={set('cost_price')} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Selling Price *</label>
+                          <input type="number" value={form.price} onChange={set('price')} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg" required />
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Lead Time (Days)</label>
-                        <input type="number" value={form.supplier_lead_days} onChange={set('supplier_lead_days')} placeholder="5"
-                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all dark:text-slate-200" />
+                      <label className="flex items-center cursor-pointer mt-5">
+                        <input type="checkbox" checked={useVat} onChange={() => setUseVat(!useVat)} className="mr-2" />
+                        <span className="text-sm font-semibold text-slate-600">Price includes VAT (18%)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-8">
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                      <h3 className="text-lg font-bold text-slate-800 mb-6 border-b pb-4">Product Image</h3>
+                      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                      {imagePreview ? (
+                        <div className="relative aspect-video rounded-xl overflow-hidden border">
+                          <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                          <button type="button" onClick={clearImage} className="absolute top-2 right-2 p-1 bg-rose-500 text-white rounded-full"><X className="w-4 h-4" /></button>
+                        </div>
+                      ) : (
+                        <div onClick={() => fileInputRef.current?.click()} className="aspect-video rounded-xl border-2 border-dashed border-sky-300 bg-sky-50 flex flex-col items-center justify-center cursor-pointer">
+                          <ImageIcon className="w-8 h-8 text-sky-400 mb-2" />
+                          <p className="font-semibold text-sky-600 text-sm">Upload Image</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                      <h3 className="text-lg font-bold text-slate-800 mb-6 border-b pb-4">Inventory Details</h3>
+                      <div className="space-y-5">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">SKU / Code *</label>
+                          <div className="relative">
+                            <input value={form.sku} onChange={set('sku')} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg font-mono font-bold uppercase" required />
+                            <button type="button" onClick={() => setForm(f => ({ ...f, sku: genSKU(f.name, f.category) }))} className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-sky-100 text-sky-600 rounded text-xs font-bold">GEN</button>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Low Stock Alert Level</label>
+                          <input type="number" value={form.min_stock_level} onChange={set('min_stock_level')} className="w-full px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 font-bold" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">Pricing (RWF)</h3>
-                  <div className="grid grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Cost Price</label>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">RWF</span>
-                        <input type="number" value={form.cost_price} onChange={set('cost_price')} placeholder="0"
-                          className="w-full pl-14 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all font-bold dark:text-slate-200" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Selling Price *</label>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">RWF</span>
-                        <input type="number" value={form.price} onChange={set('price')} placeholder="0" required
-                          className="w-full pl-14 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all font-bold dark:text-slate-200" />
-                      </div>
-                    </div>
-                  </div>
-                  <label className="flex items-center cursor-pointer mt-5 w-fit">
-                    <input type="checkbox" checked={useVat} onChange={() => setUseVat(!useVat)} className="sr-only peer" />
-                    <div className="w-5 h-5 rounded border-2 border-slate-300 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 transition-colors flex items-center justify-center">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                    </div>
-                    <span className="ml-3 text-sm font-semibold text-slate-600 dark:text-slate-400">Price includes VAT (18%)</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-8">
-                <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">Product Image</h3>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    className="hidden"
-                    onChange={handleImageChange}
-                  />
-                  {imagePreview ? (
-                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
-                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={clearImage}
-                        className="absolute top-2 right-2 w-7 h-7 bg-rose-500 text-white rounded-full flex items-center justify-center hover:bg-rose-600 transition-colors shadow"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full aspect-video rounded-xl border-2 border-dashed border-sky-300 bg-sky-50 flex flex-col items-center justify-center cursor-pointer hover:bg-sky-100 transition-colors"
-                    >
-                      <ImageIcon className="w-8 h-8 text-sky-400 mb-2" />
-                      <p className="font-semibold text-sky-600 text-sm">Click to Upload</p>
-                      <p className="text-xs text-slate-400 mt-1">PNG, JPG, WEBP (max 2MB)</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" />
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">Inventory Details</h3>
-                  <div className="space-y-5">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">SKU / Code *</label>
-                      <div className="relative">
-                        <input value={form.sku} onChange={set('sku')} placeholder="e.g., BEV-TUSK-M330" required
-                          className="w-full pl-4 pr-16 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all font-mono font-bold uppercase dark:text-slate-200" />
-                        <button type="button" onClick={() => setForm(f => ({ ...f, sku: genSKU(f.name, f.category) }))}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-sky-100 text-sky-600 rounded text-xs font-bold hover:bg-sky-200 transition-colors flex items-center">
-                          <RefreshCcw className="w-3 h-3 mr-1" /> GEN
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Barcode</label>
-                      <input value={form.barcode} onChange={set('barcode')} placeholder="Scan or enter barcode"
-                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all dark:text-slate-200" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Low Stock Alert Level</label>
-                      <div className="relative">
-                        <input type="number" value={form.min_stock_level} onChange={set('min_stock_level')}
-                          className="w-full pr-16 pl-4 py-3 bg-amber-50 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-all text-amber-700 font-bold" />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 font-medium text-amber-600 text-sm">Units</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
+              </form>
             </>
           )}
         </div>
@@ -307,5 +242,3 @@ export default function AddProduct() {
     </div>
   );
 }
-
-// Code cleanup 1778534036218
