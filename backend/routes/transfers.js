@@ -13,6 +13,7 @@ router.get('/', ctrl.getTransfers);
 router.get('/:id', ctrl.getTransferById);
 router.post('/', ctrl.createTransfer);
 router.post('/:id/approve', ctrl.approveTransfer);
+router.post('/:id/confirm', ctrl.confirmReceipt);
 router.post('/:id/reject', ctrl.rejectTransfer);
 
 module.exports = router;
