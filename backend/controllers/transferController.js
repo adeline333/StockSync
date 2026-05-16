@@ -82,9 +82,9 @@ exports.createTransfer = async (req, res) => {
   if (!items || items.length === 0) return res.status(400).json({ message: 'Add at least one item' });
   if (source_branch_id === dest_branch_id) return res.status(400).json({ message: 'Source and destination cannot be the same' });
 
-  // BUSINESS RULE: Anyone logged in can create a transfer request (Staff notice low stock first!)
-  if (!req.user) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  // BUSINESS RULE: Only Managers and Admins can create transfer requests (Handshake among managers)
+  if (!req.user || (req.user.role !== 'manager' && req.user.role !== 'admin')) {
+    return res.status(403).json({ message: 'Access denied: Only managers and admins can request stock.' });
   }
 
   try {
@@ -159,29 +159,78 @@ exports.approveTransfer = async (req, res) => {
         [item.quantity, item.product_id, transfer.source_branch_id]
       );
 
-      // Add to destination
+      // Log transaction as 'pending' at destination
+      await client.query(
+        `INSERT INTO transactions (product_id, source_branch_id, dest_branch_id, type, quantity, user_id, status)
+         VALUES ($1,$2,$3,'transfer',$4,$5,'in_transit')`,
+        [item.product_id, transfer.source_branch_id, transfer.dest_branch_id, item.quantity, req.user.id]
+      );
+    }
+
+    await client.query(
+      'UPDATE stock_transfers SET status=$1, approved_by=$2, shipped_at=NOW(), updated_at=NOW() WHERE id=$3',
+      ['in_transit', req.user.id, transfer.id]
+    );
+
+    await client.query('COMMIT');
+    await logActivity(req.user.id, 'TRANSFER_SHIPPED', `Transfer ${transfer.transfer_number} shipped. Now In Transit.`, ip);
+    res.json({ message: 'Transfer approved and stock is now in transit' });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ message: e.message });
+  } finally {
+    client.release();
+  }
+};
+
+// POST /api/transfers/:id/confirm — finalize transfer at destination
+exports.confirmReceipt = async (req, res) => {
+  const ip = getIP(req);
+  const client = await db.pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const transferResult = await client.query('SELECT * FROM stock_transfers WHERE id = $1 FOR UPDATE', [req.params.id]);
+    if (transferResult.rows.length === 0) throw new Error('Transfer not found');
+    const transfer = transferResult.rows[0];
+    if (transfer.status !== 'in_transit') throw new Error(`Transfer is ${transfer.status}, cannot confirm receipt.`);
+
+    // HIERARCHICAL RULE: 
+    // 1. Admins can confirm anything.
+    // 2. Managers can ONLY confirm transfers ARRIVING at their own branch (Dest Branch).
+    const isDestManager = req.user.role === 'manager' && parseInt(req.user.branch_id) === parseInt(transfer.dest_branch_id);
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isAdmin && !isDestManager) {
+      throw new Error('Authority Error: Only the Destination Branch Manager or Admin can confirm receipt of this stock.');
+    }
+
+    const items = await client.query('SELECT * FROM stock_transfer_items WHERE transfer_id = $1', [transfer.id]);
+
+    // Add stock to destination
+    for (const item of items.rows) {
       await client.query(
         `INSERT INTO inventory (product_id, branch_id, quantity) VALUES ($1,$2,$3)
          ON CONFLICT (product_id, branch_id) DO UPDATE SET quantity = inventory.quantity + $3, last_updated = NOW()`,
         [item.product_id, transfer.dest_branch_id, item.quantity]
       );
 
-      // Log transaction
+      // Update transaction status
       await client.query(
-        `INSERT INTO transactions (product_id, source_branch_id, dest_branch_id, type, quantity, user_id, status)
-         VALUES ($1,$2,$3,'transfer',$4,$5,'completed')`,
-        [item.product_id, transfer.source_branch_id, transfer.dest_branch_id, item.quantity, req.user.id]
+        `UPDATE transactions SET status = 'completed' WHERE product_id = $1 AND dest_branch_id = $2 AND type = 'transfer' AND status = 'in_transit' AND created_at >= $3`,
+        [item.product_id, transfer.dest_branch_id, transfer.shipped_at]
       );
     }
 
     await client.query(
-      'UPDATE stock_transfers SET status=$1, approved_by=$2, updated_at=NOW() WHERE id=$3',
-      ['approved', req.user.id, transfer.id]
+      'UPDATE stock_transfers SET status=$1, received_by=$2, received_at=NOW(), updated_at=NOW() WHERE id=$3',
+      ['completed', req.user.id, transfer.id]
     );
 
     await client.query('COMMIT');
-    await logActivity(req.user.id, 'TRANSFER_APPROVED', `Transfer ${transfer.transfer_number} approved`, ip);
-    res.json({ message: 'Transfer approved and stock moved' });
+    await logActivity(req.user.id, 'TRANSFER_COMPLETED', `Transfer ${transfer.transfer_number} received and stock updated at branch ${transfer.dest_branch_id}`, ip);
+    res.json({ message: 'Stock received and inventory updated' });
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ message: e.message });
