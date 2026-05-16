@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 const API_URL = 'http://localhost:5000/api';
 
 export default function NewStockTransfer() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -22,6 +22,12 @@ export default function NewStockTransfer() {
   const [priority, setPriority] = useState('normal');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user && user.role !== 'manager' && user.role !== 'admin') {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     fetch(`${API_URL}/locations`, { headers })
@@ -61,9 +67,23 @@ export default function NewStockTransfer() {
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
 
   const handleSubmit = async () => {
-    if (!sourceBranch || !destBranch) { setError('Select source and destination'); return; }
-    if (sourceBranch === destBranch) { setError('Source and destination cannot be the same'); return; }
-    if (items.length === 0) { setError('Add at least one item'); return; }
+    if (!sourceBranch || !destBranch) { setError('Please select both source and destination locations.'); return; }
+    if (sourceBranch === destBranch) { setError('Error: Source and destination locations cannot be the same.'); return; }
+    if (items.length === 0) { setError('Your transfer list is empty. Please add at least one product.'); return; }
+
+    // Check for stock availability
+    const overstockedItem = items.find(i => i.quantity > i.source_stock);
+    if (overstockedItem) {
+      setError(`Error: You are trying to ship ${overstockedItem.quantity} units of ${overstockedItem.product_name}, but only ${overstockedItem.source_stock} are available.`);
+      return;
+    }
+
+    // Check for reason on high priority
+    if (priority === 'high' && !reason.trim()) {
+      setError('A reason is mandatory for high-priority/urgent transfers.');
+      return;
+    }
+
     setSaving(true); setError('');
     try {
       const res = await fetch(`${API_URL}/transfers`, {
@@ -90,7 +110,7 @@ export default function NewStockTransfer() {
     <div className="flex flex-col min-h-screen dark:bg-slate-950">
       <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
         <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
-            <button onClick={() => navigate('/locations')}
+            <button onClick={() => navigate('/transfers/my')}
             className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 text-slate-900 dark:text-slate-400 rounded-lg text-sm font-bold transition-all">
             <X className="w-4 h-4" /> Cancel Transfer
           </button>
@@ -219,7 +239,7 @@ export default function NewStockTransfer() {
           <div className="flex justify-end gap-4">
             <button onClick={() => navigate('/transfers/my')}
               className="px-8 py-3.5 bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-600 hover:border-slate-400 dark:hover:border-slate-500 transition-colors shadow-lg">
-              Save as Draft
+              View History
             </button>
             <button onClick={handleSubmit} disabled={saving}
               className="px-10 py-3.5 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-400 text-white rounded-xl text-base font-black transition-all shadow-xl shadow-sky-500/30 active:scale-[0.98] flex items-center gap-2 disabled:opacity-60">
@@ -231,5 +251,3 @@ export default function NewStockTransfer() {
     </div>
   );
 }
-
-// Code cleanup 1778534036257
