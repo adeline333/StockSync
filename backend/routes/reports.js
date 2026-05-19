@@ -7,6 +7,7 @@ router.use(authMiddleware);
 
 router.get('/sales', ctrl.getSalesReport);
 router.get('/inventory', ctrl.getInventoryReport);
+router.get('/transfers', ctrl.getTransfersReport);
 router.get('/settings', ctrl.getSettings);
 router.put('/settings', ctrl.saveSettings);
 

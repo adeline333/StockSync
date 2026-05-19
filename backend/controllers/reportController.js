@@ -4,7 +4,12 @@ exports.getSalesReport = async (req, res) => {
   const { from_date, to_date, branch_id } = req.query;
   const start = from_date || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
   const end = to_date || new Date().toISOString().split('T')[0];
-  const bf = branch_id ? `AND o.branch_id = ${parseInt(branch_id)}` : '';
+  
+  let finalBranchId = branch_id;
+  if (req.user.role === 'manager' || req.user.role === 'staff') {
+    finalBranchId = req.user.branch_id;
+  }
+  const bf = finalBranchId ? `AND o.branch_id = ${parseInt(finalBranchId)}` : '';
 
   try {
     const daily = await db.query(
@@ -68,7 +73,12 @@ exports.getSalesReport = async (req, res) => {
 
 exports.getInventoryReport = async (req, res) => {
   const { branch_id } = req.query;
-  const bf = branch_id ? `AND i.branch_id = ${parseInt(branch_id)}` : '';
+  
+  let finalBranchId = branch_id;
+  if (req.user.role === 'manager' || req.user.role === 'staff') {
+    finalBranchId = req.user.branch_id;
+  }
+  const bf = finalBranchId ? `AND i.branch_id = ${parseInt(finalBranchId)}` : '';
 
   try {
     const summary = await db.query(
@@ -140,6 +150,64 @@ exports.saveSettings = async (req, res) => {
     );
     res.json({ message: 'Settings saved' });
   } catch (e) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getTransfersReport = async (req, res) => {
+  const { from_date, to_date, branch_id } = req.query;
+  const start = from_date || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+  const end = to_date || new Date().toISOString().split('T')[0];
+
+  let finalBranchId = branch_id;
+  if (req.user.role === 'manager' || req.user.role === 'staff') {
+    finalBranchId = req.user.branch_id;
+  }
+
+  let bf = '';
+  if (finalBranchId) {
+    bf = `AND (st.source_branch_id = ${parseInt(finalBranchId)} OR st.dest_branch_id = ${parseInt(finalBranchId)})`;
+  }
+
+  try {
+    const summary = await db.query(
+      `SELECT 
+        COUNT(*) as total_transfers,
+        COUNT(CASE WHEN st.status = 'completed' THEN 1 END) as completed_transfers,
+        COUNT(CASE WHEN st.status = 'pending' THEN 1 END) as pending_transfers,
+        COUNT(CASE WHEN st.status = 'in_transit' THEN 1 END) as transit_transfers,
+        COALESCE(SUM((SELECT SUM(quantity) FROM stock_transfer_items WHERE transfer_id = st.id)), 0) as total_items_moved
+       FROM stock_transfers st
+       WHERE DATE(st.created_at) BETWEEN $1 AND $2 ${bf}`,
+      [start, end]
+    );
+
+    const list = await db.query(
+      `SELECT 
+        st.id,
+        st.transfer_number as transfer_no,
+        DATE(st.created_at) as date,
+        sb.name as source_branch,
+        db.name as dest_branch,
+        st.status,
+        COALESCE((SELECT SUM(quantity) FROM stock_transfer_items WHERE transfer_id = st.id), 0) as total_items,
+        u.name as requested_by
+       FROM stock_transfers st
+       JOIN branches sb ON st.source_branch_id = sb.id
+       JOIN branches db ON st.dest_branch_id = db.id
+       LEFT JOIN users u ON st.requested_by = u.id
+       WHERE DATE(st.created_at) BETWEEN $1 AND $2 ${bf}
+       ORDER BY st.created_at DESC`,
+      [start, end]
+    );
+
+    res.json({
+      period: { start, end },
+      summary: summary.rows[0],
+      transfers: list.rows
+    });
+  } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Server error' });
   }
 };
