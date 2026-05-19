@@ -5,11 +5,13 @@ import AIChatbot from './AIChatbot';
 export default function AppLayout({ children }) {
   return (
     <div className="min-h-screen flex font-sans bg-slate-100 dark:bg-slate-950 transition-colors duration-200">
-      <Sidebar />
-      <AIChatbot />
+      <div className="print:hidden">
+        <Sidebar />
+        <AIChatbot />
+      </div>
 
       {/* Background decoration */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden print:hidden">
         <svg className="absolute inset-0 w-full h-full opacity-[0.035]" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -24,7 +26,7 @@ export default function AppLayout({ children }) {
           style={{ background: 'radial-gradient(circle, #14B8A6 0%, transparent 70%)' }} />
       </div>
 
-      <main className="flex-1 ml-64 flex flex-col min-h-screen relative z-10 overflow-x-hidden">
+      <main className="flex-1 ml-64 print:ml-0 flex flex-col min-h-screen relative z-10 overflow-x-hidden print:overflow-visible">
         {children}
       </main>
     </div>
