@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 const API_URL = 'http://localhost:5000/api';
 
 export default function ReportBuilder() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const headers = { Authorization: `Bearer ${token}` };
 
   const [source, setSource] = useState('sales');
@@ -18,19 +18,13 @@ export default function ReportBuilder() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState([]);
-  const [branchId, setBranchId] = useState('');
-
-  useEffect(() => {
-    fetch(`${API_URL}/locations`, { headers })
-      .then(r => r.json()).then(d => setBranches(d.branches || [])).catch(() => {});
-    generateReport();
-  }, []);
+  const [branchId, setBranchId] = useState(user?.role === 'manager' ? user?.branch_id || '' : '');
 
   const generateReport = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({ from_date: fromDate, to_date: toDate });
     if (branchId) params.append('branch_id', branchId);
-    const endpoint = source === 'sales' ? 'sales' : 'inventory';
+    const endpoint = source;
     try {
       const res = await fetch(`${API_URL}/reports/${endpoint}?${params}`, { headers });
       const json = await res.json();
@@ -38,6 +32,23 @@ export default function ReportBuilder() {
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, [source, fromDate, toDate, branchId, token]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/locations`, { headers })
+      .then(r => r.json()).then(d => setBranches(d.branches || [])).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (user?.role === 'manager' && user?.branch_id) {
+      setBranchId(user.branch_id);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user && (user.role !== 'manager' || branchId)) {
+      generateReport();
+    }
+  }, [branchId, source, fromDate, toDate, user]);
 
   const exportCSV = () => {
     if (!data) return;
@@ -48,6 +59,9 @@ export default function ReportBuilder() {
     } else if (source === 'inventory' && data.byCategory) {
       csv = 'Category,SKUs,Units,Value\n' +
         data.byCategory.map(c => `${c.category},${c.skus},${c.units},${c.value}`).join('\n');
+    } else if (source === 'transfers' && data.transfers) {
+      csv = 'Transfer No,Date,Source Branch,Destination Branch,Total Items,Requested By,Status\n' +
+        data.transfers.map(t => `"${t.transfer_no}","${t.date}","${t.source_branch}","${t.dest_branch}",${t.total_items},"${t.requested_by || ''}","${t.status}"`).join('\n');
     }
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -60,12 +74,15 @@ export default function ReportBuilder() {
   return (
     <div className="flex flex-col min-h-screen dark:bg-slate-950">
       <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
-        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10 print:hidden">
           <div>
             <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100">Custom Report Generator</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">Visualize real business data</p>
           </div>
           <div className="flex gap-3">
+            <button onClick={() => window.print()} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
+              <FileText className="w-4 h-4"/> Save PDF
+            </button>
             <button onClick={exportCSV} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
               <Save className="w-4 h-4"/> Export CSV
             </button>
@@ -78,7 +95,7 @@ export default function ReportBuilder() {
 
         <div className="p-8 flex-1 flex gap-6">
           {/* Settings Panel */}
-          <div className="w-80 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col shrink-0 space-y-6">
+          <div className="w-80 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col shrink-0 space-y-6 print:hidden">
             <h2 className="text-base font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
               <Settings className="w-4 h-4 text-slate-400"/> Report Settings
             </h2>
@@ -90,6 +107,7 @@ export default function ReportBuilder() {
                   className="w-full bg-slate-50 border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-800 dark:text-slate-100 py-3 pl-4 pr-10 rounded-xl outline-none focus:border-sky-500 appearance-none cursor-pointer">
                   <option value="sales">Sales Performance</option>
                   <option value="inventory">Inventory Valuation</option>
+                  <option value="transfers">Stock Transfers</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>
               </div>
@@ -108,12 +126,17 @@ export default function ReportBuilder() {
             <div>
               <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Location</label>
               <div className="relative">
-                <select value={branchId} onChange={e => setBranchId(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-700 dark:text-slate-300 py-3 pl-4 pr-10 rounded-xl outline-none focus:border-sky-500 appearance-none cursor-pointer">
-                  <option value="">All Locations</option>
-                  {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                <select 
+                  value={branchId} 
+                  onChange={e => setBranchId(e.target.value)}
+                  disabled={user?.role === 'manager'}
+                  className="w-full bg-slate-50 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-700 dark:text-slate-300 py-3 pl-4 pr-10 rounded-xl outline-none focus:border-sky-500 appearance-none cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed">
+                  {user?.role !== 'manager' && <option value="">All Locations</option>}
+                  {branches
+                    .filter(b => user?.role !== 'manager' || parseInt(b.id) === parseInt(user?.branch_id))
+                    .map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>
+                {user?.role !== 'manager' && <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>}
               </div>
             </div>
 
@@ -139,27 +162,10 @@ export default function ReportBuilder() {
                 </div>
               </div>
             )}
-
-            <div>
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 block">4. Format</label>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { id: 'bar', icon: <BarChart2 className="w-6 h-6"/>, label: 'Bar' },
-                  { id: 'table', icon: <FileText className="w-6 h-6"/>, label: 'Table' },
-                  { id: 'line', icon: <BarChart2 className="w-6 h-6 rotate-90"/>, label: 'Line' },
-                ].map(f => (
-                  <div key={f.id} onClick={() => setFormat(f.id)}
-                    className={`py-4 flex flex-col items-center rounded-xl border-2 cursor-pointer transition-all ${format === f.id ? 'bg-sky-50 border-sky-500' : 'bg-white border-slate-200 hover:border-sky-200'}`}>
-                    <span className={format === f.id ? 'text-sky-500' : 'text-slate-400'}>{f.icon}</span>
-                    <span className={`text-[10px] font-black uppercase tracking-widest mt-1 ${format === f.id ? 'text-sky-600' : 'text-slate-400'}`}>{f.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Report Preview */}
-          <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col">
+          <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col print:shadow-none print:border-0 print:p-0">
             {loading ? (
               <div className="flex-1 flex items-center justify-center">
                 <Loader2 className="w-10 h-10 animate-spin text-sky-500"/>
@@ -173,14 +179,20 @@ export default function ReportBuilder() {
                 <div className="flex items-center justify-between mb-6 border-b-2 border-slate-900 pb-6">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-white font-black">SS</div>
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center shrink-0 shadow-sm print:shadow-none print:bg-none print:border-2 print:border-sky-500">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M4 12C4 7.58172 7.58172 4 12 4V12H4Z" fill="white" className="print:fill-sky-500"/>
+                          <path d="M16 12C16 14.2091 14.2091 16 12 16V12H16Z" fill="white" fillOpacity="0.6" className="print:fill-teal-500 print:fill-opacity-100"/>
+                        </svg>
+                      </div>
                       <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter">StockSync</h2>
                     </div>
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">B Special Business Ltd · Inventory Report</p>
                   </div>
                   <div className="text-right">
                     <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-1">
-                      {source === 'sales' ? 'Sales Performance Report' : 'Inventory Valuation Report'}
+                      {source === 'sales' ? 'Sales Performance Report' : 
+                       source === 'inventory' ? 'Inventory Valuation Report' : 'Stock Transfers Report'}
                     </h1>
                     <p className="text-xs font-bold text-slate-400">Generated on {new Date().toLocaleString('en-GB')}</p>
                     <p className="text-[10px] text-slate-500 font-medium">Period: {data.period?.start} — {data.period?.end || new Date().toISOString().split('T')[0]}</p>
@@ -189,12 +201,13 @@ export default function ReportBuilder() {
 
                 {source === 'sales' && data.summary && (
                   <>
-                    <div className="grid grid-cols-4 gap-4 mb-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                       {[
-                        { label: 'Total Revenue', value: `${(parseFloat(data.summary.total_revenue)/1000000).toFixed(2)}M RWF`, color: 'text-slate-800' },
-                        { label: 'COGS', value: `${(data.cogs/1000000).toFixed(2)}M RWF`, color: 'text-rose-500' },
-                        { label: 'VAT Collected', value: `${(parseFloat(data.summary.total_vat)/1000000).toFixed(2)}M RWF`, color: 'text-amber-600' },
-                        { label: 'Transactions', value: data.summary.total_transactions, color: 'text-sky-600' },
+                        ...(metrics.revenue ? [{ label: 'Total Revenue', value: `${(parseFloat(data.summary.total_revenue)/1000000).toFixed(2)}M RWF`, color: 'text-slate-800' }] : []),
+                        ...(metrics.cogs ? [{ label: 'COGS', value: `${(data.cogs/1000000).toFixed(2)}M RWF`, color: 'text-rose-500' }] : []),
+                        ...(metrics.vat ? [{ label: 'VAT Collected', value: `${(parseFloat(data.summary.total_vat)/1000000).toFixed(2)}M RWF`, color: 'text-amber-600' }] : []),
+                        ...(metrics.discounts ? [{ label: 'Discounts', value: `${(parseFloat(data.summary.total_discounts)/1000000).toFixed(2)}M RWF`, color: 'text-emerald-600' }] : []),
+                        { label: 'Transactions', value: data.summary.total_transactions, color: 'text-sky-600' }
                       ].map((s, i) => (
                         <div key={i} className="bg-slate-50 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{s.label}</p>
@@ -203,26 +216,8 @@ export default function ReportBuilder() {
                       ))}
                     </div>
 
-                    {format === 'bar' && data.daily?.length > 0 && (
-                      <div className="flex-1 min-h-[200px]">
-                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">Revenue vs COGS (Daily)</h3>
-                        <div className="relative h-48 bg-slate-50 rounded-xl border border-slate-100 dark:border-slate-800 p-4 flex items-end gap-1 overflow-hidden">
-                          {data.daily.map((d, i) => (
-                            <div key={i} className="flex-1 flex gap-0.5 items-end" title={`${d.date}: ${Number(d.revenue).toLocaleString()} RWF`}>
-                              <div className="flex-1 bg-sky-500 rounded-t-sm transition-all" style={{ height: `${(parseFloat(d.revenue) / maxRevenue) * 100}%` }}/>
-                              <div className="flex-1 bg-rose-400 rounded-t-sm transition-all" style={{ height: `${(parseFloat(d.revenue) * 0.7 / maxRevenue) * 100}%` }}/>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex gap-4 mt-3">
-                          <div className="flex items-center gap-1.5"><div className="w-3 h-3 bg-sky-500 rounded-sm"/><span className="text-xs font-bold text-slate-500 dark:text-slate-400">Revenue</span></div>
-                          <div className="flex items-center gap-1.5"><div className="w-3 h-3 bg-rose-400 rounded-sm"/><span className="text-xs font-bold text-slate-500 dark:text-slate-400">COGS (est.)</span></div>
-                        </div>
-                      </div>
-                    )}
-
-                    {format === 'table' && data.daily?.length > 0 && (
-                      <div className="flex-1 overflow-auto">
+                    {data.daily?.length > 0 && (
+                      <div className="flex-1 overflow-auto mb-6 rounded-xl border border-slate-100 dark:border-slate-800">
                         <table className="w-full text-left border-collapse">
                           <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -305,6 +300,65 @@ export default function ReportBuilder() {
                             );
                           })}
                         </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {source === 'transfers' && data.summary && (
+                  <>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                      {[
+                        { label: 'Total Transfers', value: data.summary.total_transfers, color: 'text-slate-800' },
+                        { label: 'Completed', value: data.summary.completed_transfers, color: 'text-emerald-600' },
+                        { label: 'Pending / In Transit', value: Number(data.summary.pending_transfers || 0) + Number(data.summary.transit_transfers || 0), color: 'text-amber-500' },
+                        { label: 'Total Items Moved', value: data.summary.total_items_moved, color: 'text-sky-600' },
+                      ].map((s, i) => (
+                        <div key={i} className="bg-slate-50 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{s.label}</p>
+                          <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {data.transfers?.length > 0 ? (
+                      <div className="flex-1 overflow-auto mb-6 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-slate-50 dark:bg-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                              <th className="px-4 py-3">Transfer No</th>
+                              <th className="px-4 py-3">Date</th>
+                              <th className="px-4 py-3">Source Branch</th>
+                              <th className="px-4 py-3">Destination Branch</th>
+                              <th className="px-4 py-3">Items</th>
+                              <th className="px-4 py-3">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-sm divide-y divide-slate-50 dark:divide-slate-800">
+                            {data.transfers.map((t, i) => (
+                              <tr key={i} className="hover:bg-slate-50">
+                                <td className="px-4 py-3 font-mono font-bold text-slate-800 dark:text-slate-100">{t.transfer_no}</td>
+                                <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t.date}</td>
+                                <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{t.source_branch}</td>
+                                <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{t.dest_branch}</td>
+                                <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t.total_items}</td>
+                                <td className="px-4 py-3">
+                                  <span className={`px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                                    t.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' :
+                                    t.status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-200' :
+                                    'bg-sky-50 text-sky-600 border border-sky-200'
+                                  }`}>
+                                    {t.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-center text-slate-400">
+                        <p className="font-semibold">No stock transfers found for this period</p>
                       </div>
                     )}
                   </>
