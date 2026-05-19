@@ -172,20 +172,22 @@ export default function ProductDetail() {
             <span className="mx-2">/</span>
             <span className="text-slate-800 dark:text-slate-100 font-bold truncate max-w-xs">{product?.name || 'Details'}</span>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => { setShowModal(true); setAdjMsg(null); }}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm"
-            >
-              <PenTool className="w-4 h-4 mr-2" /> Adjust Stock
-            </button>
-            <Link
-              to={`/inventory/edit/${id}`}
-              className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm"
-            >
-              <PenTool className="w-4 h-4 mr-2" /> Edit Product
-            </Link>
-          </div>
+          {(user?.role === 'manager' || user?.role === 'admin') && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => { setShowModal(true); setAdjMsg(null); }}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm"
+              >
+                <PenTool className="w-4 h-4 mr-2" /> Adjust Stock
+              </button>
+              <Link
+                to={`/inventory/edit/${id}`}
+                className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm"
+              >
+                <PenTool className="w-4 h-4 mr-2" /> Edit Product
+              </Link>
+            </div>
+          )}
         </header>
 
         <div className="p-8 space-y-8 flex-1 bg-slate-50 dark:bg-slate-950 max-w-7xl mx-auto w-full">

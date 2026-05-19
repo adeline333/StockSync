@@ -77,9 +77,11 @@ export default function Inventory() {
             </h1>
             {summary && <p className="text-sm text-slate-500 dark:text-slate-400">{total} products · RWF {Number(summary.total_value).toLocaleString()} total value</p>}
           </div>
-          <Link to="/inventory/new" className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm">
-            <Plus className="w-4 h-4 mr-2" /> Add New Product
-          </Link>
+          {(user?.role === 'manager' || user?.role === 'admin') && (
+            <Link to="/inventory/new" className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm">
+              <Plus className="w-4 h-4 mr-2" /> Add New Product
+            </Link>
+          )}
         </header>
 
         <div className="p-8 space-y-6 flex-1">
@@ -212,5 +214,3 @@ export default function Inventory() {
     </div>
   );
 }
-
-// Code cleanup 1778534036238
