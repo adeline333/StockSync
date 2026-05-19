@@ -4,7 +4,6 @@ import { User, Mail, Hash, Lock, CheckCircle2, Crown, Package, Store, AlertTrian
 import { useAuth } from '../context/AuthContext';
 
 const roles = [
-  { id: 'admin', label: 'Admin', icon: <Crown className="w-6 h-6" /> },
   { id: 'manager', label: 'Manager', icon: <Package className="w-6 h-6" /> },
   { id: 'staff', label: 'Retail Staff', icon: <Store className="w-6 h-6" /> },
 ];
@@ -85,7 +84,7 @@ const Register = () => {
         </svg>
       </div>
 
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-8 md:p-12 relative z-10 border border-slate-100 dark:border-slate-800">
+      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-8 md:p-12 relative z-10 border border-slate-100 dark:border-slate-800">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Create Account</h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">Set up a new system profile for StockSync</p>
@@ -101,10 +100,10 @@ const Register = () => {
         <form onSubmit={handleRegister} className="space-y-8">
           {/* Role Selection */}
           <div>
-            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4">
+            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">
               Select Role Privilege
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {roles.map((role) => (
                 <button
                   key={role.id}
@@ -112,8 +111,8 @@ const Register = () => {
                   onClick={() => setSelectedRole(role.id)}
                   className={`relative flex flex-col items-center justify-center p-4 h-24 rounded-2xl border-2 transition-all ${
                     selectedRole === role.id
-                      ? 'bg-sky-50 border-sky-500 text-sky-600 shadow-sm'
-                      : 'bg-white border-slate-200 text-slate-500 dark:text-slate-400 hover:border-slate-300'
+                      ? 'bg-sky-50 border-sky-500 text-sky-600 shadow-sm dark:bg-sky-900/20'
+                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
                   <div className={`p-2 rounded-full mb-2 ${selectedRole === role.id ? 'bg-sky-100 text-sky-600' : 'bg-slate-100 text-slate-400'}`}>
@@ -183,7 +182,7 @@ const Register = () => {
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </select>
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                 {selectedRole === 'admin' && '💡 Admins have access to all branches'}
                 {selectedRole === 'manager' && '💡 Managers are typically assigned to Central Warehouse'}
                 {selectedRole === 'staff' && '💡 Staff are assigned to specific retail branches'}
@@ -214,7 +213,7 @@ const Register = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all text-slate-800 dark:text-slate-100 font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
                   placeholder="••••••••"
                   required
                 />
@@ -231,7 +230,7 @@ const Register = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all text-slate-800 dark:text-slate-100 font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all font-black placeholder:font-normal placeholder:text-slate-400 tracking-wider"
                   placeholder="••••••••"
                   required
                 />
