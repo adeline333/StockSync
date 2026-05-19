@@ -94,18 +94,10 @@ export default function POS() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans overflow-hidden">
       {/* Slim Sidebar */}
       <aside className="w-[100px] bg-slate-900 flex flex-col items-center py-6 h-screen shrink-0 fixed z-20">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center shadow-lg mb-10">
-          <span className="text-white font-black text-xs uppercase tracking-widest">Sync</span>
-        </div>
-        <nav className="flex-1 space-y-6 flex flex-col items-center">
+        <nav className="flex-1 flex flex-col items-center justify-center space-y-6">
           <Link to="/retail-dashboard" className="w-14 h-14 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-white transition-all group relative">
             <Home className="w-6 h-6" />
-            <span className="absolute left-16 bg-slate-800 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 pointer-events-none">Dashboard</span>
-          </Link>
-          <Link to="/pos" className="w-14 h-14 rounded-xl flex items-center justify-center bg-slate-800 text-sky-400 relative border border-slate-700">
-            <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-1 h-8 bg-sky-500 rounded-r-md" />
-            <Smartphone className="w-6 h-6" />
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-sky-500" />
+            <span className="absolute left-16 bg-slate-800 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 pointer-events-none">Exit POS</span>
           </Link>
         </nav>
         <div className="w-12 h-12 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center text-emerald-400 font-bold text-lg">

@@ -43,6 +43,7 @@ const NAV_CONFIG = {
     { label: 'Analytics', icon: BarChart2, to: '/analytics/forecasting' },
     { label: 'Stock Risk', icon: BatteryWarning, to: '/analytics/stock-risk' },
     { label: 'Reorder List', icon: ClipboardList, to: '/inventory/reorder' },
+    { label: 'Reports', icon: FileBarChart, to: '/admin/reports' },
     { label: 'Notifications', icon: Bell, to: '/notifications' },
   ],
   staff: [
@@ -50,7 +51,6 @@ const NAV_CONFIG = {
     { label: 'POS Terminal', icon: ShoppingCart, to: '/pos' },
     { label: 'Sales History', icon: History, to: '/sales-history' },
     { label: 'Item Search', icon: Search, to: '/inventory' },
-    { label: 'My Transfers', icon: ListChecks, to: '/transfers/my' },
     { label: 'Notifications', icon: Bell, to: '/notifications' },
   ],
   auditor: [
