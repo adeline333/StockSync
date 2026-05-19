@@ -268,6 +268,11 @@ export default function POSCheckout() {
 
             {/* Proceed Button */}
             <div className="p-6 border-t-2 border-slate-200 dark:border-slate-700">
+              {tinError && (
+                <div className="mb-4 bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-700 text-rose-600 dark:text-rose-400 px-4 py-3 rounded-xl text-sm font-bold flex justify-center items-center text-center shadow-sm">
+                  ⚠️ {tinError}
+                </div>
+              )}
               <button onClick={handleProceed}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 text-white p-5 rounded-2xl text-xl font-black shadow-lg shadow-emerald-500/30 flex justify-center items-center gap-3 transition-all active:scale-[0.98]">
                 Proceed to Payment <ChevronRight className="w-7 h-7" />

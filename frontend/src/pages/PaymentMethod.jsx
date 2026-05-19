@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Smartphone, Home, Banknote, CreditCard, SplitSquareHorizontal, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Smartphone, Home, Banknote, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useOffline } from '../context/OfflineContext';
@@ -89,17 +89,12 @@ export default function PaymentMethod() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans overflow-hidden">
+      {/* Slim Sidebar */}
       <aside className="w-[100px] bg-slate-900 flex flex-col items-center py-6 h-screen shrink-0 fixed z-20">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center shadow-lg mb-10">
-          <span className="text-white font-black text-xs uppercase">Sync</span>
-        </div>
-        <nav className="flex-1 space-y-6 flex flex-col items-center">
-          <Link to="/retail-dashboard" className="w-14 h-14 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+        <nav className="flex-1 flex flex-col items-center justify-center space-y-6">
+          <Link to="/retail-dashboard" className="w-14 h-14 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-white transition-all group relative">
             <Home className="w-6 h-6" />
-          </Link>
-          <Link to="/pos" className="w-14 h-14 rounded-xl flex items-center justify-center bg-slate-800 text-sky-400 relative border border-slate-700">
-            <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-1 h-8 bg-sky-500 rounded-r-md" />
-            <Smartphone className="w-6 h-6" />
+            <span className="absolute left-16 bg-slate-800 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 pointer-events-none">Exit POS</span>
           </Link>
         </nav>
         <div className="w-12 h-12 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center text-emerald-400 font-bold text-lg">
@@ -108,6 +103,7 @@ export default function PaymentMethod() {
       </aside>
 
       <main className="flex-1 ml-[100px] flex flex-col h-screen overflow-hidden">
+        {/* Header */}
         <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between shrink-0">
           <button onClick={() => navigate(-1)} className="flex items-center text-slate-500 dark:text-slate-400 hover:text-sky-600 font-bold group">
             <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" /> Back
@@ -116,23 +112,23 @@ export default function PaymentMethod() {
           <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Total: {total.toLocaleString()} RWF</span>
         </header>
 
+        {/* Content */}
         <div className="flex-1 p-8 overflow-y-auto bg-slate-50 dark:bg-slate-950 flex gap-8 max-w-[1200px] mx-auto w-full items-start mt-4">
+          
           {/* Payment Options */}
-          <div className="flex-[3] bg-white p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">
+          <div className="flex-[3] bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">
             <h2 className="text-lg font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-6">Payment Options</h2>
             <div className="grid grid-cols-2 gap-5">
               {[
-                { id: 'cash', label: 'Cash Payment', sub: 'Accept RWF currency', icon: <Banknote className="w-7 h-7" />, iconBg: 'bg-sky-100', iconColor: 'text-sky-500' },
-                { id: 'momo', label: 'Mobile Money', sub: 'MTN / Airtel Money', icon: <Smartphone className="w-7 h-7" />, iconBg: 'bg-amber-100', iconColor: 'text-amber-500' },
-                { id: 'card', label: 'Card / POS', sub: 'Visa / Mastercard', icon: <CreditCard className="w-7 h-7" />, iconBg: 'bg-slate-100', iconColor: 'text-slate-500' },
-                { id: 'split', label: 'Split / Credit', sub: 'Multiple methods', icon: <SplitSquareHorizontal className="w-7 h-7" />, iconBg: 'bg-slate-100', iconColor: 'text-slate-500' },
+                { id: 'cash', label: 'Cash Payment', sub: 'Accept RWF currency', icon: <Banknote className="w-7 h-7" />, iconBg: 'bg-sky-100 dark:bg-sky-950/50', iconColor: 'text-sky-500' },
+                { id: 'momo', label: 'Mobile Money', sub: 'MTN / Airtel Money', icon: <Smartphone className="w-7 h-7" />, iconBg: 'bg-amber-100 dark:bg-amber-950/50', iconColor: 'text-amber-500' },
               ].map(opt => (
                 <div key={opt.id} onClick={() => setMethod(opt.id)}
-                  className={`p-6 rounded-2xl cursor-pointer border-2 transition-all relative ${method === opt.id ? 'bg-sky-50 border-sky-500' : 'bg-white border-slate-200 hover:border-sky-300'}`}>
+                  className={`p-6 rounded-2xl cursor-pointer border-2 transition-all relative ${method === opt.id ? 'bg-sky-50 dark:bg-sky-950/20 border-sky-500' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-600'}`}>
                   <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-5 ${opt.iconBg}`}>
                     <span className={opt.iconColor}>{opt.icon}</span>
                   </div>
-                  <h3 className={`text-lg font-black mb-1 ${method === opt.id ? 'text-sky-600' : 'text-slate-800'}`}>{opt.label}</h3>
+                  <h3 className={`text-lg font-black mb-1 ${method === opt.id ? 'text-sky-600 dark:text-sky-400' : 'text-slate-800 dark:text-slate-100'}`}>{opt.label}</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400">{opt.sub}</p>
                   {method === opt.id && <CheckCircle2 className="w-6 h-6 text-sky-500 absolute top-5 right-5" />}
                 </div>
@@ -140,41 +136,25 @@ export default function PaymentMethod() {
             </div>
           </div>
 
-          {/* Calculator */}
-          <div className="flex-[2] bg-white p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col min-h-[560px]">
+          {/* Calculator Panel */}
+          <div className="flex-[2] bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col min-h-[560px]">
             <div className="mb-6">
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Total Due</p>
               <p className="text-5xl font-black text-slate-800 dark:text-slate-100">{total.toLocaleString()} <span className="text-xl text-slate-400 font-semibold">RWF</span></p>
             </div>
 
             <div className="border-t border-slate-100 dark:border-slate-800 pt-6 flex-1">
-              <div className="grid grid-cols-4 gap-2 mb-5">
-                {quickAmounts.map(amt => (
-                  <button key={amt} onClick={() => setTendered(amt)}
-                    className={`py-2 rounded-full font-bold text-xs transition-colors border-2 ${parseFloat(tendered) === amt ? 'bg-sky-50 border-sky-500 text-sky-600' : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-600'}`}>
-                    {amt === total ? 'Exact' : amt.toLocaleString()}
-                  </button>
-                ))}
-              </div>
-
               <div className="mb-5">
                 <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-2">Amount Tendered (RWF)</label>
-                <div className="w-full bg-slate-50 border-2 border-sky-500 rounded-xl p-4 flex items-center shadow-inner">
+                <div className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-sky-500 rounded-xl p-4 flex items-center shadow-inner">
                   <input type="number" value={tendered} onChange={e => setTendered(e.target.value)}
                     className="text-3xl font-black text-slate-800 dark:text-slate-100 flex-1 bg-transparent outline-none w-full" />
                   <span className="text-sky-500 font-bold uppercase tracking-widest text-sm ml-2">RWF</span>
                 </div>
               </div>
 
-              {method === 'cash' && (
-                <div className="w-full bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-5">
-                  <p className="text-emerald-800 font-bold text-sm uppercase tracking-wider mb-1">Change Due</p>
-                  <p className="text-4xl font-black text-emerald-600">{changeDue.toLocaleString()} <span className="text-base font-bold">RWF</span></p>
-                </div>
-              )}
-
               {error && (
-                <div className="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 mb-4">
+                <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 mb-4">
                   <AlertTriangle className="w-4 h-4 shrink-0" /> {error}
                 </div>
               )}
@@ -190,5 +170,3 @@ export default function PaymentMethod() {
     </div>
   );
 }
-
-// Code cleanup 1778534036265

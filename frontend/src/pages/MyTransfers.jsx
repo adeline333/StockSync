@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowLeftRight, Clock, CheckCircle, XCircle, Building2, Store, Loader2 } from 'lucide-react';
+import { ArrowLeftRight, Clock, CheckCircle, XCircle, Building2, Store, Loader2, Truck, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,12 +8,16 @@ const API_URL = 'http://localhost:5000/api';
 const statusStyle = {
   pending:  'bg-amber-50 text-amber-600 border-amber-200',
   approved: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  in_transit: 'bg-sky-50 text-sky-600 border-sky-200',
+  completed: 'bg-emerald-50 text-emerald-600 border-emerald-200',
   rejected: 'bg-rose-50 text-rose-500 border-rose-100',
 };
 
 const statusIcon = {
   pending: Clock,
   approved: CheckCircle,
+  in_transit: Truck,
+  completed: CheckCircle,
   rejected: XCircle,
 };
 
@@ -54,6 +58,23 @@ export default function MyTransfers() {
     } catch (e) { console.error(e); }
   };
 
+  const handleConfirm = async (id) => {
+    if (!window.confirm('Confirm that all items have been physically received?')) return;
+    try {
+      const res = await fetch(`${API_URL}/transfers/${id}/confirm`, {
+        method: 'POST',
+        headers
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      alert('Stock received successfully');
+      fetchTransfers();
+      setSelected(prev => ({ ...prev, status: 'completed' }));
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen dark:bg-slate-950">
       <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
@@ -81,7 +102,7 @@ export default function MyTransfers() {
                 <p className="text-xs text-slate-500 mt-1">Create your first transfer request</p>
               </div>
             ) : transfers.map(t => {
-              const StatusIcon = statusIcon[t.status];
+              const StatusIcon = statusIcon[t.status] || Clock;
               return (
                 <div key={t.id} onClick={() => selectTransfer(t)}
                   className={`bg-white dark:bg-slate-900 rounded-2xl p-5 border-2 shadow-sm cursor-pointer transition-all relative overflow-hidden ${selected?.id === t.id ? 'border-sky-500' : 'border-slate-100 dark:border-slate-800 hover:border-sky-300'}`}>
@@ -151,14 +172,28 @@ export default function MyTransfers() {
                 <div className="mx-8 my-4">
                   {selected.status === 'pending' && (
                     <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-                      <p className="text-sm font-bold text-amber-800 dark:text-amber-200">⏳ Awaiting Admin Approval</p>
-                      <p className="text-xs text-amber-600 dark:text-amber-300 mt-1">Your transfer request is pending review by an administrator.</p>
+                      <p className="text-sm font-bold text-amber-800 dark:text-amber-200">⏳ Awaiting Approval</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-300 mt-1">Your transfer request is pending review and authorization.</p>
                     </div>
                   )}
-                  {selected.status === 'approved' && (
+                  {selected.status === 'in_transit' && (
+                    <div className="bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-xl p-4">
+                      <p className="text-sm font-bold text-sky-800 dark:text-sky-200">🚚 Stock In Transit</p>
+                      <p className="text-xs text-sky-600 dark:text-sky-300 mt-1">Stock has left the source. Awaiting physical receipt at your location.</p>
+                      {(user?.role === 'admin' || (user?.role === 'manager' && parseInt(user?.branch_id) === parseInt(selected.dest_branch_id))) && (
+                        <button 
+                          onClick={() => handleConfirm(selected.id)}
+                          className="mt-3 w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-lg text-xs font-bold transition-all shadow-sm"
+                        >
+                          Confirm Physical Receipt
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {selected.status === 'completed' && (
                     <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
-                      <p className="text-sm font-bold text-emerald-800 dark:text-emerald-200">✅ Transfer Approved & Completed</p>
-                      <p className="text-xs text-emerald-600 dark:text-emerald-300 mt-1">Stock has been successfully moved between locations.</p>
+                      <p className="text-sm font-bold text-emerald-800 dark:text-emerald-200">✅ Transfer Completed</p>
+                      <p className="text-xs text-emerald-600 dark:text-emerald-300 mt-1">Stock has been successfully received and updated in your inventory.</p>
                     </div>
                   )}
                   {selected.status === 'rejected' && (
@@ -208,4 +243,3 @@ export default function MyTransfers() {
     </div>
   );
 }
-// Code cleanup 1778534036251
