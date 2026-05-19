@@ -14,17 +14,17 @@ export default function DemandForecasting() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
-  const [months, setMonths] = useState(6);
+  
 
   const fetchForecast = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/analytics/forecast?months=${months}`, { headers });
+      const res = await fetch(`${API_URL}/analytics/forecast?days=7`, { headers });
       const json = await res.json();
       setData(json);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  }, [months, token]);
+  }, [token]);
 
   useEffect(() => { fetchForecast(); }, [fetchForecast]);
 
@@ -56,23 +56,15 @@ export default function DemandForecasting() {
       <main className="flex-1 flex flex-col min-h-screen dark:bg-slate-950">
         <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
-            <h1 className="text-2xl font-black text-black dark:text-slate-100">Demand Forecasting</h1>
-            <p className="text-sm font-bold text-black dark:text-slate-400">AI-Powered Sales Predictions</p>
+            <h1 className="text-2xl font-black text-black dark:text-slate-100">7-Day Sales Forecast</h1>
+            <p className="text-sm font-bold text-black dark:text-slate-400">Recent Sales & Predictions</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <select value={months} onChange={e => setMonths(parseInt(e.target.value))}
-                className="appearance-none bg-slate-50 border border-slate-200 dark:border-slate-700 text-black dark:text-slate-300 font-bold text-sm py-2.5 pl-4 pr-10 rounded-lg outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
-                <option value={3}>3 Months</option>
-                <option value={6}>6 Months</option>
-                <option value={12}>12 Months</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"/>
-            </div>
+            
             <button onClick={runModel} disabled={running}
               className="bg-violet-500 hover:bg-violet-600 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md disabled:opacity-60 flex items-center gap-2">
               {running ? <Loader2 className="w-4 h-4 animate-spin"/> : null}
-              Run Model
+              Refresh Data
             </button>
           </div>
         </header>
@@ -85,8 +77,8 @@ export default function DemandForecasting() {
               {/* KPI Cards */}
               <div className="grid grid-cols-3 gap-6">
                 {[
-                  { label: 'Model Confidence', value: `${data?.confidence || 0}%`, color: 'text-violet-600', bg: 'bg-violet-50', icon: <Activity className="w-4 h-4 mr-2 text-violet-400"/>, sub: `Based on ${trend.length} months of data` },
-                  { label: 'Proj. Growth (Next 30d)', value: `${data?.projectedGrowth >= 0 ? '+' : ''}${data?.projectedGrowth || 0}%`, color: data?.projectedGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600', bg: 'bg-emerald-50', icon: <TrendingUp className="w-4 h-4 mr-2 text-emerald-400"/>, sub: 'vs previous period' },
+                  { label: '7-Day Revenue', value: `${(data?.totalRevenue || 0).toLocaleString()} RWF`, color: 'text-violet-600', bg: 'bg-violet-50', icon: <Activity className="w-4 h-4 mr-2 text-violet-400"/>, sub: `Last 7 days total` },
+                  { label: '7-Day Orders', value: `${data?.totalOrders || 0} Orders`, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: <TrendingUp className="w-4 h-4 mr-2 text-emerald-400"/>, sub: `Last 7 days total` },
                   { label: 'Top Selling Products', value: data?.topProducts?.length || 0, color: 'text-sky-600', bg: 'bg-sky-50', icon: <BarChart2 className="w-4 h-4 mr-2 text-sky-400"/>, sub: 'tracked this period' },
                 ].map((card, i) => (
                   <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
@@ -137,8 +129,8 @@ export default function DemandForecasting() {
                         )}
                       </svg>
                       <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs font-black text-black dark:text-slate-400 px-1">
-                        {trend.map((t, i) => <span key={i}>{t.month}</span>)}
-                        <span className="text-violet-700 dark:text-violet-500">FC →</span>
+                        {trend.map((t, i) => <span key={i}>{t.day_label}</span>)}
+                        <span className="text-violet-700 dark:text-violet-500">Tomorrow →</span>
                       </div>
                     </div>
                   )}
@@ -168,10 +160,10 @@ export default function DemandForecasting() {
                   )}
                 </div>
 
-                {/* AI Insights */}
+                {/* Sales Insights */}
                 <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col overflow-hidden">
                   <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-                    <h2 className="text-lg font-black text-black dark:text-slate-100">AI Insights</h2>
+                    <h2 className="text-lg font-black text-black dark:text-slate-100">Sales Insights</h2>
                   </div>
                   <div className="p-6 flex-1 space-y-6 overflow-y-auto">
                     {data?.projectedGrowth > 0 ? (

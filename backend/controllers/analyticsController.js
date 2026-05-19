@@ -1,64 +1,79 @@
 const db = require('../db');
 const ForecastingEngine = require('../utils/ForecastingEngine');
 
-// GET /api/analytics/forecast — sales trend + OLS linear forecast
+// GET /api/analytics/forecast — 7-day sales trend
 exports.getForecast = async (req, res) => {
-  const { branch_id, months = 6 } = req.query;
+  const { branch_id, days = 7 } = req.query;
   const branchFilter = branch_id ? `AND o.branch_id = ${parseInt(branch_id)}` : '';
 
   try {
-    // Monthly sales for past N months
+    // Daily sales for past N days
     const salesTrend = await db.query(
       `SELECT 
-        TO_CHAR(DATE_TRUNC('month', o.created_at), 'Mon YYYY') as month,
-        DATE_TRUNC('month', o.created_at) as month_date,
-        COUNT(*) as transaction_count,
-        COALESCE(SUM(o.total_amount), 0) as revenue,
-        COALESCE(SUM(oi.quantity), 0) as units_sold
+        TO_CHAR(DATE_TRUNC('day', o.created_at), 'Mon DD') as day_label,
+        DATE_TRUNC('day', o.created_at) as day_date,
+        COUNT(DISTINCT o.id) as transaction_count,
+        COALESCE(SUM(o.total_amount), 0) as revenue
        FROM orders o
-       LEFT JOIN order_items oi ON o.id = oi.order_id
        WHERE o.status = 'completed'
-         AND o.created_at >= NOW() - INTERVAL '${parseInt(months)} months'
+         AND o.created_at >= NOW() - INTERVAL '${parseInt(days)} days'
          ${branchFilter}
-       GROUP BY DATE_TRUNC('month', o.created_at)
-       ORDER BY month_date ASC`
+       GROUP BY DATE_TRUNC('day', o.created_at)
+       ORDER BY day_date ASC`
     );
+
+    // If there is no data, generate a 7-day array filled with 0s to avoid empty UI
+    const trend = [];
+    for (let i = parseInt(days) - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const label = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }).replace(',', '');
+      // Match "May 17" format exactly to Postgres "Mon DD"
+      const parts = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }).split(' ');
+      const formattedLabel = `${parts[0]} ${parts[1].padStart(2, '0')}`;
+      
+      const found = salesTrend.rows.find(r => r.day_label === formattedLabel);
+      trend.push({
+        day_label: formattedLabel,
+        transaction_count: found ? parseInt(found.transaction_count) : 0,
+        revenue: found ? parseFloat(found.revenue) : 0
+      });
+    }
 
     // Top selling products (for velocity calculation)
     const topProducts = await db.query(
       `SELECT oi.product_id, p.name, p.sku,
         SUM(oi.quantity) as total_sold,
         COUNT(DISTINCT o.id) as order_count,
-        ROUND(SUM(oi.quantity)::numeric / GREATEST(${parseInt(months)} * 30, 1), 2) as daily_velocity
+        ROUND(SUM(oi.quantity)::numeric / GREATEST(${parseInt(days)}, 1), 2) as daily_velocity
        FROM order_items oi
        JOIN orders o ON oi.order_id = o.id
        JOIN products p ON oi.product_id = p.id
        WHERE o.status = 'completed'
-         AND o.created_at >= NOW() - INTERVAL '${parseInt(months)} months'
+         AND o.created_at >= NOW() - INTERVAL '${parseInt(days)} days'
          ${branchFilter}
        GROUP BY oi.product_id, p.name, p.sku
        ORDER BY total_sold DESC
        LIMIT 10`
     );
 
-    // Advanced Linear Regression Forecast
-    const trend = salesTrend.rows;
-    const revenues = trend.map(t => parseFloat(t.revenue));
-    const model = ForecastingEngine.linearRegression(revenues);
+    // Compute simple totals for KPI cards
+    const totalRevenue = trend.reduce((sum, d) => sum + d.revenue, 0);
+    const totalOrders = trend.reduce((sum, d) => sum + d.transaction_count, 0);
 
-    // Projected growth for next month vs last month
-    const lastRevenue = revenues[revenues.length - 1] || 0;
-    const nextMonthForecast = model.forecast[0] || 0;
-    const projectedGrowth = lastRevenue > 0 ? ((nextMonthForecast - lastRevenue) / lastRevenue * 100).toFixed(1) : 0;
+    // Simple forecast: average of last 7 days applied to tomorrow
+    const dailyAvg = totalRevenue / parseInt(days);
+    const tomorrowForecast = dailyAvg;
+    const projectedGrowth = dailyAvg > 0 ? (((tomorrowForecast - trend[trend.length-1].revenue) / dailyAvg) * 100).toFixed(1) : 0;
 
     res.json({
-      trend: salesTrend.rows,
+      trend: trend,
       topProducts: topProducts.rows,
-      forecast: model.forecast,
+      forecast: [tomorrowForecast],
       projectedGrowth: parseFloat(projectedGrowth),
-      confidence: Math.max(model.confidence, 40), // Minimum 40% confidence for UI
-      model_type: model.modelName,
-      months: parseInt(months)
+      totalRevenue,
+      totalOrders,
+      days: parseInt(days)
     });
   } catch (e) {
     console.error(e);
