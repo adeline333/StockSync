@@ -185,6 +185,7 @@ exports.approveTransfer = async (req, res) => {
 
 // POST /api/transfers/:id/confirm — finalize transfer at destination
 exports.confirmReceipt = async (req, res) => {
+  const { items: confirmedItems, reason } = req.body;
   const ip = getIP(req);
   const client = await db.pool.connect();
 
@@ -207,20 +208,61 @@ exports.confirmReceipt = async (req, res) => {
     }
 
     const items = await client.query('SELECT * FROM stock_transfer_items WHERE transfer_id = $1', [transfer.id]);
+    
+    let activityDetails = `Transfer ${transfer.transfer_number} received at branch ${transfer.dest_branch_id}.`;
+    let mismatchLogged = false;
 
     // Add stock to destination
     for (const item of items.rows) {
+      // Find matching item in request body, if provided
+      let received_quantity = item.quantity;
+      if (confirmedItems && Array.isArray(confirmedItems)) {
+        const found = confirmedItems.find(ci => parseInt(ci.product_id) === parseInt(item.product_id));
+        if (found) {
+          received_quantity = found.received_quantity;
+        }
+      }
+
+      // Validation
+      const parsedQty = parseInt(received_quantity);
+      if (isNaN(parsedQty) || parsedQty < 0) {
+        throw new Error(`Invalid received quantity for product ID ${item.product_id}: ${received_quantity}`);
+      }
+
+      // Update received_quantity in stock_transfer_items
+      await client.query(
+        'UPDATE stock_transfer_items SET received_quantity = $1 WHERE id = $2',
+        [parsedQty, item.id]
+      );
+
+      // Add actual received quantity to destination inventory
       await client.query(
         `INSERT INTO inventory (product_id, branch_id, quantity) VALUES ($1,$2,$3)
          ON CONFLICT (product_id, branch_id) DO UPDATE SET quantity = inventory.quantity + $3, last_updated = NOW()`,
-        [item.product_id, transfer.dest_branch_id, item.quantity]
+        [item.product_id, transfer.dest_branch_id, parsedQty]
       );
 
-      // Update transaction status
+      // Update transaction status and quantity to actual received
       await client.query(
-        `UPDATE transactions SET status = 'completed' WHERE product_id = $1 AND dest_branch_id = $2 AND type = 'transfer' AND status = 'in_transit' AND created_at >= $3`,
-        [item.product_id, transfer.dest_branch_id, transfer.shipped_at]
+        `UPDATE transactions SET status = 'completed', quantity = $4 
+         WHERE product_id = $1 AND dest_branch_id = $2 AND type = 'transfer' AND status = 'in_transit' AND created_at >= $3`,
+         [item.product_id, transfer.dest_branch_id, transfer.shipped_at, parsedQty]
       );
+
+      // Check for discrepancies
+      if (parsedQty !== item.quantity) {
+        mismatchLogged = true;
+        // Log discrepancy
+        await client.query(
+          `INSERT INTO discrepancy_logs (product_id, branch_id, expected_quantity, actual_quantity, reason, reported_by)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [item.product_id, transfer.dest_branch_id, item.quantity, parsedQty, reason || 'Transfer discrepancy during physical receipt confirmation', req.user.id]
+        );
+      }
+    }
+
+    if (mismatchLogged) {
+      activityDetails += ' Discrepancies were noted and logged.';
     }
 
     await client.query(
@@ -229,8 +271,8 @@ exports.confirmReceipt = async (req, res) => {
     );
 
     await client.query('COMMIT');
-    await logActivity(req.user.id, 'TRANSFER_COMPLETED', `Transfer ${transfer.transfer_number} received and stock updated at branch ${transfer.dest_branch_id}`, ip);
-    res.json({ message: 'Stock received and inventory updated' });
+    await logActivity(req.user.id, 'TRANSFER_COMPLETED', activityDetails, ip);
+    res.json({ message: 'Stock received and inventory updated successfully' });
   } catch (e) {
     await client.query('ROLLBACK');
     res.status(400).json({ message: e.message });
