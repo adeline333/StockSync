@@ -176,7 +176,7 @@ exports.getTransfersReport = async (req, res) => {
         COUNT(CASE WHEN st.status = 'completed' THEN 1 END) as completed_transfers,
         COUNT(CASE WHEN st.status = 'pending' THEN 1 END) as pending_transfers,
         COUNT(CASE WHEN st.status = 'in_transit' THEN 1 END) as transit_transfers,
-        COALESCE(SUM((SELECT SUM(quantity) FROM stock_transfer_items WHERE transfer_id = st.id)), 0) as total_items_moved
+        COALESCE(SUM((SELECT SUM(COALESCE(received_quantity, quantity)) FROM stock_transfer_items WHERE transfer_id = st.id)), 0) as total_items_moved
        FROM stock_transfers st
        WHERE DATE(st.created_at) BETWEEN $1 AND $2 ${bf}`,
       [start, end]
@@ -190,7 +190,7 @@ exports.getTransfersReport = async (req, res) => {
         sb.name as source_branch,
         db.name as dest_branch,
         st.status,
-        COALESCE((SELECT SUM(quantity) FROM stock_transfer_items WHERE transfer_id = st.id), 0) as total_items,
+        COALESCE((SELECT SUM(COALESCE(received_quantity, quantity)) FROM stock_transfer_items WHERE transfer_id = st.id), 0) as total_items,
         u.name as requested_by
        FROM stock_transfers st
        JOIN branches sb ON st.source_branch_id = sb.id
