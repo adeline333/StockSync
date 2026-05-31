@@ -96,20 +96,59 @@ export default function WarehouseDashboard() {
                     </div>
                   </div>
                   {data?.weekly_movements?.length > 0 ? (
-                    <div className="relative h-48">
-                      <div className="absolute inset-0 flex items-end gap-3 pb-6">
+                    <div className="relative h-60 mt-6 flex flex-col justify-between">
+                      {/* Background Gridlines */}
+                      <div className="absolute inset-0 flex flex-col justify-between h-[150px] pointer-events-none z-0">
+                        {[0, 1, 2, 3].map(j => (
+                          <div key={j} className="border-b border-dashed border-slate-100 dark:border-slate-800/60 w-full h-0" />
+                        ))}
+                      </div>
+
+                      <div className="relative flex items-end gap-3 h-[150px] px-2 z-10">
                         {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day, i) => {
                           const dayData = data.weekly_movements.filter(m => new Date(m.date).getDay() === (i + 1) % 7);
                           const inbound = dayData.filter(m => m.type === 'receive').reduce((s, m) => s + parseInt(m.qty), 0);
                           const outbound = dayData.filter(m => m.type === 'sale' || m.type === 'transfer').reduce((s, m) => s + parseInt(m.qty), 0);
                           const maxQty = Math.max(...data.weekly_movements.map(m => parseInt(m.qty)), 1);
+
+                          const inboundHeight = (inbound / maxQty) * 100;
+                          const outboundHeight = (outbound / maxQty) * 100;
+
                           return (
-                            <div key={day} className="flex-1 flex flex-col items-center gap-1">
-                              <div className="w-full flex gap-0.5 items-end" style={{ height: '120px' }}>
-                                <div className="flex-1 bg-emerald-500 rounded-t-sm" style={{ height: `${(inbound / maxQty) * 100}%` }}/>
-                                <div className="flex-1 bg-sky-500 rounded-t-sm" style={{ height: `${(outbound / maxQty) * 100}%` }}/>
+                            <div key={day} className="flex-1 flex flex-col items-center justify-end h-full relative group">
+                              {/* Twin Pillars Wrapper */}
+                              <div className="flex gap-2 items-end h-full justify-center w-full">
+                                {/* Inbound Glass Track */}
+                                <div className="h-full w-3.5 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-100/90 dark:border-emerald-900/30 rounded-full flex flex-col justify-end p-[2px] relative group/pillar cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/50 transition-colors">
+                                  {inbound > 0 ? (
+                                    <>
+                                      <div className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 dark:from-emerald-500 dark:to-emerald-300 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)] group-hover/pillar:shadow-[0_0_12px_rgba(16,185,129,0.5)] transition-all duration-300" style={{ height: `${inboundHeight}%` }} />
+                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-950 text-white text-[9px] font-black px-2.5 py-1 rounded-lg shadow-xl opacity-0 group-hover/pillar:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-20 font-sans">
+                                        +{inbound} units
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div className="w-full h-0" />
+                                  )}
+                                </div>
+
+                                {/* Outbound Glass Track */}
+                                <div className="h-full w-3.5 bg-sky-50/70 dark:bg-sky-950/20 border border-sky-100/90 dark:border-sky-900/30 rounded-full flex flex-col justify-end p-[2px] relative group/pillar cursor-pointer hover:border-sky-300 dark:hover:border-sky-700/50 transition-colors">
+                                  {outbound > 0 ? (
+                                    <>
+                                      <div className="w-full bg-gradient-to-t from-sky-500 to-sky-400 dark:from-sky-400 dark:to-sky-300 rounded-full shadow-[0_0_8px_rgba(14,165,233,0.3)] group-hover/pillar:shadow-[0_0_12px_rgba(14,165,233,0.5)] transition-all duration-300" style={{ height: `${outboundHeight}%` }} />
+                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-950 text-white text-[9px] font-black px-2.5 py-1 rounded-lg shadow-xl opacity-0 group-hover/pillar:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-20 font-sans">
+                                        -{outbound} units
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div className="w-full h-0" />
+                                  )}
+                                </div>
                               </div>
-                              <span className="text-[9px] text-slate-400 font-medium">{day}</span>
+
+                              {/* Day Label */}
+                              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-black mt-3 transition-colors group-hover:text-slate-600 dark:group-hover:text-slate-300 uppercase tracking-wider">{day}</span>
                             </div>
                           );
                         })}
