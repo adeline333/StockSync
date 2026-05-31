@@ -100,7 +100,7 @@ export default function MyTransfers() {
       alert('Stock received and verified successfully!');
       setIsConfirming(false);
       fetchTransfers();
-      setSelected(prev => ({ ...prev, status: 'completed' }));
+      selectTransfer({ ...selected, status: 'completed' });
     } catch (e) {
       alert(e.message);
     } finally {
@@ -251,8 +251,8 @@ export default function MyTransfers() {
                         </div>
                         {selectedItems.map(item => {
                           const currentVal = confirmedItems[item.product_id] !== undefined ? confirmedItems[item.product_id] : item.quantity;
-                          const hasDiff = currentVal !== item.quantity;
-                          const isRemoved = currentVal === 0;
+                          const hasDiff = parseInt(currentVal) !== parseInt(item.quantity);
+                          const isRemoved = parseInt(currentVal) === 0;
                           
                           return (
                             <div 
@@ -300,7 +300,7 @@ export default function MyTransfers() {
                                   isRemoved ? 'border-rose-300 dark:border-rose-900' : hasDiff ? 'border-amber-300 dark:border-amber-900' : ''
                                 }`}>
                                   <button 
-                                    onClick={() => setConfirmedItems(prev => ({ ...prev, [item.product_id]: Math.max(0, currentVal - 1) }))}
+                                    onClick={() => setConfirmedItems(prev => ({ ...prev, [item.product_id]: Math.max(0, parseInt(currentVal) - 1) }))}
                                     className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-650 dark:text-slate-455 hover:text-slate-900 dark:hover:text-slate-205 font-bold transition-all shadow-sm"
                                   >
                                     <Minus className="w-3.5 h-3.5"/>
@@ -316,7 +316,7 @@ export default function MyTransfers() {
                                     className="w-10 text-center bg-transparent border-0 font-black text-slate-800 dark:text-slate-100 outline-none select-none text-base focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                   />
                                   <button 
-                                    onClick={() => setConfirmedItems(prev => ({ ...prev, [item.product_id]: currentVal + 1 }))}
+                                    onClick={() => setConfirmedItems(prev => ({ ...prev, [item.product_id]: parseInt(currentVal) + 1 }))}
                                     className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-655 dark:text-slate-455 hover:text-slate-900 dark:hover:text-slate-205 font-bold transition-all shadow-sm"
                                   >
                                     <Plus className="w-3.5 h-3.5"/>
@@ -355,7 +355,7 @@ export default function MyTransfers() {
                     {/* Discrepancy Reason Input */}
                     {Object.entries(confirmedItems).some(([prodId, qty]) => {
                       const orig = selectedItems.find(si => parseInt(si.product_id) === parseInt(prodId));
-                      return orig && qty !== orig.quantity;
+                      return orig && parseInt(qty) !== parseInt(orig.quantity);
                     }) && (
                       <div className="mx-8 mb-4 bg-amber-50/40 dark:bg-amber-950/10 border border-amber-250 dark:border-amber-900/30 rounded-xl p-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <label className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-widest mb-1.5 block flex items-center gap-1">
