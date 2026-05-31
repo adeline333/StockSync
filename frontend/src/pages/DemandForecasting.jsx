@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 const API_URL = 'http://localhost:5000/api';
 
 export default function DemandForecasting() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -18,13 +18,17 @@ export default function DemandForecasting() {
 
   const fetchForecast = useCallback(async () => {
     setLoading(true);
+    const params = new URLSearchParams({ days: '7' });
+    if (user?.role === 'manager' && user.branch_id) {
+      params.append('branch_id', user.branch_id);
+    }
     try {
-      const res = await fetch(`${API_URL}/analytics/forecast?days=7`, { headers });
+      const res = await fetch(`${API_URL}/analytics/forecast?${params}`, { headers });
       const json = await res.json();
       setData(json);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  }, [token]);
+  }, [token, user]);
 
   useEffect(() => { fetchForecast(); }, [fetchForecast]);
 
