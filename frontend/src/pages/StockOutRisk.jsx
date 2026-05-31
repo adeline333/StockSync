@@ -15,7 +15,7 @@ const riskConfig = {
 };
 
 export default function StockOutRisk() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -23,7 +23,7 @@ export default function StockOutRisk() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [branches, setBranches] = useState([]);
-  const [branchId, setBranchId] = useState('');
+  const [branchId, setBranchId] = useState(user?.role === 'manager' && user.branch_id ? String(user.branch_id) : '');
 
   const fetchRisk = useCallback(async () => {
     setLoading(true);
