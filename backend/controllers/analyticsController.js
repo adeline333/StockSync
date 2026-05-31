@@ -84,20 +84,18 @@ exports.getForecast = async (req, res) => {
 // GET /api/analytics/stockout-risk — products at risk of running out
 exports.getStockOutRisk = async (req, res) => {
   const { branch_id } = req.query;
-  const branchFilter = branch_id ? `AND i.branch_id = ${parseInt(branch_id)}` : '';
+  const joinBranchFilter = branch_id ? `AND i.branch_id = ${parseInt(branch_id)}` : '';
   const txBranchFilter = branch_id ? `AND t.source_branch_id = ${parseInt(branch_id)}` : '';
 
   try {
-    // Get all products with current stock
+    // Get all products with current stock (even if 0 or unstocked in this branch)
     const products = await db.query(
       `SELECT p.id, p.name, p.sku, p.supplier_lead_days, p.price,
         COALESCE(SUM(i.quantity), 0) as current_stock,
         COALESCE(MIN(i.min_stock_level), 10) as min_stock_level
        FROM products p
-       LEFT JOIN inventory i ON p.id = i.product_id
-       WHERE 1=1 ${branchFilter}
+       LEFT JOIN inventory i ON p.id = i.product_id ${joinBranchFilter}
        GROUP BY p.id
-       HAVING COALESCE(SUM(i.quantity), 0) > 0
        ORDER BY COALESCE(SUM(i.quantity), 0) ASC`
     );
 
@@ -124,10 +122,12 @@ exports.getStockOutRisk = async (req, res) => {
       const optimalSafetyStock = ForecastingEngine.calculateSafetyStock(dailyVelocity, leadDays);
       const reorderPoint = (dailyVelocity * leadDays) + optimalSafetyStock;
       const daysRemaining = dailyVelocity > 0 ? Math.floor(currentStock / dailyVelocity) : 999;
+      const minStock = parseInt(product.min_stock_level) || 10;
 
       let riskLevel = 'safe';
-      if (currentStock <= dailyVelocity * leadDays) riskLevel = 'critical';
-      else if (currentStock <= reorderPoint) riskLevel = 'high';
+      if (currentStock === 0) riskLevel = 'critical';
+      else if (currentStock <= dailyVelocity * leadDays) riskLevel = 'critical';
+      else if (currentStock <= reorderPoint || currentStock <= minStock) riskLevel = 'high';
       else if (daysRemaining <= 14) riskLevel = 'moderate';
       else if (daysRemaining <= 30) riskLevel = 'low';
 
@@ -165,7 +165,7 @@ exports.getStockOutRisk = async (req, res) => {
 // GET /api/analytics/reorder — reorder recommendations
 exports.getReorderRecommendations = async (req, res) => {
   const { branch_id } = req.query;
-  const branchFilter = branch_id ? `AND i.branch_id = ${parseInt(branch_id)}` : '';
+  const joinBranchFilter = branch_id ? `AND i.branch_id = ${parseInt(branch_id)}` : '';
   const txBranchFilter = branch_id ? `AND t.source_branch_id = ${parseInt(branch_id)}` : '';
 
   try {
@@ -174,8 +174,7 @@ exports.getReorderRecommendations = async (req, res) => {
         COALESCE(SUM(i.quantity), 0) as current_stock,
         COALESCE(MIN(i.min_stock_level), 10) as min_stock_level
        FROM products p
-       LEFT JOIN inventory i ON p.id = i.product_id
-       WHERE 1=1 ${branchFilter}
+       LEFT JOIN inventory i ON p.id = i.product_id ${joinBranchFilter}
        GROUP BY p.id
        ORDER BY COALESCE(SUM(i.quantity), 0) ASC`
     );
