@@ -14,7 +14,7 @@ const statusConfig = {
 };
 
 export default function ReorderList() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const headers = { Authorization: `Bearer ${token}` };
 
   const [data, setData] = useState(null);
@@ -22,7 +22,7 @@ export default function ReorderList() {
   const [selected, setSelected] = useState(new Set());
   const [quantities, setQuantities] = useState({});
   const [branches, setBranches] = useState([]);
-  const [branchId, setBranchId] = useState('');
+  const [branchId, setBranchId] = useState(user?.role === 'manager' && user.branch_id ? String(user.branch_id) : '');
 
   const fetchRecommendations = useCallback(async () => {
     setLoading(true);
