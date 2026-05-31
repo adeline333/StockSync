@@ -91,19 +91,23 @@ exports.getWarehouseDashboard = async (req, res) => {
   console.log('Filter:', bf);
 
   try {
+    const txBranchFilter = branch_id ? `AND (t.source_branch_id = ${parseInt(branch_id)} OR t.dest_branch_id = ${parseInt(branch_id)})` : '';
+
     const [totalStock, inboundPending, criticalStock, recentMovements, weeklyMovements] = await Promise.all([
       db.query(`SELECT COALESCE(SUM(i.quantity), 0) as total FROM inventory i WHERE 1=1 ${bf}`),
       db.query(`SELECT COUNT(*) as count FROM stock_transfers WHERE status = 'pending' ${branch_id ? `AND dest_branch_id = ${parseInt(branch_id)}` : ''}`),
       db.query(`SELECT COUNT(*) as count FROM inventory i WHERE i.quantity <= i.min_stock_level AND i.quantity > 0 ${bf}`),
-      db.query(`SELECT sa.*, p.name as product_name, p.sku, b.name as branch_name
-       FROM stock_adjustments sa
-       LEFT JOIN products p ON sa.product_id = p.id
-       LEFT JOIN branches b ON sa.branch_id = b.id
-       WHERE 1=1 ${branch_id ? `AND sa.branch_id = ${parseInt(branch_id)}` : ''}
-       ORDER BY sa.created_at DESC LIMIT 5`),
-      db.query(`SELECT DATE(created_at) as date, 'adjustment' as type, SUM(ABS(quantity_change)) as qty
-       FROM stock_adjustments WHERE created_at >= NOW() - INTERVAL '7 days' ${branch_id ? `AND branch_id = ${parseInt(branch_id)}` : ''}
-       GROUP BY DATE(created_at) ORDER BY date ASC`)
+      db.query(`SELECT t.*, p.name as product_name, p.sku,
+        sb.name as source_branch_name, db.name as dest_branch_name
+       FROM transactions t
+       LEFT JOIN products p ON t.product_id = p.id
+       LEFT JOIN branches sb ON t.source_branch_id = sb.id
+       LEFT JOIN branches db ON t.dest_branch_id = db.id
+       WHERE 1=1 ${txBranchFilter}
+       ORDER BY t.created_at DESC LIMIT 5`),
+      db.query(`SELECT DATE(t.created_at) as date, t.type, SUM(t.quantity) as qty
+       FROM transactions t WHERE t.created_at >= NOW() - INTERVAL '7 days' ${txBranchFilter}
+       GROUP BY DATE(t.created_at), t.type ORDER BY date ASC`)
     ]);
 
     const result = {
