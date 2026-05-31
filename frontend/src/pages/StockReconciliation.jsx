@@ -160,7 +160,6 @@ export default function StockReconciliation() {
                     <th className="px-6 py-4">Date</th>
                     <th className="px-6 py-4">Location</th>
                     <th className="px-6 py-4">Type</th>
-                    <th className="px-6 py-4">Accuracy</th>
                     <th className="px-6 py-4">Mismatched</th>
                     <th className="px-6 py-4">Variance Value</th>
                     <th className="px-6 py-4 text-right">Action</th>
@@ -183,11 +182,6 @@ export default function StockReconciliation() {
                         ) : (
                           <span className="inline-flex items-center text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-md"><RefreshCw className="w-3 h-3 mr-1" /> Auto System</span>
                         )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`font-bold ${parseFloat(r.score) === 100 ? 'text-emerald-500' : parseFloat(r.score) > 90 ? 'text-amber-500' : 'text-rose-500'}`}>
-                          {r.score}%
-                        </span>
                       </td>
                       <td className="px-6 py-4">
                         {parseInt(r.mismatched_items) > 0 ? (
