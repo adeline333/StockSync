@@ -7,6 +7,7 @@
     "dev": "node --watch server.js",
     "start": "node server.js",
     "setup-db": "node setupDb.js",
+    "db:seed": "node setupDb.js && node migrateSales.js && node seedBranches.js && node seedProducts.js && node setupPresentationUsers.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
