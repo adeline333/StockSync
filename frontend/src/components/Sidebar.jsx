@@ -33,7 +33,6 @@ const NAV_CONFIG = {
     { label: 'Dashboard', icon: LayoutDashboard, to: '/warehouse-dashboard' },
     { label: 'Stock List', icon: PackageSearch, to: '/inventory' },
     { label: 'Add Product', icon: PackagePlus, to: '/inventory/new' },
-    { label: 'Bulk Import', icon: Upload, to: '/inventory/import' },
     { label: 'Movements', icon: TrendingDown, to: '/movements' },
     { label: 'New Transfer', icon: ArrowRightLeft, to: '/transfers/new' },
     { label: 'My Transfers', icon: ListChecks, to: '/transfers/my' },
