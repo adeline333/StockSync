@@ -32,11 +32,11 @@ The login interface ensures that only authorized personnel can access the system
 > **[PLACEHOLDER: Figure 4.1 - Login Page Interface]**
 > *Description: The login screen featuring secure input fields for email and password, with a modern, high-contrast design.*
 
-### 4.3.2 Analytics and Forecasting Dashboard
-The dashboard provides Managers and Admins with a high-level overview of inventory health, recent sales, and AI-driven demand forecasting.
+### 4.3.2 Analytics and Sales Velocity Dashboard
+The dashboard provides Managers and Admins with a high-level overview of inventory health, recent sales, and statistical sales velocity and safety stock analytics.
 
 > **[PLACEHOLDER: Figure 4.2 - Analytics Dashboard]**
-> *Description: A visual dashboard showing stock levels, low-stock alerts, and a 7-day sales forecast chart.*
+> *Description: A visual dashboard showing stock levels, low-stock alerts, and a 7-day sales velocity chart.*
 
 ### 4.3.3 Inventory Management
 This module allows authorized users to register new products, adjust stock levels, and view detailed product information.
@@ -44,8 +44,8 @@ This module allows authorized users to register new products, adjust stock level
 > **[PLACEHOLDER: Figure 4.3 - Inventory List View]**
 > *Description: A searchable table of all products with status badges (In Stock, Low Stock, Out of Stock).*
 
-### 4.3.4 Stock Transfer Workflow (Handshake Process)
-To ensure accountability, the stock transfer process follows a three-step "Request-Ship-Confirm" model.
+### 4.3.4 Stock Transfer Workflow (Locked Protocol)
+To ensure accountability, the stock transfer process follows a secure, locked three-step "Request-Ship-Confirm" transfer protocol.
 
 > **[PLACEHOLDER: Figure 4.4 - New Stock Transfer Form]**
 > *Description: Interface for requesting stock movement between branches.*
@@ -54,10 +54,16 @@ To ensure accountability, the stock transfer process follows a three-step "Reque
 > *Description: The "Confirm Physical Receipt" interface visible to the destination manager.*
 
 ### 4.3.5 Point of Sale (POS) Terminal
-The POS module allows cashiers to process sales quickly, validate customer TIN numbers, and generate digital receipts.
+The POS module allows cashiers to process sales quickly, validate customer TIN numbers, select payment methods (Cash, Mobile Money, or Card), and generate digital receipts.
 
 > **[PLACEHOLDER: Figure 4.6 - POS Terminal Interface]**
 > *Description: A grid of products with a shopping cart sidebar and customer search functionality.*
+
+#### Integrated Credit/Debit Card Gateway (Sandbox Mode)
+To support a realistic demonstration during the thesis project defense, a secure credit/debit card payment gateway integration (Sandbox mode) has been built into the POS checkout flow:
+* **Secure Card Input Form:** When the cashier selects the "Card Payment" option, the POS system displays a modern billing integration panel where the cashier or customer inputs the Cardholder Name, Card Number, Expiry Date, CVV, and secure Card PIN.
+* **Payment Processing Lifecycle:** Upon submitting the payment, the frontend triggers a secure gateway authorization process, displaying standard transaction messages: "Initiating secure handshake..." -> "Verifying security credentials..." -> "Authorizing transaction with issuer...".
+* **Interactive Test Scenarios:** The gateway implements standard sandbox routing rules: entering a card ending in `0000` or a CVV of `999` triggers an "Insufficient Funds / Declined" response for demo purposes, while valid entries return a 6-digit transaction authorization code and record the sale in the system under the `'card'` payment method.
 
 ### 4.3.6 Inventory Reconciliation
 This section shows the automated comparison between physical stock counts and system records, a key objective of the StockSync system.
