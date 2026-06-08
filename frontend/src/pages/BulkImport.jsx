@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Download, UploadCloud,
-  CheckCircle2, XCircle, FileSpreadsheet, Loader2, AlertTriangle } from 'lucide-react';
+import { Download, UploadCloud, CheckCircle2, XCircle, FileSpreadsheet, Loader2, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -40,12 +39,15 @@ export default function BulkImport() {
       'Ribena Blackcurrant 500ml,NAB-RB-500,Ribena blackcurrant juice drink,1500,950,Fruit Drinks,6001000000017',
       'Minute Maid Orange 500ml,NAB-MM-500,Minute Maid orange juice drink,1500,950,Fruit Drinks,6001000000018',
       'Tropicana Apple 1L,NAB-TA-1L,Tropicana apple juice 1 litre,3000,1900,Fruit Juices,6001000000019',
-      'Sparkling Water 750ml,NAB-SW-750,Sparkling mineral water 750ml,2000,1200,Water,6001000000020',
-    ].join('\n');
+      'Sparkling Water 750ml,NAB-SW-750,Sparkling mineral water 750ml,2000,1200,Water,6001000000020'
+    ];
     const csv = rows.join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'stocksync_products_template.csv'; a.click();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'stocksync_products_template.csv';
+    a.click();
   };
 
   const parseCSVPreview = (text) => {
@@ -54,7 +56,9 @@ export default function BulkImport() {
     return lines.slice(1, 6).map((line, i) => {
       const vals = line.split(',').map(v => v.trim());
       const row = {};
-      headers2.forEach((h, j) => row[h] = vals[j] || '');
+      headers2.forEach((h, j) => {
+        row[h] = vals[j] || '';
+      });
       row._rowNum = i + 2;
       row._valid = !!(row.sku && row.name && row.price);
       return row;
@@ -63,22 +67,30 @@ export default function BulkImport() {
 
   const handleFile = (f) => {
     if (!f) return;
-    setFile(f); setResult(null); setError('');
+    setFile(f);
+    setResult(null);
+    setError('');
     const reader = new FileReader();
     reader.onload = (e) => setPreview(parseCSVPreview(e.target.result));
     reader.readAsText(f);
   };
 
   const handleDrop = (e) => {
-    e.preventDefault(); setDragging(false);
+    e.preventDefault();
+    setDragging(false);
     const f = e.dataTransfer.files[0];
-    if (f && (f.name.endsWith('.csv') || f.name.endsWith('.xlsx'))) handleFile(f);
-    else setError('Please upload a .CSV file');
+    if (f && f.name.endsWith('.csv')) {
+      handleFile(f);
+    } else {
+      setError('Please upload a .CSV file');
+    }
   };
 
   const handleImport = async () => {
     if (!file) return;
-    setLoading(true); setError(''); setResult(null);
+    setLoading(true);
+    setError('');
+    setResult(null);
     const formData = new FormData();
     formData.append('file', file);
     try {
@@ -229,5 +241,3 @@ export default function BulkImport() {
     </div>
   );
 }
-
-// Code cleanup 1778534036225
