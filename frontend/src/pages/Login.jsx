@@ -14,7 +14,7 @@ const Login = () => {
   const { login } = useAuth();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setIsSubmitting(true);
     setErrorBanner('');
 
@@ -145,6 +145,40 @@ const Login = () => {
           </button>
         </form>
 
+        {/* Presentation Quick Login helper panel */}
+        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+          <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center mb-4">
+            🎓 Presentation Quick Login
+          </p>
+          <div className="flex flex-col gap-2">
+            {[
+              { label: 'Login as Admin (Adeline)', email: 'adelinetuyizere333@gmail.com', badge: 'Admin', color: 'from-sky-500 to-indigo-500 hover:shadow-sky-500/20' },
+              { label: 'Login as Warehouse Manager', email: 'manager.kimironko@stocksync.com', badge: 'Warehouse', color: 'from-amber-500 to-orange-500 hover:shadow-amber-500/20' },
+              { label: 'Login as Retail Cashier', email: 'staff.kimironko@stocksync.com', badge: 'POS Terminal', color: 'from-emerald-500 to-teal-500 hover:shadow-emerald-500/20' }
+            ].map(u => (
+              <button
+                key={u.email}
+                type="button"
+                onClick={() => {
+                  setEmail(u.email);
+                  setPassword('password123');
+                  // Trigger login submission manually
+                  setTimeout(() => {
+                    const submitBtn = document.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                      submitBtn.click();
+                    }
+                  }, 150);
+                }}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-slate-900 dark:bg-slate-850 hover:bg-slate-800 transition-all border border-slate-700 dark:border-slate-800 flex justify-between items-center cursor-pointer active:scale-[0.98]"
+              >
+                <span>{u.label}</span>
+                <span className="bg-white/20 px-2 py-0.5 rounded-md text-[10px] font-black uppercase">{u.badge}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
           Don't have an account?{' '}
           <Link to="/register" className="font-semibold text-sky-500 hover:text-sky-600 transition-colors">
@@ -152,11 +186,8 @@ const Login = () => {
           </Link>
         </div>
       </div>
-
     </div>
   );
 };
 
 export default Login;
-
-// Code cleanup 1778534036241
