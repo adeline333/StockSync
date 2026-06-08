@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Bell, Settings, CheckCheck, AlertTriangle, Truck,
-  Save, Sliders, Mail, Smartphone, Loader2, RefreshCw, ShieldAlert, TrendingDown } from 'lucide-react';
+import { Bell, Settings, CheckCheck, AlertTriangle, Truck, Save, Sliders, Mail, Smartphone, Loader2, RefreshCw, ShieldAlert, TrendingDown } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -202,25 +201,9 @@ export default function Notifications() {
                   ))}
                 </div>
 
-                <div className="space-y-3 mb-5">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Send Alerts To:</p>
-                  <div>
-                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5"><Mail className="w-3 h-3"/> Email</label>
-                    <input value={prefs.alert_email || ''} onChange={e => setPrefs(p => ({...p, alert_email: e.target.value}))}
-                      placeholder="admin@bspecial.rw"
-                      className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5"><Smartphone className="w-3 h-3"/> Phone</label>
-                    <input value={prefs.alert_phone || ''} onChange={e => setPrefs(p => ({...p, alert_phone: e.target.value}))}
-                      placeholder="+250 7XX XXX XXX"
-                      className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"/>
-                  </div>
-                </div>
-
                 <button onClick={savePrefs} disabled={prefSaving}
                   className="w-full bg-sky-500 hover:bg-sky-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
-                  {prefSaving ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Save Preferences'}
+                  {prefSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : 'Save Preferences'}
                 </button>
                 {prefMsg && <p className="text-center text-xs font-semibold text-emerald-600 mt-2">{prefMsg}</p>}
               </>
@@ -231,5 +214,3 @@ export default function Notifications() {
     </div>
   );
 }
-
-// Code cleanup 1778534036258
