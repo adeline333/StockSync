@@ -5,7 +5,7 @@ The development and implementation of the StockSync Inventory Management System 
 
 The StockSync system successfully addresses the core challenges of inventory management by providing a robust platform built on modern technologies like React.js and Node.js. Key achievements include the implementation of a hierarchical security model that restricts sensitive operations to authorized managers and admins, thereby reducing the risk of internal shrinkage. The introduction of the three-step "Request-Ship-Confirm" stock transfer workflow has established a clear trail of accountability for goods in transit between branches.
 
-Furthermore, the integration of AI-driven demand forecasting and real-time reconciliation dashboards empowers decision-makers with actionable insights, moving the business from reactive to proactive inventory control. The system has been validated through rigorous unit, integration, and user acceptance testing, proving its readiness to handle the complexities of daily business operations while ensuring high performance and data integrity through its localized PostgreSQL backend.
+Furthermore, the integration of statistical sales velocity and safety stock analytics along with real-time reconciliation dashboards empowers decision-makers with actionable insights, moving the business from reactive to proactive inventory control. The system has been validated through rigorous unit, integration, and user acceptance testing, proving its readiness to handle the complexities of daily business operations while ensuring high performance and data integrity through its centralized PostgreSQL database.
 
 In conclusion, StockSync is not just a tool for record-keeping; it is a strategic asset that enhances operational efficiency, strengthens security, and provides the visibility needed for sustainable business growth in a competitive market.
 
@@ -18,8 +18,8 @@ While the system is currently responsive and accessible via web browsers, develo
 ### 5.2.2 Integration of Mobile Payment Gateways
 To provide a more seamless experience for customers at the Point of Sale, future versions of StockSync should integrate with popular local payment platforms such as Mobile Money (MoMo) and bank card processing. This would allow for direct transaction reconciliation within the system, reducing manual entry errors and speeding up the checkout process.
 
-### 5.2.3 Implementation of Advanced Predictive Analytics
-The current forecasting module provides a foundational 7-day sales outlook. Future enhancements should incorporate more advanced machine learning algorithms that account for seasonal trends, public holidays, and external economic factors. This would provide even greater accuracy in demand planning and lead to more optimized resource allocation.
+### 5.2.3 Implementation of Advanced Sales Velocity and Safety Stock Analytics
+The current analytics module provides a foundational 7-day sales velocity outlook. Future enhancements should incorporate more advanced statistical algorithms that account for seasonal trends, public holidays, and external economic factors. This would provide even greater accuracy in safety stock margins and lead to more optimized resource allocation.
 
 ### 5.2.4 Adoption of IoT and RFID Technology
 For larger warehouse environments, the integration of Internet of Things (IoT) sensors and Radio Frequency Identification (RFID) tags is recommended. This would enable real-time, automated tracking of individual items without manual scanning, virtually eliminating human error in inventory counts and reconciliation.
