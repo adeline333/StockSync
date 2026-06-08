@@ -192,6 +192,10 @@ This document provides a **step-by-step validation checklist** to ensure every f
   - VAT (18%) calculated correctly
   - Total calculated correctly
 - [ ] Select payment method (Cash, Mobile Money, Card)
+  - When **Card Payment** is selected, verify the **Credit/Debit Card Gateway** form appears on the right.
+  - Test the card decline scenario (enter a CVV of `999` or card ending in `0000`, verify payment is declined and blocks checkout).
+  - Test the successful authorization scenario (enter standard card details, verify processing states and approval).
+  - Verify that the **Confirm Payment** button remains disabled until card authorization is successful.
 - [ ] Complete sale
 - [ ] Verify receipt generated
 - [ ] Verify stock deducted immediately
