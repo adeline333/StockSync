@@ -30,7 +30,14 @@ CREATE TABLE IF NOT EXISTS products (
   sku VARCHAR(100) UNIQUE NOT NULL,
   description TEXT,
   price DECIMAL(10, 2) NOT NULL,
+  cost_price DECIMAL(10, 2),
   category VARCHAR(100),
+  brand VARCHAR(100),
+  image_url TEXT,
+  supplier_name VARCHAR(255),
+  supplier_lead_days INTEGER,
+  is_vat_inclusive BOOLEAN DEFAULT true,
+  status VARCHAR(50) DEFAULT 'active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
