@@ -43,7 +43,11 @@ self.addEventListener('fetch', (event) => {
 
   // For other requests, try network first, fall back to cache
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    fetch(event.request).catch(async (err) => {
+      const cached = await caches.match(event.request);
+      if (cached) return cached;
+      throw err;
+    })
   );
 });
 
