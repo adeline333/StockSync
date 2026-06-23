@@ -18,6 +18,7 @@ app.use((req, res, next) => {
 
 // Serve uploaded product images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/imgs', express.static(path.join(__dirname, '../frontend/public/imgs')));
 
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -46,7 +47,7 @@ app.get('/', (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, async () => {
+app.listen(PORT, '127.0.0.1', async () => {
   console.log(`Server is running on port ${PORT}`);
   try {
     // Attempt to connect to the database to ensure it's up
