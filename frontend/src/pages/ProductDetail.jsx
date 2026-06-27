@@ -142,6 +142,26 @@ export default function ProductDetail() {
     } catch (e) { console.error(e); }
   };
 
+  const handleToggleStatus = async () => {
+    if (!confirm(`Are you sure you want to ${data?.product?.status === 'active' ? 'deactivate' : 'activate'} this product?`)) return;
+    try {
+      const newStatus = data.product.status === 'active' ? 'inactive' : 'active';
+      const res = await fetch(`${API_URL}/inventory/products/${id}/status`, {
+        method: 'PUT',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        fetchProduct();
+      } else {
+        const json = await res.json();
+        alert(json.message || 'Error updating status');
+      }
+    } catch (e) {
+      alert('Network error');
+    }
+  };
+
   const { product, branchStock = [], batches = [] } = data || {};
   const totalStock = parseInt(product?.total_stock || 0);
   const totalBranchQty = branchStock.reduce((s, b) => s + parseInt(b.quantity), 0);
@@ -180,6 +200,18 @@ export default function ProductDetail() {
               >
                 <PenTool className="w-4 h-4 mr-2" /> Adjust Stock
               </button>
+              {user?.role === 'admin' && (
+                <button
+                  onClick={handleToggleStatus}
+                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm ${
+                    product?.status === 'active' 
+                      ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200' 
+                      : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
+                  }`}
+                >
+                  {product?.status === 'active' ? 'Deactivate Product' : 'Activate Product'}
+                </button>
+              )}
               <Link
                 to={`/inventory/edit/${id}`}
                 className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm"
@@ -229,188 +261,69 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            {/* Batch Table */}
-            <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-              <div className="flex items-center justify-between mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
-                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center">
-                  <Clock className="w-5 h-5 mr-2 text-slate-400" /> Batch & Expiry Tracking
-                </h3>
-              </div>
-              {batches.length === 0 ? (
-                <p className="text-slate-400 text-sm text-center py-8">No batches recorded</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Branch Distribution */}
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center border-b border-slate-100 dark:border-slate-800 pb-4">
+                <PieChart className="w-5 h-5 mr-2 text-slate-400" /> Stock Distribution
+              </h3>
+              {branchStock.length === 0 ? (
+                <p className="text-slate-400 text-sm text-center py-4">No branch data</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
-                        <th className="py-3 px-2">Batch #</th>
-                        <th className="py-3 px-2">Expiry Date</th>
-                        <th className="py-3 px-2">Location</th>
-                        <th className="py-3 px-2 text-right">Qty</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-sm divide-y divide-slate-50 dark:divide-slate-800">
-                      {batches.map((b) => {
-                        const style = getExpiryStyle(b.expiry_date);
-                        return (
-                          <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                            <td className="py-4 px-2 font-bold text-slate-800 dark:text-slate-100">{b.batch_number}</td>
-                            <td className="py-4 px-2">
-                              <span className={`font-semibold ${style.color}`}>{formatDate(b.expiry_date)}</span>
-                              {style.label && (
-                                <span className="ml-2 text-[10px] font-black uppercase text-white bg-rose-500 px-1.5 py-0.5 rounded">
-                                  {style.label}
-                                </span>
-                              )}
-                            </td>
-                            <td className="py-4 px-2 font-medium text-slate-600 dark:text-slate-400">{b.branch_name}</td>
-                            <td className="py-4 px-2 font-bold text-slate-800 dark:text-slate-100 text-right">{b.quantity}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                <div className="space-y-3">
+                  {branchStock.map((b, i) => {
+                    const pct = totalBranchQty > 0 ? Math.round((b.quantity / totalBranchQty) * 100) : 0;
+                    const colors = ['bg-sky-500', 'bg-emerald-500', 'bg-violet-500', 'bg-amber-500', 'bg-rose-500'];
+                    const dotColors = ['bg-sky-500', 'bg-emerald-500', 'bg-violet-500', 'bg-amber-500', 'bg-rose-500'];
+                    const bgColors = ['bg-sky-50 border-sky-100', 'bg-emerald-50 border-emerald-100', 'bg-violet-50 border-violet-100', 'bg-amber-50 border-amber-100', 'bg-rose-50 border-rose-100'];
+                    const textColors = ['text-sky-600', 'text-emerald-600', 'text-violet-600', 'text-amber-600', 'text-rose-600'];
+                    const ci = i % colors.length;
+                    return (
+                      <div key={b.branch_id} className={`flex items-center justify-between p-3 rounded-lg border ${bgColors[ci]}`}>
+                        <div className="flex items-center">
+                          <div className={`w-3 h-3 rounded-full ${dotColors[ci]} mr-3`}></div>
+                          <div>
+                            <span className="text-sm font-semibold text-slate-700">{b.branch_name}</span>
+                            <p className="text-xs text-slate-400">{b.quantity} units</p>
+                          </div>
+                        </div>
+                        <span className={`text-sm font-bold ${textColors[ci]}`}>{pct}%</span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
 
-            <div className="lg:col-span-1 space-y-8">
-
-              {/* Branch Distribution */}
-              <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <PieChart className="w-5 h-5 mr-2 text-slate-400" /> Stock Distribution
-                </h3>
-                {branchStock.length === 0 ? (
-                  <p className="text-slate-400 text-sm text-center py-4">No branch data</p>
+            {/* Product Showcase */}
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center overflow-hidden relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-sky-900/10 dark:to-indigo-900/10 opacity-50 transition-opacity group-hover:opacity-100"></div>
+              <div className="relative z-10 flex flex-col items-center">
+                {product?.image_url ? (
+                  <img src={`http://localhost:5000${product.image_url}`} alt={product?.name} className="w-48 h-48 object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-110" />
                 ) : (
-                  <div className="space-y-3">
-                    {branchStock.map((b, i) => {
-                      const pct = totalBranchQty > 0 ? Math.round((b.quantity / totalBranchQty) * 100) : 0;
-                      const colors = ['bg-sky-500', 'bg-emerald-500', 'bg-violet-500', 'bg-amber-500', 'bg-rose-500'];
-                      const dotColors = ['bg-sky-500', 'bg-emerald-500', 'bg-violet-500', 'bg-amber-500', 'bg-rose-500'];
-                      const bgColors = ['bg-sky-50 border-sky-100', 'bg-emerald-50 border-emerald-100', 'bg-violet-50 border-violet-100', 'bg-amber-50 border-amber-100', 'bg-rose-50 border-rose-100'];
-                      const textColors = ['text-sky-600', 'text-emerald-600', 'text-violet-600', 'text-amber-600', 'text-rose-600'];
-                      const ci = i % colors.length;
-                      return (
-                        <div key={b.branch_id} className={`flex items-center justify-between p-3 rounded-lg border ${bgColors[ci]}`}>
-                          <div className="flex items-center">
-                            <div className={`w-3 h-3 rounded-full ${dotColors[ci]} mr-3`}></div>
-                            <div>
-                              <span className="text-sm font-semibold text-slate-700">{b.branch_name}</span>
-                              <p className="text-xs text-slate-400">{b.quantity} units</p>
-                            </div>
-                          </div>
-                          <span className={`text-sm font-bold ${textColors[ci]}`}>{pct}%</span>
-                        </div>
-                      );
-                    })}
+                  <div className="w-48 h-48 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700 shadow-inner">
+                    <Package className="w-20 h-20 text-slate-300 dark:text-slate-600" />
                   </div>
                 )}
-              </div>
-
-              {/* Supplier */}
-              <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">Primary Supplier</h3>
-                {product?.supplier_name ? (
-                  <div className="flex items-center">
-                    <div className="w-14 h-14 rounded-full bg-sky-50 flex items-center justify-center mr-4 border-2 border-sky-100 shrink-0">
-                      <span className="text-lg font-black text-sky-600">
-                        {product.supplier_name.slice(0, 2).toUpperCase()}
-                      </span>
-                    </div>
-                    <div>
-                      <h4 className="text-base font-bold text-slate-800 dark:text-slate-100 leading-tight mb-1">{product.supplier_name}</h4>
-                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                        Lead time: <span className="text-slate-700 dark:text-slate-300">{product.supplier_lead_days || 0} days</span>
-                      </p>
-                    </div>
-                  </div>
+                {product?.description ? (
+                  <p className="mt-8 text-sm font-medium text-slate-500 dark:text-slate-400 max-w-sm italic leading-relaxed">
+                    "{product.description}"
+                  </p>
                 ) : (
-                  <p className="text-slate-400 text-sm">No supplier info</p>
+                  <p className="mt-8 text-sm font-medium text-slate-400 dark:text-slate-500 italic">
+                    No description available.
+                  </p>
+                )}
+                {product?.brand && (
+                  <span className="mt-4 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold uppercase tracking-widest rounded-full">
+                    {product.brand}
+                  </span>
                 )}
               </div>
-
             </div>
           </div>
-          {/* Serial Numbers Section */}
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-            <div className="flex items-center justify-between mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center">
-                <Hash className="w-5 h-5 mr-2 text-slate-400" /> Serial Number Tracking
-                <span className="ml-3 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full">{serials.length} total</span>
-              </h3>
-              <div className="flex items-center gap-3">
-                <select value={serialFilter} onChange={e => setSerialFilter(e.target.value)}
-                  className="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-600 dark:text-slate-300 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                  <option value="all">All Status</option>
-                  <option value="in_stock">In Stock</option>
-                  <option value="sold">Sold</option>
-                  <option value="damaged">Damaged</option>
-                  <option value="returned">Returned</option>
-                </select>
-                <button onClick={() => { setShowSerialModal(true); setSerialMsg(null); }}
-                  className="flex items-center gap-1.5 bg-sky-500 hover:bg-sky-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                  <Plus className="w-4 h-4" /> Add Serials
-                </button>
-              </div>
-            </div>
-
-            {serials.length === 0 ? (
-              <div className="text-center py-10 text-slate-400">
-                <Tag className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                <p className="font-semibold">No serial numbers recorded</p>
-                <p className="text-sm mt-1">Add serial numbers for high-value item tracking</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
-                      <th className="py-3 px-3">Serial Number</th>
-                      <th className="py-3 px-3">Branch</th>
-                      <th className="py-3 px-3">Status</th>
-                      <th className="py-3 px-3">Added</th>
-                      <th className="py-3 px-3">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm divide-y divide-slate-50 dark:divide-slate-800">
-                    {serials.map(s => {
-                      const statusStyles = {
-                        in_stock: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-                        sold: 'bg-sky-50 text-sky-600 border-sky-100',
-                        damaged: 'bg-rose-50 text-rose-600 border-rose-100',
-                        returned: 'bg-amber-50 text-amber-600 border-amber-100',
-                      };
-                      return (
-                        <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                          <td className="py-3 px-3 font-mono font-bold text-slate-800 dark:text-slate-100">{s.serial_number}</td>
-                          <td className="py-3 px-3 text-slate-600 dark:text-slate-400">{s.branch_name || '—'}</td>
-                          <td className="py-3 px-3">
-                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black border uppercase tracking-wider ${statusStyles[s.status] || 'bg-slate-50 text-slate-500 border-slate-100'}`}>
-                              {s.status.replace('_', ' ')}
-                            </span>
-                          </td>
-                          <td className="py-3 px-3 text-slate-400 text-xs">{formatDate(s.created_at)}</td>
-                          <td className="py-3 px-3">
-                            <select value={s.status} onChange={e => updateSerialStatus(s.id, e.target.value)}
-                              className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-slate-600 dark:text-slate-300 dark:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer">
-                              <option value="in_stock">In Stock</option>
-                              <option value="sold">Mark Sold</option>
-                              <option value="damaged">Mark Damaged</option>
-                              <option value="returned">Mark Returned</option>
-                            </select>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          {/* Serial Numbers Section Removed */}
 
         </div>
       </main>
