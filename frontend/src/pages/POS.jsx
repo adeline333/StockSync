@@ -51,14 +51,42 @@ export default function POS() {
 
   const addToCart = (product) => {
     const stock = parseInt(product.total_stock);
+    const itemsPerPack = parseInt(product.items_per_pack) || 1;
+    const discountPct = parseFloat(product.pack_discount_percent) || 0;
+    const unitPrice = parseFloat(product.price);
+    
+    // Calculate pack price
+    let packPrice = unitPrice * itemsPerPack;
+    if (itemsPerPack > 1 && discountPct > 0) {
+      packPrice = packPrice - (packPrice * (discountPct / 100));
+    }
+
     setCart(prev => {
       const existing = prev.find(i => i.id === product.id);
       if (existing) {
-        if (existing.qty >= stock) { setError(`Only ${stock} units available for ${product.name}`); return prev; }
+        const stockNeeded = existing.is_pack ? itemsPerPack : 1;
+        const currentStockUsed = existing.qty * (existing.is_pack ? itemsPerPack : 1);
+        if (currentStockUsed + stockNeeded > stock) { 
+          setError(`Only ${stock} individual units available for ${product.name}`); 
+          return prev; 
+        }
         return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
       }
       if (stock === 0) { setError(`${product.name} is out of stock`); return prev; }
-      return [...prev, { id: product.id, name: product.name, sku: product.sku, price: parseFloat(product.price), qty: 1, stock }];
+      
+      return [...prev, { 
+        id: product.id, 
+        name: product.name, 
+        sku: product.sku, 
+        price: unitPrice, 
+        unit_price: unitPrice,
+        pack_price: packPrice,
+        qty: 1, 
+        stock,
+        is_pack: false,
+        items_per_pack: itemsPerPack,
+        is_vat_inclusive: product.is_vat_inclusive === true || product.is_vat_inclusive === 'true' || product.is_vat_inclusive === 1
+      }];
     });
     setError('');
   };
@@ -68,20 +96,61 @@ export default function POS() {
       if (i.id !== id) return i;
       const newQty = i.qty + delta;
       if (newQty <= 0) return null;
-      if (newQty > i.stock) { setError(`Only ${i.stock} units available`); return i; }
+      
+      const stockNeeded = newQty * (i.is_pack ? i.items_per_pack : 1);
+      if (stockNeeded > i.stock) { 
+        setError(`Only ${i.stock} individual units available`); 
+        return i; 
+      }
       return { ...i, qty: newQty };
     }).filter(Boolean));
+    setError('');
+  };
+
+  const togglePack = (id) => {
+    setCart(prev => prev.map(i => {
+      if (i.id !== id) return i;
+      if (i.items_per_pack <= 1) return i; // Cannot be a pack
+      
+      const newIsPack = !i.is_pack;
+      const stockNeeded = i.qty * (newIsPack ? i.items_per_pack : 1);
+      
+      if (stockNeeded > i.stock) {
+        setError(`Not enough stock to switch to Pack. Needs ${stockNeeded} units.`);
+        return i;
+      }
+      
+      return {
+        ...i,
+        is_pack: newIsPack,
+        price: newIsPack ? i.pack_price : i.unit_price
+      };
+    }));
     setError('');
   };
 
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id));
   const clearCart = () => { setCart([]); setDiscount(0); setError(''); };
 
-  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const discountAmt = Math.min(parseFloat(discount) || 0, subtotal);
-  const afterDiscount = subtotal - discountAmt;
-  const vat = parseFloat((afterDiscount * VAT_RATE).toFixed(2));
-  const total = parseFloat((afterDiscount + vat).toFixed(2));
+  const calculateTotals = () => {
+    let subtotalAmt = 0;
+    cart.forEach(item => {
+      subtotalAmt += item.price * item.qty;
+    });
+
+    const discountNum = parseFloat(discount) || 0;
+    const discountAmt = Math.min(discountNum, subtotalAmt);
+    const finalTotal = subtotalAmt - discountAmt;
+    
+    return {
+      subtotal: parseFloat(subtotalAmt.toFixed(2)),
+      vat: 0, // kept for backward compatibility if needed, but always 0
+      total: parseFloat(finalTotal.toFixed(2)),
+      discountAmt
+    };
+  };
+
+  const { subtotal, vat, total, discountAmt } = calculateTotals();
 
   const handleCharge = () => {
     if (cart.length === 0) { setError('Add items to cart first'); return; }
@@ -111,7 +180,7 @@ export default function POS() {
           <div className="relative flex-1 max-w-2xl bg-slate-50 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-sky-500 transition-all">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input ref={searchRef} type="text" value={searchInput} onChange={e => setSearchInput(e.target.value)}
-              placeholder="Search products by name, SKU or scan barcode..."
+              placeholder="Search products by name or SKU..."
               className="w-full pl-12 pr-4 py-4 bg-transparent outline-none text-slate-700 dark:text-slate-300 font-medium placeholder:text-slate-400" />
           </div>
         </header>
@@ -210,14 +279,29 @@ export default function POS() {
                   </button>
                 </div>
               </div>
-              <div className="flex items-center bg-slate-200 dark:bg-slate-700 rounded-lg p-1 w-fit border border-slate-300 dark:border-slate-600">
-                <button onClick={() => updateQty(item.id, -1)} className="w-8 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-600 rounded transition-all font-black">
-                  <Minus className="w-3 h-3" />
-                </button>
-                <span className="w-10 text-center text-sm font-black">{item.qty}</span>
-                <button onClick={() => updateQty(item.id, 1)} className="w-8 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-600 rounded transition-all font-black">
-                  <Plus className="w-3 h-3" />
-                </button>
+              <div className="flex justify-between items-center mt-2">
+                <div className="flex items-center bg-slate-200 dark:bg-slate-700 rounded-lg p-1 w-fit border border-slate-300 dark:border-slate-600">
+                  <button onClick={() => updateQty(item.id, -1)} className="w-8 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-600 rounded transition-all font-black">
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="w-10 text-center text-sm font-black">{item.qty}</span>
+                  <button onClick={() => updateQty(item.id, 1)} className="w-8 h-7 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-500 hover:bg-white dark:hover:bg-slate-600 rounded transition-all font-black">
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
+                
+                {item.items_per_pack > 1 && (
+                  <button 
+                    onClick={() => togglePack(item.id)}
+                    className={`text-[10px] font-black px-3 py-1.5 rounded-lg border transition-all uppercase tracking-wider ${
+                      item.is_pack 
+                        ? 'bg-sky-500 text-white border-sky-600 shadow-sm' 
+                        : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-sky-300'
+                    }`}
+                  >
+                    {item.is_pack ? `Pack of ${item.items_per_pack}` : 'Single Unit'}
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -229,17 +313,13 @@ export default function POS() {
               <span className="text-slate-500 dark:text-slate-400 font-semibold">Subtotal</span>
               <span className="font-bold text-slate-700 dark:text-slate-300">{subtotal.toLocaleString()} RWF</span>
             </div>
-            <div className="flex justify-between items-center text-sm">
+            <div className="flex justify-between items-center text-sm border-b border-dashed border-slate-200 pb-3">
               <span className="text-slate-500 dark:text-slate-400 font-semibold">Discount</span>
               <div className="flex items-center gap-2">
                 <span className="text-slate-400 text-xs">RWF</span>
                 <input type="number" min="0" value={discount} onChange={e => setDiscount(e.target.value)}
                   className="w-24 text-right border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-sky-500" />
               </div>
-            </div>
-            <div className="flex justify-between text-sm border-t border-dashed border-slate-200 pt-3">
-              <span className="text-slate-500 dark:text-slate-400 font-semibold">VAT (18%)</span>
-              <span className="font-bold text-slate-700 dark:text-slate-300">{vat.toLocaleString()} RWF</span>
             </div>
             <div className="flex justify-between items-end pt-1">
               <span className="text-slate-800 dark:text-slate-100 font-black text-lg">Total</span>
@@ -250,12 +330,9 @@ export default function POS() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <button onClick={clearCart} className="py-3 bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-800 text-rose-500 dark:text-rose-400 rounded-xl font-bold text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors flex items-center justify-center gap-2">
-              <Trash2 className="w-4 h-4" /> Void
-            </button>
-            <button className="py-3 bg-white border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
-              <Pause className="w-4 h-4" /> Hold
+          <div className="mb-3">
+            <button onClick={clearCart} className="w-full py-3 bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-800 text-rose-500 dark:text-rose-400 rounded-xl font-bold text-sm hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors flex items-center justify-center gap-2">
+              <Trash2 className="w-4 h-4" /> Void Transaction
             </button>
           </div>
 
