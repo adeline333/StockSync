@@ -24,15 +24,30 @@ exports.createOrder = async (req, res) => {
     if (!items || items.length === 0) throw new Error('Order must have at least one item');
 
     // Calculate totals
-    let subtotal = 0;
+    let subtotalAmt = 0;
     const enrichedItems = [];
 
     for (const item of items) {
       const prodResult = await client.query(
-        'SELECT id, name, sku, price FROM products WHERE id = $1', [item.product_id]
+        'SELECT id, name, sku, price, items_per_pack, pack_discount_percent, is_vat_inclusive FROM products WHERE id = $1', [item.product_id]
       );
       if (prodResult.rows.length === 0) throw new Error(`Product ${item.product_id} not found`);
       const product = prodResult.rows[0];
+
+      const isPack = item.is_pack === true;
+      const itemsPerPack = parseInt(product.items_per_pack) || 1;
+      const discountPct = parseFloat(product.pack_discount_percent) || 0;
+      
+      const effectiveQty = isPack ? (item.quantity * itemsPerPack) : item.quantity;
+      
+      let unitPrice = parseFloat(product.price);
+      if (isPack) {
+        let packPrice = unitPrice * itemsPerPack;
+        if (itemsPerPack > 1 && discountPct > 0) {
+          packPrice = packPrice - (packPrice * (discountPct / 100));
+        }
+        unitPrice = packPrice;
+      }
 
       // Check stock
       const invResult = await client.query(
@@ -40,17 +55,32 @@ exports.createOrder = async (req, res) => {
         [item.product_id, branch_id]
       );
       const available = invResult.rows.length > 0 ? invResult.rows[0].quantity : 0;
-      if (available < item.quantity) throw new Error(`Insufficient stock for ${product.name} (available: ${available})`);
+      if (available < effectiveQty) throw new Error(`Insufficient stock for ${product.name} (available: ${available}, needed: ${effectiveQty})`);
 
-      const lineTotal = parseFloat(product.price) * item.quantity;
-      subtotal += lineTotal;
-      enrichedItems.push({ ...item, product_name: product.name, product_sku: product.sku, unit_price: product.price, total_price: lineTotal });
+      const lineTotal = unitPrice * item.quantity;
+      
+      // No VAT calculation applied here anymore, it's baked into product registry
+      subtotalAmt += lineTotal;
+      
+      const displayName = isPack ? `${product.name} (Pack of ${itemsPerPack})` : product.name;
+
+      enrichedItems.push({ 
+        ...item, 
+        product_name: displayName, 
+        product_sku: product.sku, 
+        unit_price: unitPrice, 
+        total_price: lineTotal,
+        effective_qty: effectiveQty
+      });
     }
 
     const discountAmt = parseFloat(discount_amount) || 0;
-    const afterDiscount = subtotal - discountAmt;
-    const vatAmount = parseFloat((afterDiscount * 0.18).toFixed(2));
-    const totalAmount = parseFloat((afterDiscount + vatAmount).toFixed(2));
+    const finalDiscountAmt = Math.min(discountAmt, subtotalAmt);
+    const finalTotalAmount = subtotalAmt - finalDiscountAmt;
+    
+    const subtotal = parseFloat(subtotalAmt.toFixed(2));
+    const vatAmount = 0;
+    const totalAmount = parseFloat(finalTotalAmount.toFixed(2));
     const changeAmount = amount_tendered ? Math.max(0, parseFloat(amount_tendered) - totalAmount) : 0;
 
     const orderNumber = genOrderNumber();
@@ -92,13 +122,13 @@ exports.createOrder = async (req, res) => {
 
       await client.query(
         'UPDATE inventory SET quantity = quantity - $1, last_updated = NOW() WHERE product_id = $2 AND branch_id = $3',
-        [item.quantity, item.product_id, branch_id]
+        [item.effective_qty, item.product_id, branch_id]
       );
 
       await client.query(
         `INSERT INTO transactions (product_id, source_branch_id, type, quantity, user_id, status)
          VALUES ($1,$2,'sale',$3,$4,'completed')`,
-        [item.product_id, branch_id, item.quantity, req.user.id]
+        [item.product_id, branch_id, item.effective_qty, req.user.id]
       );
     }
 
