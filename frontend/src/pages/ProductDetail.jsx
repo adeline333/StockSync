@@ -239,18 +239,36 @@ export default function ProductDetail() {
                   SKU: {product?.sku}
                   {product?.category && <><span className="mx-2">|</span>Category: {product.category}</>}
                 </p>
-                <div className="flex items-center space-x-4">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider border ${
-                    product?.status === 'active'
-                      ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                      : 'bg-slate-100 text-slate-500 border-slate-200'
-                  }`}>
-                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> {product?.status}
-                  </span>
-                  <span className="text-lg font-black text-slate-800 dark:text-slate-100">
-                    RWF {Number(product?.price || 0).toLocaleString()}
-                    <span className="text-sm font-medium text-slate-400 ml-1.5">/ unit</span>
-                  </span>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-4">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider border ${
+                      product?.status === 'active'
+                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                        : 'bg-slate-100 text-slate-500 border-slate-200'
+                    }`}>
+                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> {product?.status}
+                    </span>
+                    <span className="text-lg font-black text-slate-800 dark:text-slate-100">
+                      RWF {Number(product?.price || 0).toLocaleString()}
+                      <span className="text-sm font-medium text-slate-400 ml-1.5">/ unit</span>
+                    </span>
+                  </div>
+
+                  {(product?.items_per_pack > 1) && (
+                    <div className="flex flex-col pl-6 border-l border-slate-200 dark:border-slate-700">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                        Pack of {product.items_per_pack}
+                      </span>
+                      <span className="text-lg font-black text-emerald-500">
+                        RWF {Math.round((product?.price || 0) * (product?.items_per_pack || 1) * (1 - (product?.pack_discount_percent || 0) / 100)).toLocaleString()}
+                        {product?.pack_discount_percent > 0 && (
+                          <span className="text-xs font-bold bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded ml-2 align-middle">
+                            -{Number(product.pack_discount_percent)}%
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
