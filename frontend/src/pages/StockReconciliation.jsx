@@ -20,6 +20,8 @@ export default function StockReconciliation() {
   const [search, setSearch] = useState('');
   const [counts, setCounts] = useState({}); // { product_id: physical_count }
   const [notes, setNotes] = useState('');
+  const [periodStart, setPeriodStart] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
+  const [periodEnd, setPeriodEnd] = useState(new Date().toISOString().split('T')[0]);
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -119,6 +121,36 @@ export default function StockReconciliation() {
     }
   };
 
+  const runAutoReconciliation = async (e) => {
+    e.preventDefault();
+    if (!selectedBranch && user?.role === 'admin') return alert("Select a branch first.");
+    
+    try {
+      setSubmitLoading(true);
+      const res = await fetch(`${API_URL}/reconciliation/run`, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          branch_id: selectedBranch,
+          period_start: periodStart,
+          period_end: periodEnd
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        navigate(`/reconciliation/${data.reconciliation.id}`);
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Error running automated reconciliation');
+      }
+    } catch (e) {
+      alert('Network error');
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(search.toLowerCase()) || 
     (p.sku && p.sku.toLowerCase().includes(search.toLowerCase()))
@@ -133,7 +165,7 @@ export default function StockReconciliation() {
               <ArrowRightLeft className="w-6 h-6 mr-3 text-sky-500" />
               Stock Reconciliation
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Review system logs and perform manual stock counts</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Review discrepancies and perform manual stock counts</p>
           </div>
           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
             <button 
@@ -147,6 +179,12 @@ export default function StockReconciliation() {
               className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors flex items-center ${activeTab === 'physical' ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
             >
               <CheckCircle2 className="w-4 h-4 mr-2" /> Physical Count
+            </button>
+            <button 
+              onClick={() => setActiveTab('auto')}
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors flex items-center ${activeTab === 'auto' ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" /> Auto System Match
             </button>
           </div>
         </header>
@@ -162,6 +200,7 @@ export default function StockReconciliation() {
                     <th className="px-6 py-4">Type</th>
                     <th className="px-6 py-4">Mismatched</th>
                     <th className="px-6 py-4">Variance Value</th>
+                    <th className="px-6 py-4">Notes</th>
                     <th className="px-6 py-4 text-right">Action</th>
                   </tr>
                 </thead>
@@ -193,6 +232,9 @@ export default function StockReconciliation() {
                       <td className="px-6 py-4 text-slate-600 dark:text-slate-400 font-mono">
                         RWF {Number(r.variance_value).toLocaleString()}
                       </td>
+                      <td className="px-6 py-4 text-slate-500 text-xs max-w-[200px] truncate" title={r.notes || ''}>
+                        {r.notes?.replace('[Physical Count] ', '') || '-'}
+                      </td>
                       <td className="px-6 py-4 text-right">
                         <Link to={`/reconciliation/${r.id}`} className="inline-flex items-center justify-center px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs font-semibold transition-colors">
                           <Eye className="w-3.5 h-3.5 mr-1" /> View Ticket
@@ -203,7 +245,7 @@ export default function StockReconciliation() {
                 </tbody>
               </table>
             </div>
-          ) : (
+          ) : activeTab === 'physical' ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col h-[700px]">
                 <div className="p-4 border-b border-slate-100 dark:border-slate-800">
@@ -304,7 +346,73 @@ export default function StockReconciliation() {
                 </form>
               </div>
             </div>
-          )}
+          ) : activeTab === 'auto' ? (
+            <div className="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 p-8">
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                <div className="w-12 h-12 bg-sky-50 dark:bg-slate-800 rounded-xl flex items-center justify-center">
+                  <RefreshCw className="w-6 h-6 text-sky-500" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Automated System Match</h2>
+                  <p className="text-sm text-slate-500">Compare POS sales directly against inventory deductions</p>
+                </div>
+              </div>
+
+              <form onSubmit={runAutoReconciliation} className="space-y-6">
+                {user?.role === 'admin' && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Target Location</label>
+                    <select 
+                      value={selectedBranch} 
+                      onChange={e => setSelectedBranch(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500"
+                    >
+                      <option value="">All Locations (Consolidated)</option>
+                      {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                    </select>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Period Start</label>
+                    <input 
+                      type="date" 
+                      value={periodStart} 
+                      onChange={e => setPeriodStart(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Period End</label>
+                    <input 
+                      type="date" 
+                      value={periodEnd} 
+                      onChange={e => setPeriodEnd(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">What happens next?</p>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    The system will pull all sales transactions within the selected period and match them against the total inventory deductions for each product. Any discrepancies will be flagged for investigation.
+                  </p>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={submitLoading}
+                  className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-lg flex justify-center items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                >
+                  {submitLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Run Automated Match'}
+                </button>
+              </form>
+            </div>
+          ) : null}
         </div>
       </main>
     </div>
