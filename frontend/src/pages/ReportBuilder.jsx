@@ -14,7 +14,7 @@ export default function ReportBuilder() {
   const [fromDate, setFromDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
   const [toDate, setToDate] = useState(new Date().toISOString().split('T')[0]);
   const [format, setFormat] = useState('bar');
-  const [metrics, setMetrics] = useState({ revenue: true, cogs: true, vat: false, discounts: false });
+  const [metrics, setMetrics] = useState({ revenue: true, cogs: true, profit: true, discounts: false });
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState([]);
@@ -54,8 +54,8 @@ export default function ReportBuilder() {
     if (!data) return;
     let csv = '';
     if (source === 'sales' && data.daily) {
-      csv = 'Date,Transactions,Revenue,VAT,Discounts\n' +
-        data.daily.map(d => `${d.date},${d.transactions},${d.revenue},${d.vat},${d.discounts}`).join('\n');
+      csv = 'Date,Transactions,Revenue,Discounts\n' +
+        data.daily.map(d => `${d.date},${d.transactions},${d.revenue},${d.discounts}`).join('\n');
     } else if (source === 'inventory' && data.byCategory) {
       csv = 'Category,SKUs,Units,Value\n' +
         data.byCategory.map(c => `${c.category},${c.skus},${c.units},${c.value}`).join('\n');
@@ -146,8 +146,8 @@ export default function ReportBuilder() {
                 <div className="space-y-3">
                   {[
                     { key: 'revenue', label: 'Total Revenue' },
-                    { key: 'cogs', label: 'Cost of Goods (COGS)' },
-                    { key: 'vat', label: 'VAT Collected' },
+                    { key: 'cogs', label: 'Cost of Goods Sold (COGS)' },
+                    { key: 'profit', label: 'Gross Profit' },
                     { key: 'discounts', label: 'Discounts Given' },
                   ].map(m => (
                     <label key={m.key} className="flex items-center gap-3 cursor-pointer">
@@ -203,10 +203,10 @@ export default function ReportBuilder() {
                   <>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                       {[
-                        ...(metrics.revenue ? [{ label: 'Total Revenue', value: `${(parseFloat(data.summary.total_revenue)/1000000).toFixed(2)}M RWF`, color: 'text-slate-800' }] : []),
-                        ...(metrics.cogs ? [{ label: 'COGS', value: `${(data.cogs/1000000).toFixed(2)}M RWF`, color: 'text-rose-500' }] : []),
-                        ...(metrics.vat ? [{ label: 'VAT Collected', value: `${(parseFloat(data.summary.total_vat)/1000000).toFixed(2)}M RWF`, color: 'text-amber-600' }] : []),
-                        ...(metrics.discounts ? [{ label: 'Discounts', value: `${(parseFloat(data.summary.total_discounts)/1000000).toFixed(2)}M RWF`, color: 'text-emerald-600' }] : []),
+                        ...(metrics.revenue ? [{ label: 'Total Revenue', value: `${parseFloat(data.summary.total_revenue || 0).toLocaleString()} RWF`, color: 'text-slate-800' }] : []),
+                        ...(metrics.cogs ? [{ label: 'Cost of Goods Sold', value: `${parseFloat(data.cogs || 0).toLocaleString()} RWF`, color: 'text-rose-500' }] : []),
+                        ...(metrics.profit ? [{ label: 'Gross Profit', value: `${(parseFloat(data.summary.total_revenue || 0) - parseFloat(data.cogs || 0)).toLocaleString()} RWF`, color: 'text-emerald-600' }] : []),
+                        ...(metrics.discounts ? [{ label: 'Discounts', value: `${parseFloat(data.summary.total_discounts || 0).toLocaleString()} RWF`, color: 'text-emerald-600' }] : []),
                         { label: 'Transactions', value: data.summary.total_transactions, color: 'text-sky-600' }
                       ].map((s, i) => (
                         <div key={i} className="bg-slate-50 rounded-xl p-4 border border-slate-100 dark:border-slate-800">
@@ -224,7 +224,6 @@ export default function ReportBuilder() {
                               <th className="px-4 py-3">Date</th>
                               <th className="px-4 py-3">Transactions</th>
                               <th className="px-4 py-3">Revenue (RWF)</th>
-                              <th className="px-4 py-3">VAT</th>
                               <th className="px-4 py-3">Discounts</th>
                             </tr>
                           </thead>
@@ -234,7 +233,6 @@ export default function ReportBuilder() {
                                 <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{d.date}</td>
                                 <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{d.transactions}</td>
                                 <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">{Number(d.revenue).toLocaleString()}</td>
-                                <td className="px-4 py-3 text-amber-600">{Number(d.vat).toLocaleString()}</td>
                                 <td className="px-4 py-3 text-emerald-600">{Number(d.discounts).toLocaleString()}</td>
                               </tr>
                             ))}
