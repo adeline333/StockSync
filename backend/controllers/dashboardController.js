@@ -6,7 +6,7 @@ exports.getAdminDashboard = async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
 
     const [inventoryValue, salesToday, pendingIssues, lowStock, recentActivity, warehouseStatus, totalProducts] = await Promise.all([      // Total inventory value
-      db.query(`SELECT COALESCE(SUM(i.quantity * p.price), 0) as value FROM inventory i JOIN products p ON i.product_id = p.id`),
+      db.query(`SELECT COALESCE(SUM(i.quantity * p.price), 0) as value FROM inventory i JOIN products p ON i.product_id = p.id WHERE p.status = 'active'`),
 
       // Sales today
       db.query(`SELECT COALESCE(SUM(total_amount), 0) as revenue, COUNT(*) as count FROM orders WHERE status = 'completed' AND DATE(created_at) = $1`, [today]),
@@ -15,16 +15,16 @@ exports.getAdminDashboard = async (req, res) => {
       db.query(`SELECT (SELECT COUNT(*) FROM reconciliation_items WHERE status = 'mismatched') + (SELECT COUNT(*) FROM stock_transfers WHERE status = 'pending') as count`),
 
       // Low stock SKUs
-      db.query(`SELECT COUNT(*) as count FROM inventory i WHERE i.quantity > 0 AND i.quantity <= i.min_stock_level`),
+      db.query(`SELECT COUNT(DISTINCT i.product_id) as count FROM inventory i JOIN products p ON i.product_id = p.id WHERE p.status = 'active' AND i.quantity > 0 AND i.quantity <= i.min_stock_level`),
 
       // Recent activity logs
       db.query(`SELECT al.action, al.details, al.created_at, u.name as user_name FROM activity_logs al LEFT JOIN users u ON al.user_id = u.id ORDER BY al.created_at DESC LIMIT 5`),
 
       // Warehouse status
       db.query(`SELECT b.id, b.name, b.location,
-        COALESCE(SUM(i.quantity), 0) as total_items,
-        COALESCE(SUM(i.quantity * p.price), 0) as stock_value,
-        COUNT(CASE WHEN i.quantity <= i.min_stock_level AND i.quantity > 0 THEN 1 END) as low_stock_count
+        COALESCE(SUM(CASE WHEN p.status = 'active' THEN i.quantity ELSE 0 END), 0) as total_items,
+        COALESCE(SUM(CASE WHEN p.status = 'active' THEN i.quantity * p.price ELSE 0 END), 0) as stock_value,
+        COUNT(CASE WHEN p.status = 'active' AND i.quantity <= i.min_stock_level AND i.quantity > 0 THEN 1 END) as low_stock_count
        FROM branches b
        LEFT JOIN inventory i ON b.id = i.branch_id
        LEFT JOIN products p ON i.product_id = p.id
@@ -134,20 +134,18 @@ exports.getRetailDashboard = async (req, res) => {
   try {
     const branchCondition = branch_id ? `AND branch_id = ${parseInt(branch_id)}` : '';
 
-    const [salesToday, recentOrders, returns] = await Promise.all([
+    const [salesToday, recentOrders] = await Promise.all([
       db.query(
         `SELECT COALESCE(SUM(total_amount), 0) as revenue, COUNT(*) as count,
-          COALESCE(SUM(CASE WHEN payment_method = 'cash' THEN total_amount ELSE 0 END), 0) as cash_in_drawer
+          COALESCE(SUM(CASE WHEN payment_method = 'cash' THEN total_amount ELSE 0 END), 0) as cash_in_drawer,
+          COALESCE(SUM(CASE WHEN payment_method = 'momo' THEN total_amount ELSE 0 END), 0) as momo_total,
+          COALESCE(SUM(CASE WHEN payment_method = 'card' THEN total_amount ELSE 0 END), 0) as card_total
          FROM orders WHERE status = 'completed' AND DATE(created_at) = $1 ${branchCondition}`,
         [today]
       ),
       db.query(
         `SELECT o.*, u.name as cashier_name FROM orders o LEFT JOIN users u ON o.user_id = u.id
          WHERE o.status = 'completed' ${branch_id ? `AND o.branch_id = ${parseInt(branch_id)}` : ''} ORDER BY o.created_at DESC LIMIT 10`
-      ),
-      db.query(
-        `SELECT COUNT(*) as count FROM orders WHERE status = 'voided' AND DATE(created_at) = $1 ${branchCondition}`,
-        [today]
       )
     ]);
 
@@ -155,9 +153,10 @@ exports.getRetailDashboard = async (req, res) => {
       sales_today: {
         revenue: parseFloat(salesToday.rows[0].revenue),
         count: parseInt(salesToday.rows[0].count),
-        cash_in_drawer: parseFloat(salesToday.rows[0].cash_in_drawer)
+        cash_in_drawer: parseFloat(salesToday.rows[0].cash_in_drawer),
+        momo_total: parseFloat(salesToday.rows[0].momo_total),
+        card_total: parseFloat(salesToday.rows[0].card_total)
       },
-      returns_today: parseInt(returns.rows[0].count),
       recent_orders: recentOrders.rows
     });
   } catch (e) {
