@@ -119,7 +119,8 @@ exports.getProductById = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   const { name, sku, description, price, cost_price, category, brand, barcode,
-    supplier_name, supplier_lead_days, is_vat_inclusive, min_stock_level } = req.body;
+    supplier_name, supplier_lead_days, is_vat_inclusive, min_stock_level,
+    items_per_pack, pack_discount_percent } = req.body;
   const ip = getIP(req);
 
   // Handle uploaded image — move to permanent location
@@ -139,10 +140,11 @@ exports.createProduct = async (req, res) => {
 
     const result = await db.query(
       `INSERT INTO products (name, sku, description, price, cost_price, category, brand, barcode,
-        supplier_name, supplier_lead_days, is_vat_inclusive, image_url, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'active') RETURNING *`,
+        supplier_name, supplier_lead_days, is_vat_inclusive, image_url, status, items_per_pack, pack_discount_percent, min_stock_level)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'active',$13,$14,$15) RETURNING *`,
       [name, sku, description || null, price, cost_price || 0, category || null, brand || null,
-       barcode || null, supplier_name || null, supplier_lead_days || 0, is_vat_inclusive !== false, image_url]
+       barcode || null, supplier_name || null, supplier_lead_days || 0, is_vat_inclusive !== false, image_url,
+       items_per_pack || 1, pack_discount_percent || 0, min_stock_level || 10]
     );
 
     const product = result.rows[0];
@@ -167,7 +169,8 @@ exports.createProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   const { name, sku, description, price, cost_price, category, brand, barcode,
-    supplier_name, supplier_lead_days, is_vat_inclusive, status, min_stock_level } = req.body;
+    supplier_name, supplier_lead_days, is_vat_inclusive, status, min_stock_level,
+    items_per_pack, pack_discount_percent } = req.body;
   const ip = getIP(req);
 
   let image_url_update = '';
@@ -185,6 +188,8 @@ exports.updateProduct = async (req, res) => {
     is_vat_inclusive !== 'false' && is_vat_inclusive !== false, 
     status || 'active', 
     min_stock_level || 10, 
+    items_per_pack || 1,
+    pack_discount_percent || 0,
     req.params.id
   ];
 
@@ -203,8 +208,8 @@ exports.updateProduct = async (req, res) => {
     const result = await db.query(
       `UPDATE products SET name=$1, sku=$2, description=$3, price=$4, cost_price=$5, category=$6,
         brand=$7, barcode=$8, supplier_name=$9, supplier_lead_days=$10,
-        is_vat_inclusive=$11, status=$12, min_stock_level=$13${image_url_update}, updated_at=NOW()
-       WHERE id=$14 RETURNING *`,
+        is_vat_inclusive=$11, status=$12, min_stock_level=$13, items_per_pack=$14, pack_discount_percent=$15${image_url_update.replace('$15', '$17')}, updated_at=NOW()
+       WHERE id=$16 RETURNING *`,
       queryParams
     );
     if (result.rows.length === 0) return res.status(404).json({ message: 'Product not found' });
