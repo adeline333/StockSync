@@ -52,7 +52,7 @@ export default function Customers() {
 
   const handleSearch = (e) => { e.preventDefault(); setSearch(searchInput); setPage(1); };
 
-  const exportCSV = () => window.open(`${API_URL}/customers/export/csv`, '_blank');
+  const exportCSV = () => window.open(`${API_URL}/customers/export/csv?token=${token}`, '_blank');
 
   const handleCreate = async (e) => {
     e.preventDefault();
