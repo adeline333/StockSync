@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { CircleDollarSign, Banknote, Plus, Loader2, RefreshCw, History } from 'lucide-react';
+import { CircleDollarSign, Banknote, Plus, Loader2, RefreshCw, History, Smartphone, CreditCard } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -94,21 +94,31 @@ export default function RetailDashboard() {
                   <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{data?.sales_today?.count || 0} Transactions</p>
                 </div>
 
-                {/* Split metrics */}
-                <div className="flex flex-col gap-4">
-                  <div className="flex-1 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
-                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Cash in Drawer</p>
-                    <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                      {Number(data?.sales_today?.cash_in_drawer || 0).toLocaleString()} <span className="text-sm text-slate-400 font-normal">RWF</span>
+                {/* Payment Breakdown */}
+                <div className="flex flex-col gap-3">
+                  <div className="flex-1 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Cash In Drawer</p>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                      {Number(data?.sales_today?.cash_in_drawer || 0).toLocaleString()} <span className="text-xs text-slate-400 font-normal">RWF</span>
                     </h3>
-                    <div className="absolute bottom-0 left-5 w-14 h-1.5 bg-emerald-500 rounded-t-full"/>
-                    <Banknote className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 text-slate-50 dark:text-slate-700"/>
+                    <div className="absolute bottom-0 left-4 w-10 h-1.5 bg-emerald-500 rounded-t-full"/>
+                    <Banknote className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 text-emerald-50 dark:text-emerald-900/30"/>
                   </div>
-                  <div className="flex-1 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
-                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Returns Today</p>
-                    <h3 className="text-2xl font-bold text-rose-500">{data?.returns_today || 0} Items</h3>
-                    <div className="absolute bottom-0 left-5 w-10 h-1.5 bg-rose-500 rounded-t-full"/>
-                    <History className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 text-slate-50 dark:text-slate-700"/>
+                  <div className="flex-1 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Mobile Money</p>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                      {Number(data?.sales_today?.momo_total || 0).toLocaleString()} <span className="text-xs text-slate-400 font-normal">RWF</span>
+                    </h3>
+                    <div className="absolute bottom-0 left-4 w-10 h-1.5 bg-amber-500 rounded-t-full"/>
+                    <Smartphone className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 text-amber-50 dark:text-amber-900/30"/>
+                  </div>
+                  <div className="flex-1 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center relative overflow-hidden">
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Card Payments</p>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                      {Number(data?.sales_today?.card_total || 0).toLocaleString()} <span className="text-xs text-slate-400 font-normal">RWF</span>
+                    </h3>
+                    <div className="absolute bottom-0 left-4 w-10 h-1.5 bg-indigo-500 rounded-t-full"/>
+                    <CreditCard className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 text-indigo-50 dark:text-indigo-900/30"/>
                   </div>
                 </div>
               </div>
