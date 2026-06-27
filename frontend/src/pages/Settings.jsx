@@ -140,7 +140,7 @@ export default function Settings() {
     setSettings(sData.settings);
   };
 
-  const exportData = () => window.open(`${API_URL}/admin/export`, '_blank');
+  const exportData = () => window.open(`${API_URL}/admin/export?token=${token}`, '_blank');
 
   const generateKey = async () => {
     if (!newKeyName.trim()) return;
