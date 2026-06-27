@@ -122,7 +122,9 @@ export default function POSCheckout() {
                       <Package className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-slate-900 dark:text-white">{item.name}</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-white">
+                        {item.name} {item.is_pack && <span className="text-sky-500 font-bold ml-1">(Pack of {item.items_per_pack})</span>}
+                      </p>
                       <p className="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 mt-0.5">SKU: {item.sku}</p>
                     </div>
                   </div>
@@ -191,11 +193,6 @@ export default function POSCheckout() {
                 </div>
               )}
 
-              {/* VAT */}
-              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 px-5 py-4 rounded-2xl">
-                <span className="text-sm font-black text-slate-700 dark:text-slate-200">VAT (18%)</span>
-                <span className="text-base font-black text-slate-900 dark:text-white">{vat.toLocaleString()} <span className="text-xs text-slate-500 dark:text-slate-400">RWF</span></span>
-              </div>
 
               {/* Grand Total */}
               <div className="bg-slate-900 dark:bg-slate-950 border-2 border-slate-700 px-5 py-5 rounded-2xl flex justify-between items-center">
