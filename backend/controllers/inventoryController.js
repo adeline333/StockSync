@@ -33,6 +33,13 @@ exports.getProducts = async (req, res) => {
   try {
     const branchFilter = branch_id ? `AND i.branch_id = ${parseInt(branch_id)}` : '';
 
+    let having = '';
+    if (status && status !== 'all') {
+      if (status === 'in_stock') having = 'HAVING COALESCE(SUM(i.quantity), 0) > COALESCE(MIN(i.min_stock_level), 10)';
+      if (status === 'low_stock') having = 'HAVING COALESCE(SUM(i.quantity), 0) > 0 AND COALESCE(SUM(i.quantity), 0) <= COALESCE(MIN(i.min_stock_level), 10)';
+      if (status === 'out_of_stock') having = 'HAVING COALESCE(SUM(i.quantity), 0) = 0';
+    }
+
     params.push(parseInt(limit), parseInt(offset));
     const result = await db.query(
       `SELECT p.*, 
@@ -42,26 +49,24 @@ exports.getProducts = async (req, res) => {
        LEFT JOIN inventory i ON p.id = i.product_id ${branchFilter}
        ${where}
        GROUP BY p.id
+       ${having}
        ORDER BY p.created_at DESC
        LIMIT $${idx} OFFSET $${idx + 1}`,
       params
     );
 
     const countResult = await db.query(
-      `SELECT COUNT(*) FROM products p ${where}`, params.slice(0, idx - 1)
+      `SELECT COUNT(*) FROM (
+         SELECT p.id 
+         FROM products p
+         LEFT JOIN inventory i ON p.id = i.product_id ${branchFilter}
+         ${where}
+         GROUP BY p.id
+         ${having}
+       ) as c`, params.slice(0, idx - 1)
     );
 
-    // Apply status filter after aggregation
     let products = result.rows;
-    if (status && status !== 'all') {
-      products = products.filter(p => {
-        const qty = parseInt(p.total_stock);
-        if (status === 'in_stock') return qty > p.min_stock_level;
-        if (status === 'low_stock') return qty > 0 && qty <= p.min_stock_level;
-        if (status === 'out_of_stock') return qty === 0;
-        return true;
-      });
-    }
 
     res.json({ products, total: parseInt(countResult.rows[0].count), page: parseInt(page), limit: parseInt(limit) });
   } catch (e) {
@@ -161,21 +166,74 @@ exports.createProduct = async (req, res) => {
 };
 
 exports.updateProduct = async (req, res) => {
-  const { name, description, price, cost_price, category, brand, barcode,
-    supplier_name, supplier_lead_days, is_vat_inclusive, status } = req.body;
+  const { name, sku, description, price, cost_price, category, brand, barcode,
+    supplier_name, supplier_lead_days, is_vat_inclusive, status, min_stock_level } = req.body;
   const ip = getIP(req);
+
+  let image_url_update = '';
+  let queryParams = [
+    name, 
+    sku, 
+    description || null, 
+    price || 0, 
+    cost_price || 0, 
+    category || null, 
+    brand || null, 
+    barcode || null,
+    supplier_name || null, 
+    supplier_lead_days || 0, 
+    is_vat_inclusive !== 'false' && is_vat_inclusive !== false, 
+    status || 'active', 
+    min_stock_level || 10, 
+    req.params.id
+  ];
+
+  if (req.file) {
+    const fs = require('fs');
+    const path = require('path');
+    const ext = path.extname(req.file.originalname) || '.jpg';
+    const dest = path.join(__dirname, '../uploads', `product_${Date.now()}${ext}`);
+    fs.renameSync(req.file.path, dest);
+    const new_image_url = `/uploads/${path.basename(dest)}`;
+    image_url_update = `, image_url=$15`;
+    queryParams.push(new_image_url);
+  }
 
   try {
     const result = await db.query(
-      `UPDATE products SET name=$1, description=$2, price=$3, cost_price=$4, category=$5,
-        brand=$6, barcode=$7, supplier_name=$8, supplier_lead_days=$9,
-        is_vat_inclusive=$10, status=$11, updated_at=NOW()
-       WHERE id=$12 RETURNING *`,
-      [name, description, price, cost_price, category, brand, barcode,
-       supplier_name, supplier_lead_days, is_vat_inclusive, status, req.params.id]
+      `UPDATE products SET name=$1, sku=$2, description=$3, price=$4, cost_price=$5, category=$6,
+        brand=$7, barcode=$8, supplier_name=$9, supplier_lead_days=$10,
+        is_vat_inclusive=$11, status=$12, min_stock_level=$13${image_url_update}, updated_at=NOW()
+       WHERE id=$14 RETURNING *`,
+      queryParams
     );
     if (result.rows.length === 0) return res.status(404).json({ message: 'Product not found' });
     await logActivity(req.user.id, 'PRODUCT_UPDATED', `Updated product ID: ${req.params.id}`, ip);
+    res.json({ product: result.rows[0] });
+  } catch (e) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.updateProductStatus = async (req, res) => {
+  const ip = getIP(req);
+  const { status } = req.body;
+  if (!['active', 'inactive'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  // Only admin should be able to do this, though we can also check role here if needed.
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Only admins can change product status' });
+  }
+
+  try {
+    const result = await db.query(
+      `UPDATE products SET status=$1, updated_at=NOW() WHERE id=$2 RETURNING *`,
+      [status, req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ message: 'Product not found' });
+    await logActivity(req.user.id, 'PRODUCT_STATUS_UPDATED', `Product ID ${req.params.id} marked as ${status}`, ip);
     res.json({ product: result.rows[0] });
   } catch (e) {
     res.status(500).json({ message: 'Server error' });
