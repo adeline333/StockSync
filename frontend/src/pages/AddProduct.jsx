@@ -28,7 +28,8 @@ export default function AddProduct() {
   const [form, setForm] = useState({
     name: '', description: '', category: 'Beer', brand: '',
     price: '', cost_price: '', sku: '', barcode: '',
-    supplier_name: '', supplier_lead_days: '', min_stock_level: 10
+    supplier_name: '', supplier_lead_days: '', min_stock_level: 10,
+    items_per_pack: 1, pack_discount_percent: 0
   });
 
   useEffect(() => {
@@ -52,7 +53,9 @@ export default function AddProduct() {
           barcode: p.barcode || '',
           supplier_name: p.supplier_name || '',
           supplier_lead_days: p.supplier_lead_days || '',
-          min_stock_level: p.min_stock_level || 10
+          min_stock_level: p.min_stock_level || 10,
+          items_per_pack: p.items_per_pack || 1,
+          pack_discount_percent: p.pack_discount_percent || 0
         });
         setUseVat(p.is_vat_inclusive !== false);
         if (p.image_url) setImagePreview(`http://localhost:5000${p.image_url}`);
@@ -195,6 +198,35 @@ export default function AddProduct() {
                           <input type="number" value={form.price} onChange={set('price')} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg" required />
                         </div>
                       </div>
+                      
+                      <div className="grid grid-cols-2 gap-5 mt-5">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Items per Pack</label>
+                          <input type="number" value={form.items_per_pack} onChange={set('items_per_pack')} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg" placeholder="1" min="1" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">Pack Discount (%)</label>
+                          <input type="number" value={form.pack_discount_percent} onChange={set('pack_discount_percent')} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg" placeholder="0" min="0" max="100" step="0.1" />
+                        </div>
+                      </div>
+
+                      {/* Display live pack price calculation preview */}
+                      {(form.items_per_pack > 1) && (
+                        <div className="mt-4 p-4 bg-sky-50 dark:bg-slate-800 border border-sky-100 dark:border-slate-700 rounded-xl">
+                          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Pack Price Preview:</p>
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                              {Math.round((form.price || 0) * (form.items_per_pack || 1) * (1 - (form.pack_discount_percent || 0) / 100)).toLocaleString()} RWF
+                            </span>
+                            {form.pack_discount_percent > 0 && (
+                              <span className="text-sm font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-md">
+                                Save {Math.round((form.price || 0) * (form.items_per_pack || 1) * ((form.pack_discount_percent || 0) / 100)).toLocaleString()} RWF
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       <label className="flex items-center cursor-pointer mt-5">
                         <input type="checkbox" checked={useVat} onChange={() => setUseVat(!useVat)} className="mr-2" />
                         <span className="text-sm font-semibold text-slate-600">Price includes VAT (18%)</span>
