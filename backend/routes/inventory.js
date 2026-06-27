@@ -17,7 +17,8 @@ router.get('/products', inventoryController.getProducts);
 router.get('/products/export', inventoryController.exportCSV);
 router.get('/products/:id', inventoryController.getProductById);
 router.post('/products', upload.single('image'), inventoryController.createProduct);
-router.put('/products/:id', inventoryController.updateProduct);
+router.put('/products/:id', upload.single('image'), inventoryController.updateProduct);
+router.put('/products/:id/status', inventoryController.updateProductStatus);
 router.delete('/products/:id', inventoryController.deleteProduct);
 
 // Stock operations
