@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Map, MapPin, Building2, Store, AlertCircle, Plus, ArrowRightLeft,
-  User, Loader2, X, History, Settings, ChevronDown, ArrowRight } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { ArrowRightLeft, Building2, Store, MapPin, AlertCircle, Phone, Clock, Truck, ShieldCheck, Map, Settings, History, ChevronRight, Download, Plus, X, Loader2, User, ChevronDown, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -166,29 +168,41 @@ export default function Locations() {
             <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center mb-6">
               <MapPin className="w-5 h-5 mr-2 text-sky-500" /> Location Map (Kigali)
             </h2>
-            <div className="flex-1 relative bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800">
-              {/* Static map background */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <svg width="100%" height="100%" viewBox="0 0 600 500" preserveAspectRatio="xMidYMid meet">
-                  <path d="M50 300 C150 250, 250 350, 400 300 C500 260, 550 150, 580 100" fill="none" stroke="#E2E8F0" strokeWidth="40" strokeLinecap="round" />
-                  <path d="M100 500 C150 400, 300 300, 350 200" fill="none" stroke="#E2E8F0" strokeWidth="30" strokeLinecap="round" />
-                  <path d="M420 150 L250 350 L480 450" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="6 6" />
-                  {locations.map((loc, i) => {
-                    const positions = [[420, 150], [250, 350], [480, 450], [150, 200], [350, 420]];
-                    const pos = positions[i % positions.length];
-                    const hasAlert = parseInt(loc.low_stock_count) > 0;
-                    const dotColor = hasAlert ? '#EF4444' : loc.branch_type === 'warehouse' ? '#0F172A' : '#0EA5E9';
-                    return (
-                      <g key={loc.id} transform={`translate(${pos[0]}, ${pos[1]})`}>
-                        {hasAlert && <circle cx="0" cy="0" r="28" fill="#EF4444" fillOpacity="0.12" />}
-                        <circle cx="0" cy="0" r="11" fill={dotColor} />
-                        <rect x="-60" y="-48" width="120" height="28" rx="6" fill="white" />
-                        <text x="0" y="-28" fontFamily="Inter, sans-serif" fontSize="11" fontWeight="800" fill="#1E293B" textAnchor="middle">{loc.name}</text>
-                      </g>
-                    );
-                  })}
-                </svg>
-              </div>
+            <div className="flex-1 relative bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800" style={{ zIndex: 0 }}>
+              <MapContainer center={[-1.9540, 30.0500]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                />
+                {locations.map((loc) => {
+                  const hasAlert = parseInt(loc.low_stock_count) > 0;
+                  const dotColor = hasAlert ? '#EF4444' : loc.branch_type === 'warehouse' ? '#0F172A' : '#0EA5E9';
+                  
+                  // Approximate coordinates based on branch name
+                  let coords = [-1.9441, 30.0619]; // Default Kigali
+                  if (loc.name.toLowerCase().includes('central')) coords = [-1.9613, 29.9825]; // Ruyenzi
+                  if (loc.name.toLowerCase().includes('kimironko')) coords = [-1.9540, 30.1300];
+                  if (loc.name.toLowerCase().includes('remera')) coords = [-1.9580, 30.1110];
+
+                  const icon = L.divIcon({
+                    className: 'custom-leaflet-marker',
+                    html: `<div style="background-color: ${dotColor}; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
+                  });
+
+                  return (
+                    <Marker key={loc.id} position={coords} icon={icon}>
+                      <Popup>
+                        <div className="font-sans">
+                          <p className="font-bold text-sm m-0">{loc.name}</p>
+                          <p className="text-xs text-slate-500 m-0 mt-1">{(parseFloat(loc.stock_value) / 1000000).toFixed(1)}M RWF Value</p>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </MapContainer>
             </div>
             <div className="flex gap-5 mt-4">
               {[['bg-slate-900', 'Warehouse'], ['bg-sky-500', 'Retail Outlet'], ['bg-rose-500', 'Low Stock']].map(([bg, label]) => (
