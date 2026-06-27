@@ -102,11 +102,11 @@ async function seed() {
 
       const product = result.rows[0];
 
-      // Initialize inventory for each branch with 50 units
+      // Initialize inventory for each branch with 0 units
       for (const branch of branches.rows) {
         await db.query(
           `INSERT INTO inventory (product_id, branch_id, quantity, min_stock_level)
-           VALUES ($1, $2, 50, 10)
+           VALUES ($1, $2, 0, 10)
            ON CONFLICT (product_id, branch_id) DO NOTHING`,
           [product.id, branch.id]
         );
