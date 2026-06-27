@@ -108,7 +108,7 @@ export default function Inventory() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input value={searchInput} onChange={e => setSearchInput(e.target.value)}
-                  type="text" placeholder="Search by Name, SKU, or Barcode..."
+                  type="text" placeholder="Search by Name or SKU..."
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 border border-slate-200 rounded-lg text-sm focus:bg-white dark:focus:bg-slate-700 focus:border-sky-500 outline-none transition-all" />
               </div>
               <button type="submit" className="bg-sky-500 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-sky-600 transition">Search</button>
@@ -184,9 +184,18 @@ export default function Inventory() {
                     <td className="px-6 py-4">
                       <StockBadge qty={parseInt(p.total_stock)} min={parseInt(p.min_stock_level)} />
                     </td>
-                    <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">{Number(p.price).toLocaleString()}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-slate-800 dark:text-slate-100">{Number(p.price).toLocaleString()}</span>
+                        {p.items_per_pack > 1 && p.pack_discount_percent > 0 && (
+                          <span className="text-[11px] font-bold text-emerald-600 mt-0.5">
+                            Pack ({p.items_per_pack}): {Math.round(p.price * p.items_per_pack * (1 - p.pack_discount_percent / 100)).toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 text-right">
-                      <Link to={`/inventory/${p.id}`} className="text-slate-400 hover:text-sky-500 transition-colors inline-block">
+                      <Link to={`/inventory/${p.id}`} className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-sky-600 transition-colors">
                         <MoreHorizontal className="w-5 h-5" />
                       </Link>
                     </td>
