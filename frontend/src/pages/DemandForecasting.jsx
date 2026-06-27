@@ -222,6 +222,73 @@ export default function DemandForecasting() {
                   </div>
                 </div>
               </div>
+
+              {/* ABC Analysis using AI K-Means */}
+              {data?.abcAnalysis && data.abcAnalysis.length > 0 && (
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-8">
+                  <div className="mb-6 border-b border-slate-100 dark:border-slate-800 pb-4 flex justify-between items-end">
+                    <div>
+                      <h2 className="text-lg font-black text-black dark:text-slate-100 flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-violet-500" /> AI Product Segmentation (ABC Analysis)
+                      </h2>
+                      <p className="text-sm font-semibold text-slate-500 mt-1">
+                        Products clustered automatically by K-Means algorithm based on volume & revenue.
+                      </p>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="bg-emerald-50 border border-emerald-100 text-emerald-700 px-4 py-2 rounded-xl text-center">
+                        <p className="text-xs font-black uppercase">Tier A</p>
+                        <p className="text-xl font-black">{data.abcAnalysis.filter(p => p.tier === 'A').length}</p>
+                      </div>
+                      <div className="bg-amber-50 border border-amber-100 text-amber-700 px-4 py-2 rounded-xl text-center">
+                        <p className="text-xs font-black uppercase">Tier B</p>
+                        <p className="text-xl font-black">{data.abcAnalysis.filter(p => p.tier === 'B').length}</p>
+                      </div>
+                      <div className="bg-rose-50 border border-rose-100 text-rose-700 px-4 py-2 rounded-xl text-center">
+                        <p className="text-xs font-black uppercase">Tier C</p>
+                        <p className="text-xl font-black">{data.abcAnalysis.filter(p => p.tier === 'C').length}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                          <th className="py-3 px-4">Tier</th>
+                          <th className="py-3 px-4">Product Name</th>
+                          <th className="py-3 px-4 text-right">Volume Sold</th>
+                          <th className="py-3 px-4 text-right">Revenue Generated</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                        {data.abcAnalysis.map((p, i) => (
+                          <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <td className="py-3 px-4">
+                              <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg font-black text-sm
+                                ${p.tier === 'A' ? 'bg-emerald-100 text-emerald-700' : 
+                                  p.tier === 'B' ? 'bg-amber-100 text-amber-700' : 
+                                  'bg-rose-100 text-rose-700'}`}>
+                                {p.tier}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <p className="text-sm font-black text-slate-800 dark:text-slate-100">{p.name}</p>
+                              <p className="text-xs font-bold text-slate-400 font-mono">{p.sku}</p>
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <p className="text-sm font-black text-slate-800 dark:text-slate-300">{p.total_sold} units</p>
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <p className="text-sm font-black text-sky-600 dark:text-sky-400">{p.total_revenue.toLocaleString()} RWF</p>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
