@@ -3,7 +3,12 @@ const jwt = require('jsonwebtoken');
 const authMiddleware = (req, res, next) => {
   // Check for token in Authorization header (Bearer token)
   const authHeader = req.header('Authorization');
-  const token = authHeader && authHeader.split(' ')[1];
+  let token = authHeader && authHeader.split(' ')[1];
+  
+  // Fallback to query parameter for browser downloads (CSV export)
+  if (!token && req.query && req.query.token) {
+    token = req.query.token;
+  }
   
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });
