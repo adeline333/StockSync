@@ -166,7 +166,7 @@ export default function PaymentMethod() {
     if (!isOnline) {
       const orderData = {
         branch_id: branch_id || user?.branch_id || 1,
-        items: cart.map(i => ({ product_id: i.id, quantity: i.qty })),
+        items: cart.map(i => ({ product_id: i.id, quantity: i.qty, is_pack: i.is_pack })),
         discount_amount: discount || 0,
         payment_method: method,
         amount_tendered: tenderedNum,
@@ -186,7 +186,7 @@ export default function PaymentMethod() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           branch_id: branch_id || user?.branch_id || 1,
-          items: cart.map(i => ({ product_id: i.id, quantity: i.qty })),
+          items: cart.map(i => ({ product_id: i.id, quantity: i.qty, is_pack: i.is_pack })),
           discount_amount: discount || 0,
           payment_method: method,
           amount_tendered: tenderedNum,
