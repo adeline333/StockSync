@@ -66,9 +66,76 @@ exports.getForecast = async (req, res) => {
     const tomorrowForecast = dailyAvg;
     const projectedGrowth = dailyAvg > 0 ? (((tomorrowForecast - trend[trend.length-1].revenue) / dailyAvg) * 100).toFixed(1) : 0;
 
+    // Compute ABC Analysis using K-Means Clustering
+    const allProductsSales = await db.query(
+      `SELECT oi.product_id, p.name, p.sku,
+        SUM(oi.quantity) as total_sold,
+        SUM(oi.quantity * oi.unit_price) as total_revenue
+       FROM order_items oi
+       JOIN orders o ON oi.order_id = o.id
+       JOIN products p ON oi.product_id = p.id
+       WHERE o.status = 'completed'
+         AND o.created_at >= NOW() - INTERVAL '${parseInt(days)} days'
+         ${branchFilter}
+       GROUP BY oi.product_id, p.name, p.sku`
+    );
+
+    let abcAnalysis = [];
+    if (allProductsSales.rows.length > 0) {
+      // Find max volume and revenue for normalization
+      const maxVolume = Math.max(...allProductsSales.rows.map(r => Number(r.total_sold)), 1);
+      const maxRevenue = Math.max(...allProductsSales.rows.map(r => Number(r.total_revenue)), 1);
+
+      // Create points for K-Means
+      const points = allProductsSales.rows.map(p => ({
+        ...p,
+        total_sold: Number(p.total_sold),
+        total_revenue: Number(p.total_revenue),
+        x: Number(p.total_sold) / maxVolume, // Normalized volume
+        y: Number(p.total_revenue) / maxRevenue // Normalized revenue
+      }));
+
+      // Run K-Means with K=Math.min(3, points.length)
+      const k = Math.min(3, points.length);
+      const kMeansResult = ForecastingEngine.kMeans(points, k);
+      
+      // If ForecastingEngine returns an array directly (due to old bug) or object
+      const resultPoints = Array.isArray(kMeansResult) ? kMeansResult : kMeansResult.points;
+      const resultCentroids = Array.isArray(kMeansResult) 
+        ? [{ x: 1, y: 1 }] // Dummy centroid
+        : kMeansResult.centroids;
+
+      // Sort centroids to figure out which cluster is A, B, and C.
+      // We score them by x + y (normalized volume + revenue). Higher is better.
+      const centroids = resultCentroids.map((c, idx) => ({ ...c, originalIndex: idx }));
+      centroids.sort((a, b) => (b.x + b.y) - (a.x + a.y)); // Descending
+      
+      // Map cluster indices to Tiers
+      const tierMap = {};
+      if (centroids.length > 0) tierMap[centroids[0].originalIndex] = 'A';
+      if (centroids.length > 1) tierMap[centroids[1].originalIndex] = 'B';
+      if (centroids.length > 2) tierMap[centroids[2].originalIndex] = 'C';
+
+      abcAnalysis = resultPoints.map(p => ({
+        product_id: p.product_id,
+        name: p.name,
+        sku: p.sku,
+        total_sold: p.total_sold,
+        total_revenue: p.total_revenue,
+        tier: tierMap[p.cluster] || 'A'
+      }));
+
+      // Sort abcAnalysis so A is first, then B, then C, and by revenue descending within tiers
+      abcAnalysis.sort((a, b) => {
+        if (a.tier === b.tier) return b.total_revenue - a.total_revenue;
+        return a.tier > b.tier ? 1 : -1;
+      });
+    }
+
     res.json({
       trend: trend,
       topProducts: topProducts.rows,
+      abcAnalysis: abcAnalysis,
       forecast: [tomorrowForecast],
       projectedGrowth: parseFloat(projectedGrowth),
       totalRevenue,
