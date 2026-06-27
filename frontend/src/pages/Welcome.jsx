@@ -47,7 +47,7 @@ const Welcome = () => {
           StockSync.
         </h1>
         <p className="text-3xl text-slate-500 dark:text-slate-400 font-normal mb-10 max-w-2xl">
-          Intelligent Multi-Location Inventory Reconciliation.
+          Multi-Location Inventory Reconciliation.
         </p>
 
         {/* Prepared For Badge */}
