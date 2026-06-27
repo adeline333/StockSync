@@ -98,18 +98,21 @@ export default function AddProduct() {
 
     setSaving(true);
     try {
+      const body = new FormData();
+      Object.entries({ ...form, is_vat_inclusive: useVat }).forEach(([k, v]) => {
+        if (v !== undefined && v !== null) body.append(k, v);
+      });
+      if (imageFile) body.append('image', imageFile);
+
       if (isEditMode) {
         const res = await fetch(`${API_URL}/inventory/products/${id}`, {
           method: 'PUT',
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...form, is_vat_inclusive: useVat })
+          headers: { Authorization: `Bearer ${token}` },
+          body,
         });
         if (!res.ok) throw new Error('Failed to update product');
         navigate(`/inventory/${id}`);
       } else {
-        const body = new FormData();
-        Object.entries({ ...form, is_vat_inclusive: useVat }).forEach(([k, v]) => body.append(k, v));
-        if (imageFile) body.append('image', imageFile);
         const res = await fetch(`${API_URL}/inventory/products`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
